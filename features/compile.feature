@@ -6,36 +6,36 @@ Feature: Compile C code into Ruby extensions.
 
   Scenario: Compile single extension
     Given a safe project directory
-    And existing source code for extension 'extension_one'
+    And scaffold code for extension 'extension_one'
     And binary extension 'extension_one' do not exist in 'lib'
     And 'tmp' folder is deleted
     When rake task 'compile' is invoked
     Then binary extension 'extension_one' do exist in 'lib'
-    And 'tmp' folder exist
+    And 'tmp' folder is created
 
   Scenario: Not recompile unmodified extension
     Given a safe project directory
-    And existing source code for extension 'extension_one'
+    And scaffold code for extension 'extension_one'
     And binary extension 'extension_one' do exist in 'lib'
     When rake task 'compile' is invoked
     Then output does not match /extension_one/
 
   Scenario: Compile multiple extensions
     Given a safe project directory
-    And existing source code for extension 'extension_one'
-    And existing source code for extension 'extension_two'
+    And scaffold code for extension 'extension_one'
+    And scaffold code for extension 'extension_two'
     And binary extension 'extension_one' do not exist in 'lib'
     And binary extension 'extension_two' do not exist in 'lib'
     And 'tmp' folder is deleted
     When rake task 'compile' is invoked
     Then binary extension 'extension_one' do exist in 'lib'
     And binary extension 'extension_two' do exist in 'lib'
-    And 'tmp' folder exist
+    And 'tmp' folder is created
 
-  Scenario: Conditionally compile one extension from multiple
+  Scenario: Compile one extension instead of all present
     Given a safe project directory
-    And existing source code for extension 'extension_one'
-    And existing source code for extension 'extension_two'
+    And scaffold code for extension 'extension_one'
+    And scaffold code for extension 'extension_two'
     And binary extension 'extension_one' do not exist in 'lib'
     And binary extension 'extension_two' do not exist in 'lib'
     When rake task 'compile:extension_one' is invoked
