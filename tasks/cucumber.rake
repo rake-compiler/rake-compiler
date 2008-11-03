@@ -6,4 +6,5 @@ rescue
 end
 
 Cucumber::Rake::Task.new do |t|
+  t.cucumber_opts = "--format pretty --no-source"
 end

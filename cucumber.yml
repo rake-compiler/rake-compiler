@@ -1,1 +1,2 @@
-default: --format profile features
+default: --format pretty --no-source features
+autotest: --format pretty features
