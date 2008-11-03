@@ -16,6 +16,10 @@ spec = Gem::Specification.new do |s|
   # dependencies
   s.add_dependency  'rake', '>= 0.8.3', '~> 0.8.4'
 
+  # development dependencies
+  #s.add_development_dependency 'rspec', '~> 1.1.9'
+  #s.add_development_dependency 'cucumber', '~> 0.1.8'
+
   # components, files and paths
   #s.files
   s.require_path = 'lib'
