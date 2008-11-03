@@ -9,7 +9,7 @@ spec = Gem::Specification.new do |s|
   # description and details
   s.summary     = 'Rake-based Ruby C Extension task generator.'
   s.description = <<-EOF
-    Provide a spandard and simplified way to build and package
+    Provide a standard and simplified way to build and package
     Ruby C extensions using Rake as glue.
   EOF
 
