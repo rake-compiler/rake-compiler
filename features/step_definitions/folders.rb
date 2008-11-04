@@ -1,4 +1,6 @@
 Given /^a safe project directory$/ do
+  # step back to ROOT
+  Dir.chdir ROOT_PATH
   tmp_name = "project.#{Process.pid}"
   @safe_dir = File.join(ROOT_PATH, 'tmp', tmp_name)
   FileUtils.rm_rf @safe_dir
