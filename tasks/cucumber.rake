@@ -1,10 +1,14 @@
 begin
   gem 'cucumber', '~> 0.1.8'
   require 'cucumber/rake/task'
-rescue
-  raise "Cucumber gem no found. Required as development dependency. (gem install cucumber)."
+rescue Exception
+  nil
 end
 
-Cucumber::Rake::Task.new do |t|
-  t.cucumber_opts = "--format pretty --no-source"
+if defined?(Cucumber)
+  Cucumber::Rake::Task.new do |t|
+    t.cucumber_opts = "--format pretty --no-source"
+  end
+else
+  warn "Cucumber gem is required, please install it. (gem install cucumber)"
 end
