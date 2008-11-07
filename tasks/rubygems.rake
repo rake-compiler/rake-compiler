@@ -14,21 +14,28 @@ spec = Gem::Specification.new do |s|
   EOF
 
   # dependencies
-  s.add_dependency  'rake', '>= 0.8.3', '~> 0.8.4'
+  s.add_dependency  'rake', '~> 0.8.3'
 
   # development dependencies
   #s.add_development_dependency 'rspec', '~> 1.1.9'
+  #s.add_development_dependency 'rcov', '~> 0.8.1'
   #s.add_development_dependency 'cucumber', '~> 0.1.8'
 
   # components, files and paths
-  #s.files
+  s.files = FileList["features/**/*.{feature,rb}",
+                      "lib/**/*.rb", "spec/**/*.rb", "tasks/*.rake",
+                      "Rakefile", "*.{rdoc,txt,yml}"]
+
   s.require_path = 'lib'
 
   # documentation
-  s.has_rdoc = false
+  s.has_rdoc = true
+  s.rdoc_options << '--main'  << 'README.rdoc' << '--title' << 'rake-compiler -- Documentation'
+
+  s.extra_rdoc_files = %w(README.rdoc LICENSE.txt)
 
   # project information
-  s.homepage    = 'TODO'
+  s.homepage    = 'http://github.com/luislavena/rake-compiler'
   s.rubyforge_project = 'TODO'
 
   # author and contributors
@@ -42,6 +49,7 @@ gem_package = Rake::GemPackageTask.new(spec) do |pkg|
 end
 
 file 'rake-compiler.gemspec' => ['Rakefile', 'tasks/rubygems.rake'] do |t|
+  puts "Generating #{t.name}"
   File.open(t.name, 'w') { |f| f.puts spec.to_yaml }
 end
 
