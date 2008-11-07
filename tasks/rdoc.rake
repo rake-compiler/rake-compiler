@@ -1,7 +1,5 @@
 require 'rake/rdoctask'
 
-CLOBBER.include('doc/html')
-
 Rake::RDocTask.new(:rdoc) do |rd|
   rd.title    = 'rake-compiler -- Documentation'
   rd.main     = 'README.rdoc'
