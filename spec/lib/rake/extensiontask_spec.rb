@@ -137,6 +137,18 @@ describe Rake::ExtensionTask do
           Rake::Task["tmp/extension_one/Makefile"].prerequisites.should include("ext/extension_one/extconf.rb")
         end
       end
+
+      describe 'clean' do
+        it "should include 'tmp' in the pattern" do
+          CLEAN.should include('tmp')
+        end
+      end
+
+      describe 'clobber' do
+        it "should include 'lib/extension_one.{so,bundle}'" do
+          CLOBBER.should include("lib/#{ext_bin('extension_one')}")
+        end
+      end
     end
   end
 

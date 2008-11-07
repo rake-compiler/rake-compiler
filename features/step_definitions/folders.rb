@@ -18,5 +18,9 @@ Given /^'(.*)' folder (exist|is deleted)$/ do |folder, condition|
 end
 
 Then /^'(.*)' folder is created$/ do |folder|
-  File.exist?(folder).should be_true
+  File.directory?(folder).should be_true
+end
+
+Then /^'(.*)' folder do not exist$/ do |folder|
+  File.directory?(folder).should_not be_true
 end

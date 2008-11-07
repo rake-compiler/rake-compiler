@@ -51,3 +51,21 @@ Feature: Compile C code into Ruby extensions.
     And output of rake task 'compile:extension_one' do not contain /extension_two/
     And binary extension 'extension_one' do exist in 'lib'
     And binary extension 'extension_two' do not exist in 'lib'
+
+  Scenario: removing temporary files
+    Given a safe project directory
+    And scaffold code for extension 'extension_one'
+    And I've already successfully executed rake task 'compile'
+    When rake task 'clean' is invoked
+    Then rake task 'clean' succeeded
+    And binary extension 'extension_one' do exist in 'lib'
+    And 'tmp' folder do not exist
+
+  Scenario: clobbering binary and temporary files
+    Given a safe project directory
+    And scaffold code for extension 'extension_one'
+    And I've already successfully executed rake task 'compile'
+    When rake task 'clobber' is invoked
+    Then rake task 'clobber' succeeded
+    And binary extension 'extension_one' do not exist in 'lib'
+    And 'tmp' folder do not exist

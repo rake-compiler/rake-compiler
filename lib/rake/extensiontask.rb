@@ -4,6 +4,7 @@
 # gem developer/creators.
 
 require 'rake'
+require 'rake/clean'
 require 'rake/tasklib'
 require 'rbconfig'
 
@@ -38,6 +39,9 @@ module Rake
       directory "#{@tmp_dir}/#{@name}"
       directory @lib_dir
 
+      # temporary dir should be on the cleaning
+      CLEAN.include(@tmp_dir)
+
       # makefile depends of tmp_dir and config_script
       # tmp/extension_name/Makefile
       file makefile => [tmp_path, extconf] do
@@ -61,10 +65,13 @@ module Rake
         cp tmp_binary, lib_binary
       end
 
+      # clobbering should remove the binaries from lib_path
+      CLOBBER.include(lib_binary)
+
       desc "Compile just the #{@name} extension"
       task "compile:#{@name}" => [lib_binary]
 
-      desc "Compile the extension(s)"
+      desc "Compile the extension(s)" unless Rake::Task.task_defined?('compile')
       task "compile" => ["compile:#{@name}"]
     end
 
