@@ -6,7 +6,7 @@ Feature: Compile C code into Ruby extensions.
 
   Scenario: compile single extension
     Given a safe project directory
-    And scaffold code for extension 'extension_one'
+    And a extension named 'extension_one'
     And 'tmp' folder is deleted
     When rake task 'compile' is invoked
     Then rake task 'compile' succeeded
@@ -15,7 +15,7 @@ Feature: Compile C code into Ruby extensions.
 
   Scenario: not recompile unmodified extension
     Given a safe project directory
-    And scaffold code for extension 'extension_one'
+    And a extension named 'extension_one'
     And I've already successfully executed rake task 'compile'
     And not changed any file since
     When rake task 'compile' is invoked
@@ -24,7 +24,7 @@ Feature: Compile C code into Ruby extensions.
 
   Scenario: recompile extension when source is modified
     Given a safe project directory
-    And scaffold code for extension 'extension_one'
+    And a extension named 'extension_one'
     And I've already successfully executed rake task 'compile'
     When touching 'source.c' file of extension 'extension_one'
     And rake task 'compile' is invoked
@@ -33,8 +33,8 @@ Feature: Compile C code into Ruby extensions.
 
   Scenario: compile multiple extensions
     Given a safe project directory
-    And scaffold code for extension 'extension_one'
-    And scaffold code for extension 'extension_two'
+    And a extension named 'extension_one'
+    And a extension named 'extension_two'
     And 'tmp' folder is deleted
     When rake task 'compile' is invoked
     Then rake task 'compile' succeeded
@@ -44,8 +44,8 @@ Feature: Compile C code into Ruby extensions.
 
   Scenario: compile one extension instead of all present
     Given a safe project directory
-    And scaffold code for extension 'extension_one'
-    And scaffold code for extension 'extension_two'
+    And a extension named 'extension_one'
+    And a extension named 'extension_two'
     When rake task 'compile:extension_one' is invoked
     Then rake task 'compile:extension_one' succeeded
     And output of rake task 'compile:extension_one' do not contain /extension_two/
@@ -54,7 +54,7 @@ Feature: Compile C code into Ruby extensions.
 
   Scenario: removing temporary files
     Given a safe project directory
-    And scaffold code for extension 'extension_one'
+    And a extension named 'extension_one'
     And I've already successfully executed rake task 'compile'
     When rake task 'clean' is invoked
     Then rake task 'clean' succeeded
@@ -63,7 +63,7 @@ Feature: Compile C code into Ruby extensions.
 
   Scenario: clobbering binary and temporary files
     Given a safe project directory
-    And scaffold code for extension 'extension_one'
+    And a extension named 'extension_one'
     And I've already successfully executed rake task 'compile'
     When rake task 'clobber' is invoked
     Then rake task 'clobber' succeeded

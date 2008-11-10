@@ -1,6 +1,6 @@
-Given /^scaffold code for extension '(.*)'$/ do |extension_name|
-  setup_scaffold
-  setup_task_for extension_name
+Given /^a extension named '(.*)'$/ do |extension_name|
+  setup_extension_scaffold
+  setup_extension_task_for extension_name
   setup_source_for extension_name
 end
 
@@ -22,7 +22,7 @@ Then /^binary extension '(.*)' (do|do not) exist in '(.*)'$/ do |extension_name,
   end
 end
 
-def setup_scaffold
+def setup_extension_scaffold
   # create folder structure
   FileUtils.mkdir_p "lib"
   FileUtils.mkdir_p "tasks"
@@ -34,7 +34,7 @@ def setup_scaffold
   end
 end
 
-def setup_task_for(extension_name)
+def setup_extension_task_for(extension_name)
   # create folder structure
   FileUtils.mkdir_p "ext/#{extension_name}"
 
