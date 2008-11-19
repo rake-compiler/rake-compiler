@@ -5,9 +5,6 @@ $LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '../..', '
 
 require 'rubygems'
 require 'rake'
-require 'rake/packagetask'
-require 'rake/gempackagetask'
-require 'rake/extensiontask'
 
 # load rakefile extensions (tasks)
 Dir['tasks/*.rake'].each { |f| import f }
@@ -16,8 +13,8 @@ end
 
 def template_rake_extension(extension_name)
 <<-EOF
-Rake::ExtensionTask.new("#{extension_name}") do |ext|
-end
+require 'rake/extensiontask'
+Rake::ExtensionTask.new("#{extension_name}")
 EOF
 end
 
