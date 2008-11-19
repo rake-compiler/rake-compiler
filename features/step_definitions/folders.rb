@@ -6,6 +6,8 @@ Given /^a safe project directory$/ do
   FileUtils.rm_rf @safe_dir
   FileUtils.mkdir_p @safe_dir
   Dir.chdir @safe_dir
+
+  generate_scaffold_structure
 end
 
 Given /^'(.*)' folder (exist|is deleted)$/ do |folder, condition|

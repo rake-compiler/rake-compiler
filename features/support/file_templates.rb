@@ -11,10 +11,34 @@ Dir['tasks/*.rake'].each { |f| import f }
 EOF
 end
 
-def template_rake_extension(extension_name)
+def template_rake_gemspec(gem_name)
+<<-EOF
+require 'rake/gempackagetask'
+SPEC = Gem::Specification.new do |s|
+  s.name = "#{gem_name}"
+  s.version = "0.1.0"
+  s.summary = "#{gem_name} test gem for rake-compiler"
+
+  s.has_rdoc = true
+
+  s.homepage = 'http://github.com/luislavena/rake-compiler'
+  s.rubyforge_project = 'TODO'
+
+  s.authors = ["Luis Lavena"]
+  s.email = ["luislavena@gmail.com"]
+end
+
+gem_package = Rake::GemPackageTask.new(SPEC) do |pkg|
+  pkg.need_zip = false
+  pkg.need_tar = false
+end
+EOF
+end
+
+def template_rake_extension(extension_name, gem_spec = nil)
 <<-EOF
 require 'rake/extensiontask'
-Rake::ExtensionTask.new("#{extension_name}")
+Rake::ExtensionTask.new("#{extension_name}"#{', SPEC' if gem_spec})
 EOF
 end
 
