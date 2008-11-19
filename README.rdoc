@@ -95,6 +95,55 @@ NOTE: Please be aware that building C extensions requires the proper
 development environment for your Platform, which includes libraries, headers
 and build tools. Check your distro / vendor documentation on how to install it.
 
+=== Generate native gems
+
+A common usage scenario of rake-compiler is generate native gems that bundles
+your extensions.
+
+This got over-simplified with <tt>Rake::ExtensionTask</tt>:
+
+    # somewhere in your Rakefile, define your gem spec
+    spec = Gem::Specification.new do |s|
+      s.name = "my_gem"
+      s.platform = Gem::Platform::RUBY
+      s.extensions = FileList["ext/**/extconf.rb"]
+    end
+
+    # add your default gem packing task
+    Rake::GemPackageTask.new(spec) do |pkg|
+    end
+
+    # feed your ExtensionTask with your spec
+    Rake::ExtensionTask.new('hello_world', spec)
+
+Now, as usual, you can build your pure-ruby gem (standard output):
+
+  $ rake gem
+  (in /projects/oss/my_gem.git)
+  mkdir -p pkg
+    Successfully built RubyGem
+    Name: my_gem
+    Version: 0.1.0
+    File: my_gem-0.1.0.gem
+  mv my_gem-0.1.0.gem pkg/my_gem-0.1.0.gem
+
+Plus, you have the functionality to build native versions of the gem:
+
+  # rake native gem
+  (... compilation output ...)
+  mkdir -p pkg
+    Successfully built RubyGem
+    Name: my_gem
+    Version: 0.1.0
+    File: my_gem-0.1.0.gem
+  mv my_gem-0.1.0.gem pkg/my_gem-0.1.0.gem
+    Successfully built RubyGem
+    Name: my_gem
+    Version: 0.1.0
+    File: my_gem-0.1.0-x86-mingw32.gem
+  mv my_gem-0.1.0-x86-mingw32.gem pkg/my_gem-0.1.0-x86-mingw32.gem
+
+You get two gems for the price of one.
 
 === What about breaking the standards? (Customization)
 
@@ -108,6 +157,8 @@ personalize several settings for <tt>Rake::ExtensionTask</tt>:
       ext.config_script = 'custom_extconf.rb' # use instead of 'extconf.rb' default
       ext.tmp_dir = 'tmp'                     # temporary folder used during compilation.
       ext.source_pattern = "*.{c,cpp}"        # monitor file changes to allow simple rebuild.
+      ext.gem_spec = spec                     # optional indicate which gem specification
+                                              # will be used to based on.
     end
 
 
@@ -124,11 +175,7 @@ GitHub::    http://github.com/luislavena/rake-compiler
 
 === Some of the features already underworks
 
-* Simultaneusly generation of pure ruby and native (platform-specific) gems.
-
-  $ rake native gem
-
-* <tt>Rake::JavaTask</tt> to generate <tt>jar</tt> packages and gems for JRuby.
+* <tt>Rake::JavaJarTask</tt> to generate <tt>jar</tt> packages and gems for JRuby.
 
   $ rake java gem
 
