@@ -11,20 +11,22 @@ require 'rbconfig'
 module Rake
   class ExtensionTask < TaskLib
     attr_accessor :name
+    attr_accessor :gem_spec
     attr_accessor :config_script
     attr_accessor :tmp_dir
     attr_accessor :ext_dir
     attr_accessor :lib_dir
     attr_accessor :source_pattern
 
-    def initialize(name = nil)
-      init(name)
+    def initialize(name = nil, gem_spec = nil)
+      init(name, gem_spec)
       yield self if block_given?
       define
     end
 
-    def init(name = nil)
+    def init(name = nil, gem_spec = nil)
       @name = name
+      @gem_spec = gem_spec
       @config_script = 'extconf.rb'
       @tmp_dir = 'tmp'
       @ext_dir = 'ext'
@@ -35,6 +37,12 @@ module Rake
     def define
       fail "Extension name must be provided." if @name.nil?
 
+      define_compile_tasks
+      define_native_tasks if @gem_spec
+    end
+
+    protected
+    def define_compile_tasks
       # directories we need
       directory "#{@tmp_dir}/#{@name}"
       directory @lib_dir
@@ -73,6 +81,19 @@ module Rake
 
       desc "Compile the extension(s)" unless Rake::Task.task_defined?('compile')
       task "compile" => ["compile:#{@name}"]
+    end
+
+    def define_native_tasks
+      require 'rake/gempackagetask' unless defined?(Rake::GemPackageTask)
+
+      # only gems with 'ruby' platforms are allowed to define native tasks
+      return unless @gem_spec.platform == 'ruby'
+
+      # create 'native:gem_name' and chain it to 'native' task
+      native_task_for(@gem_spec)
+
+      # hook the binary to the prerequisites for this task
+      task native_task_gem => [lib_binary]
     end
 
     private
@@ -114,6 +135,36 @@ module Rake
 
     def lib_binary
       "#{lib_path}/#{binary}"
+    end
+
+    def native_task_gem
+      "native:#{@gem_spec.name}"
+    end
+
+    def native_task_for(gem_spec)
+      return if Rake::Task.task_defined?(native_task_gem)
+
+      spec = gem_spec.dup
+
+      task native_task_gem do |t|
+        # adjust to current platform
+        spec.platform = Gem::Platform::CURRENT
+
+        # clear the extensions defined in the specs
+        spec.extensions.clear
+
+        # add the binary dependencies of this task
+        spec.files += t.prerequisites
+
+        # Generate a package for this gem
+        gem_package = Rake::GemPackageTask.new(spec) do |pkg|
+          pkg.need_zip = false
+          pkg.need_tar = false
+        end
+      end
+
+      # add this native task to the list
+      task "native" => [native_task_gem]
     end
   end
 end

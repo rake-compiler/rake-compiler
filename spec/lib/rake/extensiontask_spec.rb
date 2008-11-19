@@ -31,6 +31,20 @@ describe Rake::ExtensionTask do
         end
         from_block.should == from_lasgn
       end
+
+      it 'should accept a gem specification as parameter' do
+        spec = mock_gem_spec
+        ext = Rake::ExtensionTask.new('extension_three', spec)
+        ext.gem_spec.should == spec
+      end
+
+      it 'should allow gem specification be defined using block assignation' do
+        spec = mock_gem_spec
+        ext = Rake::ExtensionTask.new('extension_four') do |ext|
+          ext.gem_spec = spec
+        end
+        ext.gem_spec.should == spec
+      end
     end
   end
 
@@ -146,7 +160,50 @@ describe Rake::ExtensionTask do
 
       describe 'clobber' do
         it "should include 'lib/extension_one.{so,bundle}'" do
-          CLOBBER.should include("lib/#{ext_bin('extension_one')}")
+          CLOBBER.should include("lib/#{@ext_bin}")
+        end
+      end
+    end
+
+    describe '(native tasks)' do
+      before :each do
+        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
+        @spec = mock_gem_spec
+        @ext_bin = ext_bin('extension_one')
+      end
+
+      describe 'native' do
+        before :each do
+          @spec.stub!(:platform=).and_return('ruby')
+        end
+
+        it 'should define a task for building the supplied gem' do
+          Rake::ExtensionTask.new('extension_one', @spec)
+          Rake::Task.task_defined?('native:my_gem').should be_true
+        end
+
+        it 'should define as task for pure ruby gems' do
+          Rake::Task.task_defined?('native').should be_false
+          Rake::ExtensionTask.new('extension_one', @spec)
+          Rake::Task.task_defined?('native').should be_true
+        end
+
+        it 'should not define a task for already native gems' do
+          @spec.stub!(:platform).and_return('current')
+          Rake::ExtensionTask.new('extension_one', @spec)
+          Rake::Task.task_defined?('native').should be_false
+        end
+
+        it 'should depend on gem specific native tasks' do
+          Rake::ExtensionTask.new('extension_one', @spec)
+          Rake::Task["native"].prerequisites.should include("native:my_gem")
+        end
+
+        describe 'native:my_gem' do
+          it 'should depend on binary extension' do
+            Rake::ExtensionTask.new('extension_one', @spec)
+            Rake::Task["native:my_gem"].prerequisites.should include("lib/#{@ext_bin}")
+          end
         end
       end
     end
@@ -156,4 +213,11 @@ describe Rake::ExtensionTask do
   def ext_bin(extension_name)
     "#{extension_name}.#{RbConfig::CONFIG['DLEXT']}"
   end
+
+  def mock_gem_spec(stubs = {})
+    mock(Gem::Specification, 
+      { :name => 'my_gem', :platform => 'ruby' }.merge(stubs)
+    )
+  end
+
 end
