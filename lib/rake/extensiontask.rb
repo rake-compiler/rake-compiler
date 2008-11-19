@@ -41,7 +41,7 @@ module Rake
       define_native_tasks if @gem_spec
     end
 
-    protected
+    private
     def define_compile_tasks
       # directories we need
       directory "#{@tmp_dir}/#{@name}"
@@ -96,7 +96,6 @@ module Rake
       task native_task_gem => [lib_binary]
     end
 
-    private
     def makefile
       "#{tmp_path}/Makefile"
     end
