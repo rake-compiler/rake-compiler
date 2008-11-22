@@ -25,8 +25,9 @@ if defined?(Spec)
         t.rcov_opts   = ["--exclude", "spec/*,features/*,gems/*"]
       end
     end
+  else
+    warn "RCov gem is required, please install it (gem install rcov)."
   end
 else
   warn "RSpec gem is required, please install it (gem install rspec)."
-  warn "RCov gem is required, please install it (gem install rcov)."
 end
