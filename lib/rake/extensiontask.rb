@@ -55,7 +55,8 @@ module Rake
       file makefile => [tmp_path, extconf] do
         parent = Dir.pwd
         Dir.chdir tmp_path do
-          ruby File.join(parent, extconf)
+          # Add current directory to the search path of Ruby
+          ruby "-I. #{File.join(parent, extconf)}"
         end
       end
 
@@ -84,10 +85,10 @@ module Rake
     end
 
     def define_native_tasks
-      require 'rake/gempackagetask' unless defined?(Rake::GemPackageTask)
-
       # only gems with 'ruby' platforms are allowed to define native tasks
       return unless @gem_spec.platform == 'ruby'
+
+      require 'rake/gempackagetask' unless defined?(Rake::GemPackageTask)
 
       # create 'native:gem_name' and chain it to 'native' task
       native_task_for(@gem_spec)
