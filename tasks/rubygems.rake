@@ -14,7 +14,7 @@ spec = Gem::Specification.new do |s|
   EOF
 
   # dependencies
-  s.add_dependency  'rake', '~> 0.8.3'
+  s.add_dependency  'rake', '~> 0.8.3.1'
 
   # development dependencies
   #s.add_development_dependency 'rspec', '~> 1.1.9'
