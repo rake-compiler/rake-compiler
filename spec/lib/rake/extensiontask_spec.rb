@@ -152,7 +152,6 @@ describe Rake::ExtensionTask do
 
       describe 'tmp/{platform}/extension_one/Makefile' do
         it 'should define as task' do
-          puts Rake.application.tasks.inspect
           Rake::Task.task_defined?("tmp/#{@platform}/extension_one/Makefile").should be_true
         end
 
