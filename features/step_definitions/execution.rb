@@ -1,6 +1,9 @@
 Given %r{^I've already successfully executed rake task '(.*)'$} do |task_name|
   emptyness = `rake #{task_name} 2>&1`
-  raise "rake failed with #{$?.exitstatus}" unless $?.success?
+  unless $?.success?
+    warn emptyness
+    raise "rake failed with #{$?.exitstatus}"
+  end
 end
 
 When /^rake task '(.*)' is invoked$/ do |task_name|
