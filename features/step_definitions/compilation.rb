@@ -3,6 +3,11 @@ Given /^a extension named '(.*)'$/ do |extension_name|
   generate_source_code_for extension_name
 end
 
+Given /^a extension '(.*)' with forced platform '(.*)'$/ do |extension_name, forced_platform|
+  generate_extension_task_for extension_name, forced_platform
+  generate_source_code_for extension_name
+end
+
 Given /^not changed any file since$/ do
   # don't do anything, that's the purpose of this step!
 end

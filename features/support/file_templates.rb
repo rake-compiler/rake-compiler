@@ -42,6 +42,15 @@ Rake::ExtensionTask.new("#{extension_name}"#{', SPEC' if gem_spec})
 EOF
 end
 
+def template_rake_extension_with_platform(extension_name, platform)
+<<-EOF
+require 'rake/extensiontask'
+Rake::ExtensionTask.new("#{extension_name}", SPEC) do |ext|
+  ext.platform = "#{platform}"
+end
+EOF
+end
+
 def template_extconf(extension_name)
 <<-EOF
 require 'mkmf'

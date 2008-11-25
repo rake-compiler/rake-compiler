@@ -17,15 +17,20 @@ def generate_gem_task(gem_name)
   end
 end
 
-def generate_extension_task_for(extension_name)
+def generate_extension_task_for(extension_name, platform = nil)
   # create folder structure
   FileUtils.mkdir_p "ext/#{extension_name}"
 
   return if File.exist?("tasks/#{extension_name}.rake")
 
+  # Building a gem?
   if File.exist?("tasks/gem.rake") then
     File.open("tasks/gem.rake", 'a+') do |ext_in_gem|
-      ext_in_gem.puts template_rake_extension(extension_name, true)
+      if platform
+        ext_in_gem.puts template_rake_extension_with_platform(extension_name, platform)
+      else
+        ext_in_gem.puts template_rake_extension(extension_name, true)
+      end
     end
   else
     # create specific extension rakefile
