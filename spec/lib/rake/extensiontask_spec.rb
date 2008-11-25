@@ -45,6 +45,13 @@ describe Rake::ExtensionTask do
         end
         ext.gem_spec.should == spec
       end
+
+      it 'should allow forcing of platform' do
+        ext = Rake::ExtensionTask.new('weird_extension') do |ext|
+          ext.platform = 'universal-foo-bar-10.5'
+        end
+        ext.platform.should == 'universal-foo-bar-10.5'
+      end
     end
   end
 
@@ -72,6 +79,10 @@ describe Rake::ExtensionTask do
     it 'should look for C files pattern (.c)' do
       @ext.source_pattern.should == "*.c"
     end
+
+    it 'should default to current platform' do
+      @ext.platform.should == RUBY_PLATFORM
+    end
   end
 
   describe '(tasks)' do
@@ -84,6 +95,7 @@ describe Rake::ExtensionTask do
         Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
         @ext = Rake::ExtensionTask.new('extension_one')
         @ext_bin = ext_bin('extension_one')
+        @platform = RUBY_PLATFORM
       end
 
       describe 'compile' do
@@ -116,39 +128,40 @@ describe Rake::ExtensionTask do
         end
 
         it "should depend on 'tmp/extension_one.{so,bundle}'" do
-          Rake::Task["lib/#{@ext_bin}"].prerequisites.should include("tmp/extension_one/#{@ext_bin}")
+          Rake::Task["lib/#{@ext_bin}"].prerequisites.should include("tmp/#{@platform}/extension_one/#{@ext_bin}")
         end
       end
 
-      describe 'tmp/extension_one/extension_one.{so,bundle}' do
+      describe 'tmp/{platform}/extension_one/extension_one.{so,bundle}' do
         it 'should define as task' do
-          Rake::Task.task_defined?("tmp/extension_one/#{@ext_bin}").should be_true
+          Rake::Task.task_defined?("tmp/#{@platform}/extension_one/#{@ext_bin}").should be_true
         end
 
-        it "should depend on 'tmp/extension_one/Makefile'" do
-          Rake::Task["tmp/extension_one/#{@ext_bin}"].prerequisites.should include("tmp/extension_one/Makefile")
+        it "should depend on 'tmp/{platform}/extension_one/Makefile'" do
+          Rake::Task["tmp/#{@platform}/extension_one/#{@ext_bin}"].prerequisites.should include("tmp/#{@platform}/extension_one/Makefile")
         end
 
         it "should depend on 'ext/extension_one/source.c'" do
-          Rake::Task["tmp/extension_one/#{@ext_bin}"].prerequisites.should include("ext/extension_one/source.c")
+          Rake::Task["tmp/#{@platform}/extension_one/#{@ext_bin}"].prerequisites.should include("ext/extension_one/source.c")
         end
 
         it "should not depend on 'ext/extension_one/source.h'" do
-          Rake::Task["tmp/extension_one/#{@ext_bin}"].prerequisites.should_not include("ext/extension_one/source.h")
+          Rake::Task["tmp/#{@platform}/extension_one/#{@ext_bin}"].prerequisites.should_not include("ext/extension_one/source.h")
         end
       end
 
-      describe 'tmp/extension_one/Makefile' do
+      describe 'tmp/{platform}/extension_one/Makefile' do
         it 'should define as task' do
-          Rake::Task.task_defined?('tmp/extension_one/Makefile').should be_true
+          puts Rake.application.tasks.inspect
+          Rake::Task.task_defined?("tmp/#{@platform}/extension_one/Makefile").should be_true
         end
 
-        it "should depend on 'tmp/extension_one'" do
-          Rake::Task["tmp/extension_one/Makefile"].prerequisites.should include("tmp/extension_one")
+        it "should depend on 'tmp/{platform}/extension_one'" do
+          Rake::Task["tmp/#{@platform}/extension_one/Makefile"].prerequisites.should include("tmp/#{@platform}/extension_one")
         end
 
         it "should depend on 'ext/extension_one/extconf.rb'" do
-          Rake::Task["tmp/extension_one/Makefile"].prerequisites.should include("ext/extension_one/extconf.rb")
+          Rake::Task["tmp/#{@platform}/extension_one/Makefile"].prerequisites.should include("ext/extension_one/extconf.rb")
         end
       end
 

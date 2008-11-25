@@ -16,6 +16,7 @@ module Rake
     attr_accessor :tmp_dir
     attr_accessor :ext_dir
     attr_accessor :lib_dir
+    attr_accessor :platform
     attr_accessor :source_pattern
 
     def initialize(name = nil, gem_spec = nil)
@@ -34,6 +35,10 @@ module Rake
       @source_pattern = "*.c"
     end
 
+    def platform
+      @platform ||= RUBY_PLATFORM
+    end
+
     def define
       fail "Extension name must be provided." if @name.nil?
 
@@ -44,7 +49,7 @@ module Rake
     private
     def define_compile_tasks
       # directories we need
-      directory "#{@tmp_dir}/#{@name}"
+      directory tmp_path
       directory @lib_dir
 
       # temporary dir should be on the cleaning
@@ -106,7 +111,7 @@ module Rake
     end
 
     def tmp_path
-      File.join(@tmp_dir, @name)
+      File.join(@tmp_dir, platform, @name)
     end
 
     def ext_path
@@ -148,7 +153,7 @@ module Rake
 
       task native_task_gem do |t|
         # adjust to current platform
-        spec.platform = Gem::Platform::CURRENT
+        spec.platform = (@platform || Gem::Platform::CURRENT)
 
         # clear the extensions defined in the specs
         spec.extensions.clear
