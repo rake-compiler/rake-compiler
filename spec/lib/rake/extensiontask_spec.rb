@@ -88,6 +88,8 @@ describe Rake::ExtensionTask do
   describe '(tasks)' do
     before :each do
       Rake.application.clear
+      CLEAN.clear
+      CLOBBER.clear
     end
 
     describe '(one extension)' do
@@ -165,14 +167,18 @@ describe Rake::ExtensionTask do
       end
 
       describe 'clean' do
-        it "should include 'tmp' in the pattern" do
-          CLEAN.should include('tmp')
+        it "should include 'tmp/{platform}/extension_one' in the pattern" do
+          CLEAN.should include("tmp/#{@platform}/extension_one")
         end
       end
 
       describe 'clobber' do
         it "should include 'lib/extension_one.{so,bundle}'" do
           CLOBBER.should include("lib/#{@ext_bin}")
+        end
+
+        it "should include 'tmp'" do
+          CLOBBER.should include('tmp')
         end
       end
     end

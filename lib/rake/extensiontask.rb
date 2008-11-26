@@ -52,8 +52,8 @@ module Rake
       directory tmp_path
       directory @lib_dir
 
-      # temporary dir should be on the cleaning
-      CLEAN.include(@tmp_dir)
+      # platform specific temp folder should be on the cleaning
+      CLEAN.include(tmp_path)
 
       # makefile depends of tmp_dir and config_script
       # tmp/extension_name/Makefile
@@ -81,6 +81,9 @@ module Rake
 
       # clobbering should remove the binaries from lib_path
       CLOBBER.include(lib_binary)
+
+      # we should also clobber the tmp folder
+      CLOBBER.include(@tmp_dir)
 
       desc "Compile just the #{@name} extension"
       task "compile:#{@name}" => [lib_binary]
