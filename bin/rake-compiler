@@ -14,10 +14,8 @@ rescue LoadError
   require 'rake'
 end
 
-# Move into user home to initialize Rake
-Dir.chdir File.expand_path("~") do
-  Rake.application.init('rake-compiler')
-end
+# Initialize 'rake-compiler' application
+Rake.application.init('rake-compiler')
 
 # Load the already cooked tasks ;-)
 load File.join(File.dirname(__FILE__), %w{.. tasks cross Rakefile})

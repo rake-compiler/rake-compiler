@@ -21,27 +21,28 @@ require 'rake'
 require 'rake/clean'
 require 'yaml'
 
+HOME = File.expand_path("~/.rake-compiler")
 RUBY = "ruby-#{ENV['VERSION'] || '1.8.6-p287'}"
 
 # grab the major "1.8" or "1.9" part of the version number
 MAJOR = RUBY.match(/.*-(\d.\d).\d/)[1]
 
 # define a location where sources will be stored
-directory ".rake-compiler/sources/#{RUBY}"
-directory ".rake-compiler/builds/#{RUBY}"
+directory "#{HOME}/sources/#{RUBY}"
+directory "#{HOME}/builds/#{RUBY}"
 
 # clean intermediate files and folders
-CLEAN.include(".rake-compiler/sources/#{RUBY}")
-CLEAN.include(".rake-compiler/builds/#{RUBY}")
+CLEAN.include("#{HOME}/sources/#{RUBY}")
+CLEAN.include("#{HOME}/builds/#{RUBY}")
 
 # remove the final products and sources
-CLOBBER.include('.rake-compiler/sources')
-CLOBBER.include('.rake-compiler/builds')
-CLOBBER.include(".rake-compiler/ruby/#{RUBY}")
-CLOBBER.include('.rake-compiler/config.yml')
+CLOBBER.include("#{HOME}/sources")
+CLOBBER.include("#{HOME}/builds")
+CLOBBER.include("#{HOME}/ruby/#{RUBY}")
+CLOBBER.include("#{HOME}/config.yml")
 
 # ruby source file should be stored there
-file ".rake-compiler/sources/#{RUBY}.tar.gz" => ['.rake-compiler/sources'] do |t|
+file "#{HOME}/sources/#{RUBY}.tar.gz" => ["#{HOME}/sources"] do |t|
   # download the source file using wget or curl
   chdir File.dirname(t.name) do
     url = "ftp://ftp.ruby-lang.org/pub/ruby/#{MAJOR}/#{File.basename(t.name)}"
@@ -50,19 +51,19 @@ file ".rake-compiler/sources/#{RUBY}.tar.gz" => ['.rake-compiler/sources'] do |t
 end
 
 # Extract the sources
-file ".rake-compiler/sources/#{RUBY}" => [".rake-compiler/sources/#{RUBY}.tar.gz"] do |t|
+file "#{HOME}/sources/#{RUBY}" => ["#{HOME}/sources/#{RUBY}.tar.gz"] do |t|
   chdir File.dirname(t.name) do
     t.prerequisites.each { |f| sh "tar xfz #{File.basename(f)}" }
   end
 end
 
 # backup makefile.in
-file ".rake-compiler/sources/#{RUBY}/Makefile.in.bak" => [".rake-compiler/sources/#{RUBY}"] do |t|
-  cp ".rake-compiler/sources/#{RUBY}/Makefile.in", t.name
+file "#{HOME}/sources/#{RUBY}/Makefile.in.bak" => ["#{HOME}/sources/#{RUBY}"] do |t|
+  cp "#{HOME}/sources/#{RUBY}/Makefile.in", t.name
 end
 
 # correct the makefiles
-file ".rake-compiler/sources/#{RUBY}/Makefile.in" => [".rake-compiler/sources/#{RUBY}/Makefile.in.bak"] do |t|
+file "#{HOME}/sources/#{RUBY}/Makefile.in" => ["#{HOME}/sources/#{RUBY}/Makefile.in.bak"] do |t|
   content = File.open(t.name, 'rb') { |f| f.read }
 
   out = ""
@@ -96,8 +97,8 @@ task :environment do
 end
 
 # generate the makefile in a clean build location
-file ".rake-compiler/builds/#{RUBY}/Makefile" => [".rake-compiler/builds/#{RUBY}",
-                                  ".rake-compiler/sources/#{RUBY}/Makefile.in"] do |t|
+file "#{HOME}/builds/#{RUBY}/Makefile" => ["#{HOME}/builds/#{RUBY}",
+                                  "#{HOME}/sources/#{RUBY}/Makefile.in"] do |t|
 
   # set the configure options
   options = [
@@ -115,23 +116,23 @@ file ".rake-compiler/builds/#{RUBY}/Makefile" => [".rake-compiler/builds/#{RUBY}
 end
 
 # make
-file ".rake-compiler/builds/#{RUBY}/ruby.exe" => [".rake-compiler/builds/#{RUBY}/Makefile"] do |t|
+file "#{HOME}/builds/#{RUBY}/ruby.exe" => ["#{HOME}/builds/#{RUBY}/Makefile"] do |t|
   chdir File.dirname(t.prerequisites.first) do
     sh "make"
   end
 end
 
 # make install
-file ".rake-compiler/ruby/#{RUBY}/bin/ruby.exe" => [".rake-compiler/builds/#{RUBY}/ruby.exe"] do |t|
+file "#{HOME}/ruby/#{RUBY}/bin/ruby.exe" => ["#{HOME}/builds/#{RUBY}/ruby.exe"] do |t|
   chdir File.dirname(t.prerequisites.first) do
     sh "make install"
   end
 end
 
 # rbconfig.rb location
-file ".rake-compiler/ruby/#{RUBY}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb" => [".rake-compiler/ruby/#{RUBY}/bin/ruby.exe"]
+file "#{HOME}/ruby/#{RUBY}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb" => ["#{HOME}/ruby/#{RUBY}/bin/ruby.exe"]
 
-file '.rake-compiler/config.yml' => [".rake-compiler/ruby/#{RUBY}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb"] do |t|
+file "#{HOME}/config.yml" => ["#{HOME}/ruby/#{RUBY}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb"] do |t|
   if File.exist?(t.name) then
     puts "Updating #{t.name}"
     config = YAML.load_file(t.name)
@@ -151,4 +152,4 @@ task :default do
 end
 
 desc "Build #{RUBY} suitable for cross-platform development."
-task 'cross-ruby' => [:mingw32, :environment, '.rake-compiler/config.yml']
+task 'cross-ruby' => [:mingw32, :environment, "#{HOME}/config.yml"]
