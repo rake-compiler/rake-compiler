@@ -17,6 +17,7 @@ module Rake
     attr_accessor :ext_dir
     attr_accessor :lib_dir
     attr_accessor :platform
+    attr_accessor :additional_options
     attr_accessor :source_pattern
 
     def initialize(name = nil, gem_spec = nil)
@@ -33,6 +34,7 @@ module Rake
       @ext_dir = 'ext'
       @lib_dir = 'lib'
       @source_pattern = "*.c"
+      @additional_options = []
     end
 
     def platform
@@ -60,8 +62,10 @@ module Rake
       file makefile => [tmp_path, extconf] do
         parent = Dir.pwd
         Dir.chdir tmp_path do
+          # FIXME: Rake is broken for multiple arguments system() calls.
           # Add current directory to the search path of Ruby
-          ruby "-I. #{File.join(parent, extconf)}"
+          # Also, include additional parameters supplied.
+          ruby ['-I.', File.join(parent, extconf), *@additional_options].join(' ')
         end
       end
 

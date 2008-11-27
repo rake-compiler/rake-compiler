@@ -157,6 +157,7 @@ personalize several settings for <tt>Rake::ExtensionTask</tt>:
       ext.config_script = 'custom_extconf.rb' # use instead of 'extconf.rb' default
       ext.tmp_dir = 'tmp'                     # temporary folder used during compilation.
       ext.source_pattern = "*.{c,cpp}"        # monitor file changes to allow simple rebuild.
+      ext.additional_options << '--with-foo'  # supply addition configure options to config script-
       ext.gem_spec = spec                     # optional indicate which gem specification
                                               # will be used to based on.
     end
@@ -169,8 +170,8 @@ development of it! (and contributions too!)
 
 You can find more information about rake-compiler:
 
-Blog::      http://blog.mmediasys.com
-GitHub::    http://github.com/luislavena/rake-compiler
+Blog:      http://blog.mmediasys.com
+GitHub:    http://github.com/luislavena/rake-compiler
 
 
 === Some of the features already underworks

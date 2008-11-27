@@ -80,6 +80,10 @@ describe Rake::ExtensionTask do
       @ext.source_pattern.should == "*.c"
     end
 
+    it 'should have no additional options preset to delegate' do
+      @ext.additional_options.should be_empty
+    end
+
     it 'should default to current platform' do
       @ext.platform.should == RUBY_PLATFORM
     end
