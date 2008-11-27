@@ -59,7 +59,7 @@ Feature: Compile C code into Ruby extensions.
     When rake task 'clean' is invoked
     Then rake task 'clean' succeeded
     And binary extension 'extension_one' do exist in 'lib'
-    And 'tmp' folder do not exist
+    And no left over from 'extension_one' remains in 'tmp'
 
   Scenario: clobbering binary and temporary files
     Given a safe project directory

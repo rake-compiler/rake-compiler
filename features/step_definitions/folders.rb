@@ -26,3 +26,7 @@ end
 Then /^'(.*)' folder do not exist$/ do |folder|
   File.directory?(folder).should_not be_true
 end
+
+Then /^no left over from '(.*)' remains in '(.*)'$/ do |name, folder|
+  Dir.glob("#{folder}/**/#{name}").should be_empty
+end
