@@ -14,7 +14,7 @@ spec = Gem::Specification.new do |s|
   EOF
 
   # dependencies
-  s.add_dependency  'rake', '~> 0.8.3.1'
+  s.add_dependency  'rake', '>= 0.8.3', '< 0.9'
 
   # development dependencies
   #s.add_development_dependency 'rspec', '~> 1.1.9'
@@ -22,9 +22,11 @@ spec = Gem::Specification.new do |s|
   #s.add_development_dependency 'cucumber', '~> 0.1.8'
 
   # components, files and paths
-  s.files = FileList["features/**/*.{feature,rb}",
-                      "lib/**/*.rb", "spec/**/*.rb", "tasks/*.rake",
+  s.files = FileList["features/**/*.{feature,rb}", "bin/rake-compiler",
+                      "lib/**/*.rb", "spec/**/*.rb", "tasks/**/*.rake",
                       "Rakefile", "*.{rdoc,txt,yml}"]
+
+  s.executables = ['rake-compiler']
 
   s.require_path = 'lib'
 
