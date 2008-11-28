@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: rake-compiler
 version: !ruby/object:Gem::Version 
-  version: 0.1.0
+  version: 0.1.1
 platform: ruby
 authors: 
 - Luis Lavena
