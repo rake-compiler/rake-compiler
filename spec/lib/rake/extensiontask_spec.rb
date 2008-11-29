@@ -80,12 +80,24 @@ describe Rake::ExtensionTask do
       @ext.source_pattern.should == "*.c"
     end
 
-    it 'should have no configuration parameters preset to delegate' do
+    it 'should have no configuration options preset to delegate' do
       @ext.config_options.should be_empty
     end
 
     it 'should default to current platform' do
       @ext.platform.should == RUBY_PLATFORM
+    end
+
+    it 'should default to no cross compilation' do
+      @ext.cross_compile.should be_false
+    end
+
+    it 'should have no configuration options for cross compilation' do
+      @ext.cross_config_options.should be_empty
+    end
+
+    it "should have cross platform defined to 'i386-mingw32'" do
+      @ext.cross_platform.should == 'i386-mingw32'
     end
   end
 
@@ -226,6 +238,84 @@ describe Rake::ExtensionTask do
         end
       end
     end
+
+    describe '(cross platform tasks)' do
+      before :each do
+        File.stub!(:exist?).and_return(true)
+        YAML.stub!(:load_file).and_return(mock_config_yml)
+        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
+        @spec = mock_gem_spec
+        @config_file = File.expand_path("~/.rake-compiler/config.yml")
+        @major_ver = RUBY_VERSION.match(/(\d+.\d+)/)[1]
+        @config_path = mock_config_yml["rbconfig-#{@major_ver}"]
+      end
+
+      it 'should generate an error if no rake-compiler configuration exist' do
+        File.should_receive(:exist?).with(@config_file).and_return(false)
+        lambda {
+          Rake::ExtensionTask.new('extension_one') do |ext|
+            ext.cross_compile = true
+          end
+        }.should raise_error(RuntimeError, /rake-compiler must be configured first/)
+      end
+
+      it 'should parse the config file using YAML' do
+        YAML.should_receive(:load_file).with(@config_file).and_return(mock_config_yml)
+        Rake::ExtensionTask.new('extension_one') do |ext|
+          ext.cross_compile = true
+        end
+      end
+
+      it 'should fail if no section of config file defines running version of ruby' do
+        config = mock(Hash)
+        config.should_receive(:[]).with("rbconfig-#{@major_ver}").and_return(nil)
+        YAML.stub!(:load_file).and_return(config)
+        lambda {
+          Rake::ExtensionTask.new('extension_one') do |ext|
+            ext.cross_compile = true
+          end
+        }.should raise_error(RuntimeError, /no configuration section for this version of Ruby/)
+      end
+
+      describe "(cross for 'universal-unknown' platform)" do
+        before :each do
+          @ext = Rake::ExtensionTask.new('extension_one', @spec) do |ext|
+            ext.cross_compile = true
+            ext.cross_platform = 'universal-unknown'
+          end
+        end
+
+        describe 'rbconfig' do
+          it 'should chain rbconfig tasks to Makefile generation' do
+            Rake::Task['tmp/universal-unknown/extension_one/Makefile'].prerequisites.should include('tmp/universal-unknown/extension_one/rbconfig.rb')
+          end
+
+          it 'should take rbconfig from rake-compiler configuration' do
+            Rake::Task['tmp/universal-unknown/extension_one/rbconfig.rb'].prerequisites.should include(@config_path)
+          end
+        end
+
+        describe 'compile:universal-unknown' do
+          it "should be defined" do
+            Rake::Task.task_defined?('compile:universal-unknown').should be_true
+          end
+
+          it "should depend on 'compile:extension_one:universal-unknown'" do
+            Rake::Task['compile:universal-unknown'].prerequisites.should include('compile:extension_one:universal-unknown')
+          end
+        end
+
+        describe 'native:universal-unknown' do
+          it "should be defined" do
+            Rake::Task.task_defined?('native:universal-unknown').should be_true
+          end
+
+          it "should depend on 'native:my_gem:universal-unknown'" do
+            Rake::Task['native:universal-unknown'].prerequisites.should include('native:my_gem:universal-unknown')
+          end
+        end
+      end
+    end
   end
 
   private
@@ -239,4 +329,10 @@ describe Rake::ExtensionTask do
     )
   end
 
+  def mock_config_yml
+    {
+      'rbconfig-1.8' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-1.9' => '/some/path/version/1.9/to/rbconfig.rb'
+    }
+  end
 end
