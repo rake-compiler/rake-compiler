@@ -19,6 +19,8 @@ SPEC = Gem::Specification.new do |s|
   s.version = "0.1.0"
   s.summary = "#{gem_name} test gem for rake-compiler"
 
+  s.files = FileList["ext/**/*.{rb,c,h}", "Rakefile", "tasks/*.rake", "lib/**/*.rb"]
+
   s.has_rdoc = true
 
   s.homepage = 'http://github.com/luislavena/rake-compiler'
