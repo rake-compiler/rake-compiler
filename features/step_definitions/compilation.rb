@@ -18,6 +18,12 @@ Given /^that all my source files are in place$/ do
   Given "a extension cross-compilable 'extension_one'"
 end
 
+Given /^that my gem source is all in place$/ do
+  Given "a safe project directory"
+  Given "a gem named 'gem_abc'"
+  Given "a extension cross-compilable 'extension_one'"
+end
+
 Given /^not changed any file since$/ do
   # don't do anything, that's the purpose of this step!
 end

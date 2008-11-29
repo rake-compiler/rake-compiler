@@ -21,6 +21,8 @@ SPEC = Gem::Specification.new do |s|
 
   s.files = FileList["ext/**/*.{rb,c,h}", "Rakefile", "tasks/*.rake", "lib/**/*.rb"]
 
+  s.extensions = FileList["ext/**/extconf.rb"]
+
   s.has_rdoc = true
 
   s.homepage = 'http://github.com/luislavena/rake-compiler'
@@ -53,10 +55,10 @@ end
 EOF
 end
 
-def template_rake_extension_cross_compile(extension_name)
+def template_rake_extension_cross_compile(extension_name, gem_spec = nil)
 <<-EOF
 require 'rake/extensiontask'
-Rake::ExtensionTask.new("#{extension_name}") do |ext|
+Rake::ExtensionTask.new("#{extension_name}"#{', SPEC' if gem_spec}) do |ext|
   ext.cross_compile = true
 end
 EOF

@@ -47,8 +47,15 @@ def generate_cross_compile_extension_task_for(extension_name)
   return if File.exist?("tasks/#{extension_name}.rake")
 
   # create specific extension rakefile
-  File.open("tasks/#{extension_name}.rake", 'w') do |ext_rake|
-    ext_rake.puts template_rake_extension_cross_compile(extension_name)
+  # Building a gem?
+  if File.exist?("tasks/gem.rake") then
+    File.open("tasks/gem.rake", 'a+') do |ext_in_gem|
+      ext_in_gem.puts template_rake_extension_cross_compile(extension_name, true)
+    end
+  else
+    File.open("tasks/#{extension_name}.rake", 'w') do |ext_rake|
+      ext_rake.puts template_rake_extension_cross_compile(extension_name)
+    end
   end
 end
 

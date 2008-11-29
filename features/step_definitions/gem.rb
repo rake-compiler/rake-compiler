@@ -14,6 +14,10 @@ Then /^a gem for '(.*)' version '(.*)' platform '(.*)' do exist in '(.*)'$/ do |
   File.exist?(gem_file_platform(folder, name, version, platform)).should be_true
 end
 
+Then /^gem for platform '(.*)' get generated$/ do |platform|
+  Then "a gem for 'gem_abc' version '0.1.0' platform '#{platform}' do exist in 'pkg'"
+end
+
 def gem_file(folder, name, version)
   "#{folder}/#{name}-#{version}.gem"
 end
