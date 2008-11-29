@@ -19,7 +19,7 @@ module Rake
     attr_accessor :ext_dir
     attr_accessor :lib_dir
     attr_accessor :platform
-    attr_accessor :additional_options
+    attr_accessor :config_options
     attr_accessor :source_pattern
 
     def initialize(name = nil, gem_spec = nil)
@@ -36,7 +36,7 @@ module Rake
       @ext_dir = 'ext'
       @lib_dir = 'lib'
       @source_pattern = "*.c"
-      @additional_options = []
+      @config_options = []
     end
 
     def platform
@@ -91,7 +91,7 @@ module Rake
           # FIXME: Rake is broken for multiple arguments system() calls.
           # Add current directory to the search path of Ruby
           # Also, include additional parameters supplied.
-          ruby ['-I.', File.join(parent, extconf), *@additional_options].join(' ')
+          ruby ['-I.', File.join(parent, extconf), *@config_options].join(' ')
         end
       end
 

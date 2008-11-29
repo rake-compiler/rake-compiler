@@ -157,7 +157,7 @@ personalize several settings for <tt>Rake::ExtensionTask</tt>:
       ext.config_script = 'custom_extconf.rb' # use instead of 'extconf.rb' default
       ext.tmp_dir = 'tmp'                     # temporary folder used during compilation.
       ext.source_pattern = "*.{c,cpp}"        # monitor file changes to allow simple rebuild.
-      ext.additional_options << '--with-foo'  # supply addition configure options to config script-
+      ext.config_options << '--with-foo'      # supply additional configure options to config script.
       ext.gem_spec = spec                     # optional indicate which gem specification
                                               # will be used to based on.
     end
