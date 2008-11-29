@@ -33,8 +33,8 @@ Feature: Distribute native extension with gems
     And a extension 'extension_one' with forced platform 'universal-unknown'
     And I've already successfully executed rake task 'compile'
     And 'pkg' folder is deleted
-    When rake task 'native gem' is invoked
-    Then rake task 'native gem' succeeded
+    When rake task 'native:universal-unknown gem' is invoked
+    Then rake task 'native:universal-unknown gem' succeeded
     And 'pkg' folder is created
     And ruby gem for 'my_project' version '0.1.0' do exist in 'pkg'
     And a gem for 'my_project' version '0.1.0' platform 'universal-unknown' do exist in 'pkg'
