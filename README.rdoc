@@ -163,6 +163,72 @@ personalize several settings for <tt>Rake::ExtensionTask</tt>:
     end
 
 
+== Future is now: Cross compilation
+
+rake-compiler provides now an standarized way to generate, from Linux or OSX
+both extensions and gem binaries for Windows!
+
+It takes advantages from GCC host/target to build binaries (for target) on 
+different OS (hosts).
+
+
+=== How I enjoy this?
+
+Besides having the development tool chain installed (GCC), you should install
+also <tt>mingw32</tt> cross compilation package.
+
+Dependending on your operating system distribution, a simple <tt>apt-get install mingw32</tt>
+will be enough.
+
+Please check OSX documentation about installing mingw32 from macports.
+
+
+=== I have my toolchain, now what?
+
+You need to build Ruby for Windows.
+
+Relax, no need to freak out. rake-compiler do it for you:
+
+  rake-compiler cross-ruby
+
+And you're done. It will automatically download, configure and compile latest
+stable version of Ruby for Windows, and place it into <tt>~/.rake-compiler</tt>
+
+If, instead, you want to build another version than the default one, please
+supply a <tt>VERSION</tt>:
+
+  rake-compiler cross-ruby VERSION=1.8.6-p114
+
+=== Let's build some gems!
+
+Now, you only need to use additional options in your extension defintion:
+
+    Rake::ExtensionTask.new('my_extension', gem_spec) do |ext|
+      ext.cross_compile = true                # enable cross compilation (requires cross compile toolchain)
+      ext.cross_platform = 'i386-mswin32'     # forces the Windows platform instead of the default one
+                                              # configure options only for cross compile
+      ext.cross_config_options << '--with-something'
+    end
+
+By default, cross compilation targets 'i386-mingw32' which is default GCC platform
+for Ruby.
+
+To target gems for current Ruby official distribution, please force the platform
+to the one shown before.
+
+=== Magician doing some tricks, don't blink!
+
+Compiles keeps being simple:
+
+  rake cross compile
+
+And now, build your gems for Windows is just 4 more letters:
+
+  rake cross native gem
+
+And you're done, yeah.
+
+
 == Future
 
 rake-compiler is a work in progress and we will appreciate feedback during the
