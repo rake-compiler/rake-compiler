@@ -143,8 +143,6 @@ module Rake
           ext_files = t.prerequisites.map { |ext| "#{@lib_dir}/#{File.basename(ext)}" }
           spec.files += ext_files
 
-          puts spec.files.inspect
-
           # Generate a package for this gem
           gem_package = Rake::GemPackageTask.new(spec) do |pkg|
             pkg.need_zip = false
@@ -152,10 +150,7 @@ module Rake
           end
 
           # ensure the binaries are copied
-          puts "#{gem_package.package_dir}/#{gem_package.gem_file}"
           task "#{gem_package.package_dir}/#{gem_package.gem_file}" => ["copy:#{@name}:#{platf}"]
-
-          puts Rake::Task["#{gem_package.package_dir}/#{gem_package.gem_file}"].prerequisites.inspect
         end
       end
 
