@@ -61,7 +61,8 @@ module Rake
       # only gems with 'ruby' platforms are allowed to define native tasks
       define_native_tasks if @gem_spec && @gem_spec.platform == 'ruby'
 
-      # only define cross platform functionality when enabled.
+      # only define cross platform functionality when enabled
+      # FIXME: there is no value for having this on Windows or JRuby
       define_cross_platform_tasks if @cross_compile
     end
 
@@ -185,7 +186,11 @@ module Rake
       config_path = File.expand_path("~/.rake-compiler/config.yml")
       major_ver = RUBY_VERSION.match(/(\d+.\d+)/)[1]
 
-      fail "rake-compiler must be configured first" unless File.exist?(config_path)
+      # warn the user about the need of configuration to use cross compilation.
+      unless File.exist?(config_path)
+        warn "rake-compiler must be configured first to enable cross-compilation"
+        return
+      end
 
       config_file = YAML.load_file(config_path)
 

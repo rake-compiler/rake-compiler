@@ -250,13 +250,13 @@ describe Rake::ExtensionTask do
         @config_path = mock_config_yml["rbconfig-#{@major_ver}"]
       end
 
-      it 'should generate an error if no rake-compiler configuration exist' do
+      it 'should not generate an error if no rake-compiler configuration exist' do
         File.should_receive(:exist?).with(@config_file).and_return(false)
         lambda {
           Rake::ExtensionTask.new('extension_one') do |ext|
             ext.cross_compile = true
           end
-        }.should raise_error(RuntimeError, /rake-compiler must be configured first/)
+        }.should_not raise_error(RuntimeError)
       end
 
       it 'should parse the config file using YAML' do
