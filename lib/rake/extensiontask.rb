@@ -161,7 +161,16 @@ module Rake
           spec.extensions.clear
 
           # add the binaries that this task depends on
+          # ensure the files get properly copied to lib_dir
           ext_files = t.prerequisites.map { |ext| "#{@lib_dir}/#{File.basename(ext)}" }
+          ext_files.each do |ext|
+            unless Rake::Task.task_defined?("#{@lib_dir}/#{File.basename(ext)}") then
+              # strip out path and .so/.bundle
+              file "#{@lib_dir}/#{File.basename(ext)}" => ["copy:#{File.basename(ext).ext('')}:#{platf}"]
+            end
+          end
+
+          # include the files in the gem specification
           spec.files += ext_files
 
           # Generate a package for this gem
