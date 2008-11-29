@@ -188,6 +188,7 @@ describe Rake::ExtensionTask do
         Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
         @spec = mock_gem_spec
         @ext_bin = ext_bin('extension_one')
+        @platform = RUBY_PLATFORM
       end
 
       describe 'native' do
@@ -212,15 +213,15 @@ describe Rake::ExtensionTask do
           Rake::Task.task_defined?('native').should be_false
         end
 
-        it 'should depend on gem specific native tasks' do
+        it 'should depend on platform specific native tasks' do
           Rake::ExtensionTask.new('extension_one', @spec)
-          Rake::Task["native"].prerequisites.should include("native:my_gem")
+          Rake::Task["native"].prerequisites.should include("native:#{@platform}")
         end
 
-        describe 'native:my_gem' do
+        describe 'native:my_gem:{platform}' do
           it 'should depend on binary extension' do
             Rake::ExtensionTask.new('extension_one', @spec)
-            Rake::Task["native:my_gem"].prerequisites.should include("lib/#{@ext_bin}")
+            Rake::Task["native:my_gem:#{@platform}"].prerequisites.should include("tmp/#{@platform}/extension_one/#{@ext_bin}")
           end
         end
       end

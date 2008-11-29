@@ -47,7 +47,9 @@ module Rake
       fail "Extension name must be provided." if @name.nil?
 
       define_compile_tasks
-      define_native_tasks if @gem_spec
+
+      # only gems with 'ruby' platforms are allowed to define native tasks
+      define_native_tasks if @gem_spec && @gem_spec.platform == 'ruby'
     end
 
     private
@@ -72,9 +74,6 @@ module Rake
       task "copy:#{@name}:#{platf}" => [lib_dir, "#{tmp_path}/#{binary}"] do
         cp "#{tmp_path}/#{binary}", "#{@lib_dir}/#{binary}"
       end
-
-      # ensure file is always copied
-      file "#{@lib_dir}/#{binary}" => ["copy:#{name}:#{platf}"]
 
       # binary in temporary folder depends on makefile and source files
       # tmp/extension_name/extension_name.{so,bundle}
@@ -102,6 +101,12 @@ module Rake
         task "compile"
       end
 
+      # compile:name
+      unless Rake::Task.task_defined?("compile:#{@name}") then
+        desc "Compile #{@name}"
+        task "compile:#{@name}"
+      end
+
       # Allow segmented compilation by platfrom (open door for 'cross compile')
       task "compile:#{@name}:#{platf}" => ["copy:#{@name}:#{platf}"]
       task "compile:#{platf}" => ["compile:#{@name}:#{platf}"]
@@ -109,20 +114,63 @@ module Rake
       # Only add this extension to the compile chain if current
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
+        # ensure file is always copied
+        file "#{@lib_dir}/#{binary}" => ["copy:#{name}:#{platf}"]
+
         task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
         task "compile" => ["compile:#{platf}"]
       end
     end
 
-    def define_native_tasks
-      # only gems with 'ruby' platforms are allowed to define native tasks
-      return unless @gem_spec.platform == 'ruby'
+    def define_native_tasks(for_platform = nil)
+      platf = for_platform || platform
+
+      # tmp_path
+      tmp_path = "#{@tmp_dir}/#{platf}/#{@name}"
 
       # create 'native:gem_name' and chain it to 'native' task
-      native_task_for(@gem_spec)
+      spec = @gem_spec.dup
 
-      # hook the binary to the prerequisites for this task
-      task native_task_gem => ["#{@lib_dir}/#{binary}"]
+      unless Rake::Task.task_defined?("native:#{@gem_spec.name}:#{platf}")
+        task "native:#{@gem_spec.name}:#{platf}" do |t|
+          # adjust to specified platform
+          spec.platform = platf
+
+          # clear the extensions defined in the specs
+          spec.extensions.clear
+
+          # add the binaries that this task depends on
+          ext_files = t.prerequisites.map { |ext| "#{@lib_dir}/#{File.basename(ext)}" }
+          spec.files += ext_files
+
+          puts spec.files.inspect
+
+          # Generate a package for this gem
+          gem_package = Rake::GemPackageTask.new(spec) do |pkg|
+            pkg.need_zip = false
+            pkg.need_tar = false
+          end
+
+          # ensure the binaries are copied
+          puts "#{gem_package.package_dir}/#{gem_package.gem_file}"
+          task "#{gem_package.package_dir}/#{gem_package.gem_file}" => ["copy:#{@name}:#{platf}"]
+
+          puts Rake::Task["#{gem_package.package_dir}/#{gem_package.gem_file}"].prerequisites.inspect
+        end
+      end
+
+      # add binaries to the dependency chain
+      task "native:#{@gem_spec.name}:#{platf}" => ["#{tmp_path}/#{binary}"]
+
+      # Allow segmented packaging by platfrom (open door for 'cross compile')
+      task "native:#{platf}" => ["native:#{@gem_spec.name}:#{platf}"]
+
+      # Only add this extension to the compile chain if current
+      # platform matches the indicated one.
+      if platf == RUBY_PLATFORM then
+        task "native:#{@gem_spec.name}" => ["native:#{@gem_spec.name}:#{platf}"]
+        task "native" => ["native:#{platf}"]
+      end
     end
 
     def extconf
@@ -139,36 +187,6 @@ module Rake
 
     def source_files
      @source_files ||= FileList["#{@ext_dir}/#{@name}/#{@source_pattern}"]
-    end
-
-    def native_task_gem
-      "native:#{@gem_spec.name}"
-    end
-
-    def native_task_for(gem_spec)
-      return if Rake::Task.task_defined?(native_task_gem)
-
-      spec = gem_spec.dup
-
-      task native_task_gem do |t|
-        # adjust to current platform
-        spec.platform = (@platform || Gem::Platform::CURRENT)
-
-        # clear the extensions defined in the specs
-        spec.extensions.clear
-
-        # add the binary dependencies of this task
-        spec.files += t.prerequisites
-
-        # Generate a package for this gem
-        gem_package = Rake::GemPackageTask.new(spec) do |pkg|
-          pkg.need_zip = false
-          pkg.need_tar = false
-        end
-      end
-
-      # add this native task to the list
-      task "native" => [native_task_gem]
     end
   end
 end
