@@ -9,6 +9,8 @@ require 'rake/tasklib'
 require 'rbconfig'
 
 module Rake
+  autoload :GemPackageTask, 'rake/gempackagetask'
+
   class ExtensionTask < TaskLib
     attr_accessor :name
     attr_accessor :gem_spec
@@ -49,19 +51,44 @@ module Rake
     end
 
     private
-    def define_compile_tasks
+    def define_compile_tasks(for_platform = nil)
+      # platform usage
+      platf = for_platform || platform
+
+      # tmp_path
+      tmp_path = "#{@tmp_dir}/#{platf}/#{@name}"
+
+      # cleanup and clobbering
+      CLEAN.include(tmp_path)
+      CLOBBER.include("#{@lib_dir}/#{binary}")
+      CLOBBER.include("#{@tmp_dir}")
+
       # directories we need
       directory tmp_path
-      directory @lib_dir
+      directory lib_dir
 
-      # platform specific temp folder should be on the cleaning
-      CLEAN.include(tmp_path)
+      # copy binary from temporary location to final lib
+      # tmp/extension_name/extension_name.{so,bundle} => lib/
+      task "copy:#{@name}:#{platf}" => [lib_dir, "#{tmp_path}/#{binary}"] do
+        cp "#{tmp_path}/#{binary}", "#{@lib_dir}/#{binary}"
+      end
+
+      # ensure file is always copied
+      file "#{@lib_dir}/#{binary}" => ["copy:#{name}:#{platf}"]
+
+      # binary in temporary folder depends on makefile and source files
+      # tmp/extension_name/extension_name.{so,bundle}
+      file "#{tmp_path}/#{binary}" => ["#{tmp_path}/Makefile"] + source_files do
+        chdir tmp_path do
+          sh make
+        end
+      end
 
       # makefile depends of tmp_dir and config_script
       # tmp/extension_name/Makefile
-      file makefile => [tmp_path, extconf] do
+      file "#{tmp_path}/Makefile" => [tmp_path, extconf] do
         parent = Dir.pwd
-        Dir.chdir tmp_path do
+        chdir tmp_path do
           # FIXME: Rake is broken for multiple arguments system() calls.
           # Add current directory to the search path of Ruby
           # Also, include additional parameters supplied.
@@ -69,64 +96,37 @@ module Rake
         end
       end
 
-      # binary in temporary folder depends on makefile and source files
-      # tmp/extension_name/extension_name.{so,bundle}
-      file tmp_binary => [makefile] + source_files do
-        Dir.chdir tmp_path do
-          sh make
-        end
+      # compile tasks
+      unless Rake::Task.task_defined?('compile') then
+        desc "Compile all the extensions"
+        task "compile"
       end
 
-      # copy binary from temporary location to final lib
-      # tmp/extension_name/extension_name.{so,bundle} => lib/
-      file lib_binary => [lib_path, tmp_binary] do
-        cp tmp_binary, lib_binary
+      # Allow segmented compilation by platfrom (open door for 'cross compile')
+      task "compile:#{@name}:#{platf}" => ["copy:#{@name}:#{platf}"]
+      task "compile:#{platf}" => ["compile:#{@name}:#{platf}"]
+
+      # Only add this extension to the compile chain if current
+      # platform matches the indicated one.
+      if platf == RUBY_PLATFORM then
+        task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
+        task "compile" => ["compile:#{platf}"]
       end
-
-      # clobbering should remove the binaries from lib_path
-      CLOBBER.include(lib_binary)
-
-      # we should also clobber the tmp folder
-      CLOBBER.include(@tmp_dir)
-
-      desc "Compile just the #{@name} extension"
-      task "compile:#{@name}" => [lib_binary]
-
-      desc "Compile the extension(s)" unless Rake::Task.task_defined?('compile')
-      task "compile" => ["compile:#{@name}"]
     end
 
     def define_native_tasks
       # only gems with 'ruby' platforms are allowed to define native tasks
       return unless @gem_spec.platform == 'ruby'
 
-      require 'rake/gempackagetask' unless defined?(Rake::GemPackageTask)
-
       # create 'native:gem_name' and chain it to 'native' task
       native_task_for(@gem_spec)
 
       # hook the binary to the prerequisites for this task
-      task native_task_gem => [lib_binary]
-    end
-
-    def makefile
-      "#{tmp_path}/Makefile"
+      task native_task_gem => ["#{@lib_dir}/#{binary}"]
     end
 
     def extconf
-      "#{ext_path}/#{@config_script}"
-    end
-
-    def tmp_path
-      File.join(@tmp_dir, platform, @name)
-    end
-
-    def ext_path
-      File.join(@ext_dir, @name)
-    end
-
-    def lib_path
-      @lib_dir
+      "#{@ext_dir}/#{@name}/#{@config_script}"
     end
 
     def make
@@ -138,15 +138,7 @@ module Rake
     end
 
     def source_files
-     @source_files ||= FileList["#{ext_path}/#{@source_pattern}"]
-    end
-
-    def tmp_binary
-      "#{tmp_path}/#{binary}"
-    end
-
-    def lib_binary
-      "#{lib_path}/#{binary}"
+     @source_files ||= FileList["#{@ext_dir}/#{@name}/#{@source_pattern}"]
     end
 
     def native_task_gem

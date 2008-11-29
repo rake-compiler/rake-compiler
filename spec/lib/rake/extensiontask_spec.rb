@@ -109,8 +109,8 @@ describe Rake::ExtensionTask do
           Rake::Task.task_defined?('compile').should be_true
         end
 
-        it "should depend on 'compile:extension_one'" do
-          Rake::Task['compile'].prerequisites.should include('compile:extension_one')
+        it "should depend on 'compile:{platform}'" do
+          Rake::Task['compile'].prerequisites.should include("compile:#{@platform}")
         end
       end
 
@@ -119,8 +119,8 @@ describe Rake::ExtensionTask do
           Rake::Task.task_defined?('compile:extension_one').should be_true
         end
 
-        it "should depend on 'lib/extension_one.{so,bundle}'" do
-          Rake::Task['compile:extension_one'].prerequisites.should include("lib/#{@ext_bin}")
+        it "should depend on 'compile:extension_one:{platform}'" do
+          Rake::Task['compile:extension_one'].prerequisites.should include("compile:extension_one:#{@platform}")
         end
       end
 
@@ -129,12 +129,8 @@ describe Rake::ExtensionTask do
           Rake::Task.task_defined?("lib/#{@ext_bin}").should be_true
         end
 
-        it "should depend on 'lib'" do
-          Rake::Task["lib/#{@ext_bin}"].prerequisites.should include("lib")
-        end
-
-        it "should depend on 'tmp/extension_one.{so,bundle}'" do
-          Rake::Task["lib/#{@ext_bin}"].prerequisites.should include("tmp/#{@platform}/extension_one/#{@ext_bin}")
+        it "should depend on 'copy:extension_one:{platform}'" do
+          Rake::Task["lib/#{@ext_bin}"].prerequisites.should include("copy:extension_one:#{@platform}")
         end
       end
 
