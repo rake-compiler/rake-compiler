@@ -53,6 +53,15 @@ end
 EOF
 end
 
+def template_rake_extension_cross_compile(extension_name)
+<<-EOF
+require 'rake/extensiontask'
+Rake::ExtensionTask.new("#{extension_name}") do |ext|
+  ext.cross_compile = true
+end
+EOF
+end
+
 def template_extconf(extension_name)
 <<-EOF
 require 'mkmf'

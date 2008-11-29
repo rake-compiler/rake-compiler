@@ -3,9 +3,19 @@ Given /^a extension named '(.*)'$/ do |extension_name|
   generate_source_code_for extension_name
 end
 
+Given /^a extension cross-compilable '(.*)'$/ do |extension_name|
+  generate_cross_compile_extension_task_for extension_name
+  generate_source_code_for extension_name
+end
+
 Given /^a extension '(.*)' with forced platform '(.*)'$/ do |extension_name, forced_platform|
   generate_extension_task_for extension_name, forced_platform
   generate_source_code_for extension_name
+end
+
+Given /^that all my source files are in place$/ do
+  Given "a safe project directory"
+  Given "a extension cross-compilable 'extension_one'"
 end
 
 Given /^not changed any file since$/ do

@@ -40,6 +40,18 @@ def generate_extension_task_for(extension_name, platform = nil)
   end
 end
 
+def generate_cross_compile_extension_task_for(extension_name)
+  # create folder structure
+  FileUtils.mkdir_p "ext/#{extension_name}"
+
+  return if File.exist?("tasks/#{extension_name}.rake")
+
+  # create specific extension rakefile
+  File.open("tasks/#{extension_name}.rake", 'w') do |ext_rake|
+    ext_rake.puts template_rake_extension_cross_compile(extension_name)
+  end
+end
+
 def generate_source_code_for(extension_name)
   # source C file
   File.open("ext/#{extension_name}/source.c", 'w') do |c|
