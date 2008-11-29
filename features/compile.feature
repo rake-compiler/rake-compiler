@@ -20,7 +20,7 @@ Feature: Compile C code into Ruby extensions.
     And not changed any file since
     When rake task 'compile' is invoked
     Then rake task 'compile' succeeded
-    And output of rake task 'compile' do not contain /extension_one/
+    And output of rake task 'compile' do not contain /gcc|cl/
 
   Scenario: recompile extension when source is modified
     Given a safe project directory
