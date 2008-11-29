@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: rake-compiler
 version: !ruby/object:Gem::Version 
-  version: 0.1.1
+  version: 0.2.0
 platform: ruby
 authors: 
 - Luis Lavena
@@ -9,7 +9,7 @@ autorequire:
 bindir: bin
 cert_chain: []
 
-date: 2008-11-28 00:00:00 -02:00
+date: 2008-11-29 00:00:00 -02:00
 default_executable: 
 dependencies: 
 - !ruby/object:Gem::Dependency 
@@ -36,8 +36,11 @@ extra_rdoc_files:
 - LICENSE.txt
 files: 
 - features/compile.feature
+- features/cross-compile.feature
+- features/cross-package.feature
 - features/package.feature
 - features/step_definitions/compilation.rb
+- features/step_definitions/cross_compilation.rb
 - features/step_definitions/execution.rb
 - features/step_definitions/folders.rb
 - features/step_definitions/gem.rb
