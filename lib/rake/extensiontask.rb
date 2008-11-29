@@ -99,13 +99,20 @@ module Rake
 
       # makefile depends of tmp_dir and config_script
       # tmp/extension_name/Makefile
-      file "#{tmp_path}/Makefile" => [tmp_path, extconf] do
+      file "#{tmp_path}/Makefile" => [tmp_path, extconf] do |t|
+        options = @config_options.dup
+
+        # rbconfig.rb will be present if we are cross compiling
+        if t.prerequisites.include?("#{tmp_path}/rbconfig.rb") then
+          options.push(*@cross_config_options)
+        end
+
         parent = Dir.pwd
         chdir tmp_path do
           # FIXME: Rake is broken for multiple arguments system() calls.
           # Add current directory to the search path of Ruby
           # Also, include additional parameters supplied.
-          ruby ['-I.', File.join(parent, extconf), *@config_options].join(' ')
+          ruby ['-I.', File.join(parent, extconf), *options].join(' ')
         end
       end
 
