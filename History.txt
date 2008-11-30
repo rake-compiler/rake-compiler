@@ -1,0 +1,14 @@
+=== 0.2.1 / 2008-11-30
+
+* 2 Major Enhancements:
+
+  * Allow cross compilation (cross compile) using mingw32 on Linux or OSX.
+  * Allow packaging of gems for Windows on Linux or OSX.
+
+* 1 Minor Enhancement:
+
+  * Made generation of extensions safe and target folders per-platform
+
+* 1 Bug Fix:
+
+  * Ensure binaries for the specific platform are copied before packaging.

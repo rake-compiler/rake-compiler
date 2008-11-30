@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 spec = Gem::Specification.new do |s|
   # basic information
   s.name        = "rake-compiler"
-  s.version     = "0.2.0"
+  s.version     = "0.2.1"
   s.platform    = Gem::Platform::RUBY
 
   # description and details
@@ -34,7 +34,7 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = true
   s.rdoc_options << '--main'  << 'README.rdoc' << '--title' << 'rake-compiler -- Documentation'
 
-  s.extra_rdoc_files = %w(README.rdoc LICENSE.txt)
+  s.extra_rdoc_files = %w(README.rdoc LICENSE.txt History.txt)
 
   # project information
   s.homepage    = 'http://github.com/luislavena/rake-compiler'
