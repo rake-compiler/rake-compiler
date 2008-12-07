@@ -10,7 +10,6 @@ This is the result of expriences dealing with several Gems that required
 native extensions across platforms and different user configurations 
 where details like portability and clarity of code were lacking.
 
-
 == An Overview
 
 Let's summarize what rake-compiler provides:
@@ -23,6 +22,7 @@ Let's summarize what rake-compiler provides:
 
 * Mimics RubyGems installation process, so helps as test environment.
 
+* Simplify cross platform compilation of extensions (target Windows from Linux).
 
 == I'm sold! show me how to use it! (Installation)
 
@@ -39,11 +39,9 @@ from GitHub:
 
 The development gem is usually in pretty good shape actually.
 
-
 == Now what? (Usage)
 
 Now that you have the gem installed, let's give your project some structure.
-
 
 === Structure
 
@@ -60,7 +58,6 @@ organize the code and folders that will help rake-compiler do it's job:
 TIP: Having a consistent folder structure will help developers and newcomers
 to find code and also contribute back to your project more easily.
 
-
 === Adding the code
 
 So now it's time to introduce the code to compile our extension:
@@ -72,7 +69,6 @@ So now it's time to introduce the code to compile our extension:
     Rake::ExtensionTask.new('hello_world')
 
 Ok, that's it. No other line of code.
-
 
 === Compile process
 
@@ -162,7 +158,6 @@ personalize several settings for <tt>Rake::ExtensionTask</tt>:
                                               # will be used to based on.
     end
 
-
 == Future is now: Cross compilation
 
 rake-compiler provides now an standarized way to generate, from Linux or OSX
@@ -170,7 +165,6 @@ both extensions and gem binaries for Windows!
 
 It takes advantages from GCC host/target to build binaries (for target) on 
 different OS (hosts).
-
 
 === How I enjoy this?
 
@@ -181,7 +175,6 @@ Dependending on your operating system distribution, a simple <tt>apt-get install
 will be enough.
 
 Please check OSX documentation about installing mingw32 from macports.
-
 
 === I have my toolchain, now what?
 
@@ -228,7 +221,6 @@ And now, build your gems for Windows is just 4 more letters:
 
 And you're done, yeah.
 
-
 == Future
 
 rake-compiler is a work in progress and we will appreciate feedback during the
@@ -239,13 +231,11 @@ You can find more information about rake-compiler:
 Blog:      http://blog.mmediasys.com
 GitHub:    http://github.com/luislavena/rake-compiler
 
-
 === Some of the features already underworks
 
 * <tt>Rake::JavaJarTask</tt> to generate <tt>jar</tt> packages and gems for JRuby.
 
   $ rake java gem
-
 
 == Disclaimer
 
