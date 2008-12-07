@@ -1,6 +1,6 @@
 require 'rake/rdoctask'
 
-Rake::RDocTask.new(:rdoc) do |rd|
+DOC = Rake::RDocTask.new(:rdoc) do |rd|
   rd.title    = 'rake-compiler -- Documentation'
   rd.main     = 'README.rdoc'
   rd.rdoc_dir = 'doc/api'
