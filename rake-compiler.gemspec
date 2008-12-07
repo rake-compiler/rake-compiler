@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: rake-compiler
 version: !ruby/object:Gem::Version 
-  version: 0.2.1
+  version: 0.3.0
 platform: ruby
 authors: 
 - Luis Lavena
@@ -9,7 +9,7 @@ autorequire:
 bindir: bin
 cert_chain: []
 
-date: 2008-11-30 00:00:00 -05:00
+date: 2008-12-07 00:00:00 -05:00
 default_executable: 
 dependencies: 
 - !ruby/object:Gem::Dependency 
@@ -55,9 +55,10 @@ files:
 - tasks/bin/cross-ruby.rake
 - tasks/common.rake
 - tasks/cucumber.rake
+- tasks/gem.rake
 - tasks/rdoc.rake
+- tasks/release.rake
 - tasks/rspec.rake
-- tasks/rubygems.rake
 - Rakefile
 - README.rdoc
 - History.txt
@@ -87,7 +88,7 @@ required_rubygems_version: !ruby/object:Gem::Requirement
   version: 
 requirements: []
 
-rubyforge_project: TODO
+rubyforge_project: rake-compiler
 rubygems_version: 1.3.0
 signing_key: 
 specification_version: 2
