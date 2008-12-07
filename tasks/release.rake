@@ -7,7 +7,7 @@ end
 
 if defined?(RubyForge) then
   if defined?(GEM_SPEC) then
-    task :release => [:clean, :package] do |t|
+    task :release => [:clobber, :package] do |t|
       ver = ENV['VERSION'] or fail "Must supply VERSION (rake release VERSION=x.y.z)."
 
       # compare versions to avoid mistakes
@@ -68,7 +68,7 @@ if defined?(RubyForge) then
       end
 
       puts "Releasing #{GEM_SPEC.name} version #{GEM_SPEC.version}..."
-      #rf.add_release GEM_SPEC.rubyforge_project, GEM_SPEC.name, GEM_SPEC.version, *files
+      rf.add_release GEM_SPEC.rubyforge_project, GEM_SPEC.name, GEM_SPEC.version, *files
       puts "Done."
     end
   else
