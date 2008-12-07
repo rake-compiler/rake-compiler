@@ -7,6 +7,7 @@ end
 
 if defined?(RubyForge) then
   if defined?(GEM_SPEC) then
+    desc 'Package and upload to RubyForge'
     task :release => [:clobber, :package] do |t|
       ver = ENV['VERSION'] or fail "Must supply VERSION (rake release VERSION=x.y.z)."
 
