@@ -51,12 +51,6 @@ if defined?(RubyForge) then
       # prepare configuration
       rf.configure config
 
-      # ensure this was not released before
-      releases = rf.autoconfig['release_ids']
-      if releases.has_key?(GEM_SPEC.name) and releases[GEM_SPEC.name][GEM_SPEC.version] then
-        fail "Release #{GEM_SPEC.version} already exist. Unable to release."
-      end
-
       files = FileList["pkg/#{GEM_SPEC.name}-#{GEM_SPEC.version}*.*"].to_a
       fail "No files found for the release." if files.empty?
 
