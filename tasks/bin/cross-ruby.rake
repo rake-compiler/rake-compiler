@@ -133,10 +133,11 @@ end
 # rbconfig.rb location
 file "#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb" => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/bin/ruby.exe"]
 
-file "#{USER_HOME}/config.yml" => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb"] do |t|
-  if File.exist?(t.name) then
+file :update_config => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb"] do |t|
+  config_file = "#{USER_HOME}/config.yml"
+  if File.exist?(config_file) then
     puts "Updating #{t.name}"
-    config = YAML.load_file(t.name)
+    config = YAML.load_file(config_file)
   else
     puts "Generating #{t.name}"
     config = {}
@@ -144,8 +145,8 @@ file "#{USER_HOME}/config.yml" => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/rub
 
   config["rbconfig-#{MAJOR}"] = File.expand_path(t.prerequisites.first)
 
-  when_writing("Saving changes into #{t.name}") {
-    File.open(t.name, 'w') do |f|
+  when_writing("Saving changes into #{config_file}") {
+    File.open(config_file, 'w') do |f|
       f.puts config.to_yaml
     end
   }
@@ -155,4 +156,4 @@ task :default do
 end
 
 desc "Build #{RUBY_CC_VERSION} suitable for cross-platform development."
-task 'cross-ruby' => [:mingw32, :environment, "#{USER_HOME}/config.yml"]
+task 'cross-ruby' => [:mingw32, :environment, :update_config]
