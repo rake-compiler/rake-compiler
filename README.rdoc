@@ -215,11 +215,21 @@ Compiles keeps being simple:
 
   rake cross compile
 
-And now, build your gems for Windows is just 4 more letters:
+And now, build your gems for Windows is just 5 more letters:
 
   rake cross native gem
 
 And you're done, yeah.
+
+=== Take it even further
+
+You can specify against with version of Ruby you want to build the extension:
+
+  rake cross compile RUBY_CC_VERSION=1.8
+
+If you installed <tt>1.9.1</tt>, you can do:
+
+  rake cross compile RUBY_CC_VERSION=1.9
 
 == Future
 
@@ -229,9 +239,10 @@ development of it! (and contributions too!)
 You can find more information about rake-compiler:
 
 Blog:      http://blog.mmediasys.com
+RubyForge: http://rubyforge.org/projects/rake-compiler
 GitHub:    http://github.com/luislavena/rake-compiler
 
-=== Some of the features already underworks
+=== Some of the desired features
 
 * <tt>Rake::JavaJarTask</tt> to generate <tt>jar</tt> packages and gems for JRuby.
 
