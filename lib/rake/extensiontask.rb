@@ -200,7 +200,7 @@ module Rake
 
     def define_cross_platform_tasks
       config_path = File.expand_path("~/.rake-compiler/config.yml")
-      major_ver = RUBY_VERSION.match(/(\d+.\d+)/)[1]
+      major_ver = (ENV['RUBY_CC_VERSION'] || RUBY_VERSION).match(/(\d+.\d+)/)[1]
 
       # warn the user about the need of configuration to use cross compilation.
       unless File.exist?(config_path)

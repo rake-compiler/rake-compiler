@@ -277,6 +277,20 @@ describe Rake::ExtensionTask do
         }.should raise_error(RuntimeError, /no configuration section for this version of Ruby/)
       end
 
+      it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
+        config = mock(Hash)
+        config.should_receive(:[]).with("rbconfig-2.0").and_return('/path/to/ruby/2.0/rbconfig.rb')
+        YAML.stub!(:load_file).and_return(config)
+        begin
+          ENV['RUBY_CC_VERSION'] = '2.0'
+          Rake::ExtensionTask.new('extension_one') do |ext|
+            ext.cross_compile = true
+          end
+        ensure
+          ENV.delete('RUBY_CC_VERSION')
+        end
+      end
+
       describe "(cross for 'universal-unknown' platform)" do
         before :each do
           @ext = Rake::ExtensionTask.new('extension_one', @spec) do |ext|
