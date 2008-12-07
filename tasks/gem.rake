@@ -1,6 +1,6 @@
 require 'rake/gempackagetask'
 
-spec = Gem::Specification.new do |s|
+GEM_SPEC = Gem::Specification.new do |s|
   # basic information
   s.name        = "rake-compiler"
   s.version     = "0.2.1"
@@ -37,22 +37,22 @@ spec = Gem::Specification.new do |s|
   s.extra_rdoc_files = %w(README.rdoc LICENSE.txt History.txt)
 
   # project information
-  s.homepage    = 'http://github.com/luislavena/rake-compiler'
-  s.rubyforge_project = 'TODO'
+  s.homepage          = 'http://github.com/luislavena/rake-compiler'
+  s.rubyforge_project = 'rake-compiler'
 
   # author and contributors
   s.author      = 'Luis Lavena'
   s.email       = 'luislavena@gmail.com'
 end
 
-gem_package = Rake::GemPackageTask.new(spec) do |pkg|
+gem_package = Rake::GemPackageTask.new(GEM_SPEC) do |pkg|
   pkg.need_tar = false
   pkg.need_zip = false
 end
 
-file 'rake-compiler.gemspec' => ['Rakefile', 'tasks/rubygems.rake'] do |t|
+file 'rake-compiler.gemspec' => ['Rakefile', 'tasks/gem.rake'] do |t|
   puts "Generating #{t.name}"
-  File.open(t.name, 'w') { |f| f.puts spec.to_yaml }
+  File.open(t.name, 'w') { |f| f.puts GEM_SPEC.to_yaml }
 end
 
 desc "Generate or update the standalone gemspec file for the project"
