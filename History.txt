@@ -1,3 +1,21 @@
+=== 0.2.2 (In Git)
+
+* 1 Major Enhancement:
+
+  * Let you specify the Ruby version used for cross compilation instead 
+    of default one.
+
+      rake cross compile RUBY_CC_VERSION=1.8
+
+* 2 Minor Enhancements:
+
+  * Properly update rake-compiler configuration when new version is installed.
+  * Automated release process to RubyForge, yay!
+
+* 1 Bug fix:
+
+  * Corrected documentation to reflect the available options
+
 === 0.2.1 / 2008-11-30
 
 * 2 Major Enhancements:
