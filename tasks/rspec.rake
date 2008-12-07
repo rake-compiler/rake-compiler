@@ -13,9 +13,6 @@ if defined?(Spec)
     t.spec_files  = FileList["spec/**/*_spec.rb"]
   end
 
-  # make packing depend on success of running specs
-  task :package => [:spec]
-
   if defined?(Rcov)
     CLOBBER.include('coverage')
 
