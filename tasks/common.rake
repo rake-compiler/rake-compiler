@@ -11,3 +11,6 @@ task :package => [:spec, :features]
 
 # make the release re-generate the gemspec if required
 task :release => [:gemspec]
+
+# publish documentation when doing a release
+task :release => [:publish]
