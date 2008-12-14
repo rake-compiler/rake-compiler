@@ -27,6 +27,18 @@ RUBY_CC_VERSION = "ruby-#{ENV['VERSION'] || '1.8.6-p287'}"
 # grab the major "1.8" or "1.9" part of the version number
 MAJOR = RUBY_CC_VERSION.match(/.*-(\d.\d).\d/)[1]
 
+# Sorry!
+# On some systems (linux) you get i586 targets, on others i386 targets, at 
+# present, I only know to search for them.
+compilers = %w(i586-mingw32msvc-gcc i386-mingw32-gcc)
+paths = ENV['PATH'].split(File::PATH_SEPARATOR)
+compiler = compilers.find do |comp|
+  paths.find do |path|
+    File.exist? File.join(path, comp)
+  end
+end
+MINGW_HOST = compiler[0..-5]
+
 # define a location where sources will be stored
 directory "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
 directory "#{USER_HOME}/builds/#{RUBY_CC_VERSION}"
@@ -82,7 +94,7 @@ file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in" => ["#{USER_HOME}/sou
 end
 
 task :mingw32 do
-  unless File.exist?('/usr/bin/i586-mingw32msvc-gcc') then
+  unless MINGW_HOST then
     warn "You need to install mingw32 cross compile functionality to be able to continue."
     warn "Please refer to your distro documentation about installation."
     fail
@@ -103,7 +115,7 @@ file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/
 
   # set the configure options
   options = [
-    '--host=i586-mingw32msvc',
+    "--host=#{MINGW_HOST}",
     '--target=i386-mingw32',
     '--build=i686-linux',
     '--enable-shared'
