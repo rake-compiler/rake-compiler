@@ -240,7 +240,10 @@ module Rake
         task 'compile' => ["compile:#{cross_platform}"]
 
         # clear lib/binary dependencies and trigger cross platform ones
-        Rake::Task["#{@lib_dir}/#{binary(cross_platform)}"].prerequisites.clear
+        # check if lib/binary is defined (damn bundle versus so versus dll)
+        if Rake::Task.task_defined?("#{@lib_dir}/#{binary(cross_platform)}") then
+          Rake::Task["#{@lib_dir}/#{binary(cross_platform)}"].prerequisites.clear
+        end
         file "#{@lib_dir}/#{binary(cross_platform)}" => ["copy:#{@name}:#{cross_platform}"]
 
         # if everything for native task is in place
