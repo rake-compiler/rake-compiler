@@ -76,7 +76,7 @@ module Rake
 
       # cleanup and clobbering
       CLEAN.include(tmp_path)
-      CLOBBER.include("#{@lib_dir}/#{binary}")
+      CLOBBER.include("#{@lib_dir}/#{binary(platf)}")
       CLOBBER.include("#{@tmp_dir}")
 
       # directories we need
@@ -85,13 +85,13 @@ module Rake
 
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
-      task "copy:#{@name}:#{platf}" => [lib_dir, "#{tmp_path}/#{binary}"] do
-        cp "#{tmp_path}/#{binary}", "#{@lib_dir}/#{binary}"
+      task "copy:#{@name}:#{platf}" => [lib_dir, "#{tmp_path}/#{binary(platf)}"] do
+        cp "#{tmp_path}/#{binary(platf)}", "#{@lib_dir}/#{binary(platf)}"
       end
 
       # binary in temporary folder depends on makefile and source files
       # tmp/extension_name/extension_name.{so,bundle}
-      file "#{tmp_path}/#{binary}" => ["#{tmp_path}/Makefile"] + source_files do
+      file "#{tmp_path}/#{binary(platf)}" => ["#{tmp_path}/Makefile"] + source_files do
         chdir tmp_path do
           sh make
         end
@@ -136,7 +136,7 @@ module Rake
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
         # ensure file is always copied
-        file "#{@lib_dir}/#{binary}" => ["copy:#{name}:#{platf}"]
+        file "#{@lib_dir}/#{binary(platf)}" => ["copy:#{name}:#{platf}"]
 
         task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
         task "compile" => ["compile:#{platf}"]
@@ -185,7 +185,7 @@ module Rake
       end
 
       # add binaries to the dependency chain
-      task "native:#{@gem_spec.name}:#{platf}" => ["#{tmp_path}/#{binary}"]
+      task "native:#{@gem_spec.name}:#{platf}" => ["#{tmp_path}/#{binary(platf)}"]
 
       # Allow segmented packaging by platfrom (open door for 'cross compile')
       task "native:#{platf}" => ["native:#{@gem_spec.name}:#{platf}"]
@@ -240,8 +240,8 @@ module Rake
         task 'compile' => ["compile:#{cross_platform}"]
 
         # clear lib/binary dependencies and trigger cross platform ones
-        Rake::Task["#{@lib_dir}/#{binary}"].prerequisites.clear
-        file "#{@lib_dir}/#{binary}" => ["copy:#{@name}:#{cross_platform}"]
+        Rake::Task["#{@lib_dir}/#{binary(cross_platform)}"].prerequisites.clear
+        file "#{@lib_dir}/#{binary(cross_platform)}" => ["copy:#{@name}:#{cross_platform}"]
 
         # if everything for native task is in place
         if @gem_spec && @gem_spec.platform == 'ruby' then
@@ -259,8 +259,16 @@ module Rake
       RUBY_PLATFORM =~ /mswin/ ? 'nmake' : 'make'
     end
 
-    def binary
-      "#{@name}.#{RbConfig::CONFIG['DLEXT']}"
+    def binary(platform = nil)
+      ext = case platform
+        when /darwin/
+          'bundle'
+        when /mingw|mswin|linux/
+          'so'
+        else
+          RbConfig::CONFIG['DLEXT']
+      end
+      "#{@name}.#{ext}"
     end
 
     def source_files
