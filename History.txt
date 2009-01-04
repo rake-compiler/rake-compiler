@@ -1,3 +1,14 @@
+=== In Git
+
+* 2 Minor Enhancements:
+
+  * Download cross-ruby source code using HTTP instead of FTP.
+  * Disabled Tcl/Tk extension building on cross-ruby (helps with 1.9).
+
+* 1 Bug fix:
+
+  * Use proper binary extension on OSX (reported by Dirkjan Bussink).
+
 === 0.3.0 / 2008-12-07
 
 * 1 Major Enhancement:
