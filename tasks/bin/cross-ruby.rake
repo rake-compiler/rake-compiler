@@ -57,7 +57,7 @@ CLOBBER.include("#{USER_HOME}/config.yml")
 file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.gz" => ["#{USER_HOME}/sources"] do |t|
   # download the source file using wget or curl
   chdir File.dirname(t.name) do
-    url = "ftp://ftp.ruby-lang.org/pub/ruby/#{MAJOR}/#{File.basename(t.name)}"
+    url = "http://ftp.ruby-lang.org/pub/ruby/#{MAJOR}/#{File.basename(t.name)}"
     sh "wget #{url} || curl -O #{url}"
   end
 end
@@ -118,7 +118,10 @@ file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/
     "--host=#{MINGW_HOST}",
     '--target=i386-mingw32',
     '--build=i686-linux',
-    '--enable-shared'
+    '--enable-shared',
+    '--disable-install-doc',
+    '--without-tk',
+    '--without-tcl'
   ]
 
   chdir File.dirname(t.name) do
