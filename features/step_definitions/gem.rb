@@ -24,6 +24,7 @@ end
 
 def gem_file_platform(folder, name, version, platform = nil)
   file = "#{folder}/#{name}-#{version}"
-  file << "-" << (platform || Gem::Platform.local.to_s)
+  file << "-" << (platform || Gem::Platform.new(RUBY_PLATFORM).to_s)
   file << ".gem"
+  file
 end
