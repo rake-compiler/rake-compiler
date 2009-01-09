@@ -1,4 +1,4 @@
-=== In Git
+=== 0.3.1 / 2009-01-09
 
 * 2 Minor Enhancements:
 
