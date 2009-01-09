@@ -5,8 +5,9 @@
   * Download cross-ruby source code using HTTP instead of FTP.
   * Disabled Tcl/Tk extension building on cross-ruby (helps with 1.9).
 
-* 2 Bug fixes:
+* 3 Bug fixes:
 
+  * Workaround bug introduced by lack of Gem::Specification cloning. Fixes DM LH #757.
   * Use proper binary extension on OSX (reported by Dirkjan Bussink).
   * Ensure lib/binary task is defined prior clear of requisites.
 

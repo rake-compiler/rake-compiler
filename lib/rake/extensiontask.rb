@@ -150,10 +150,12 @@ module Rake
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}"
 
       # create 'native:gem_name' and chain it to 'native' task
-      spec = @gem_spec.dup
-
       unless Rake::Task.task_defined?("native:#{@gem_spec.name}:#{platf}")
         task "native:#{@gem_spec.name}:#{platf}" do |t|
+          # FIXME: truly duplicate the Gem::Specification
+          # workaround the lack of #dup for Gem::Specification
+          spec = Gem::Specification.from_yaml(gem_spec.to_yaml)
+
           # adjust to specified platform
           spec.platform = platf
 
