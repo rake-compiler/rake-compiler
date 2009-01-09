@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: rake-compiler
 version: !ruby/object:Gem::Version 
-  version: 0.3.0
+  version: 0.3.1
 platform: ruby
 authors: 
 - Luis Lavena
@@ -9,7 +9,7 @@ autorequire:
 bindir: bin
 cert_chain: []
 
-date: 2008-12-07 00:00:00 -05:00
+date: 2009-01-09 00:00:00 -02:00
 default_executable: 
 dependencies: 
 - !ruby/object:Gem::Dependency 
@@ -56,7 +56,9 @@ files:
 - tasks/common.rake
 - tasks/cucumber.rake
 - tasks/gem.rake
+- tasks/news.rake
 - tasks/rdoc.rake
+- tasks/rdoc_publish.rake
 - tasks/release.rake
 - tasks/rspec.rake
 - Rakefile
