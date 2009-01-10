@@ -1,10 +1,16 @@
 begin
   gem 'rspec', '~> 1.1.9'
-  gem 'rcov', '~> 0.8.1'
   require 'spec/rake/spectask'
-  require 'rcov'
-rescue Exception
-  nil
+
+  begin
+    gem 'rcov', '~> 0.8.1'
+    require 'rcov'
+  rescue LoadError
+    warn "RCov gem is required, please install it (gem install rcov)."
+  end
+
+rescue LoadError
+  warn "RSpec gem is required, please install it (gem install rspec)."
 end
 
 if defined?(Spec)
@@ -25,9 +31,5 @@ if defined?(Spec)
         t.rcov_opts   = ["--exclude", "spec/*,features/*,gems/*"]
       end
     end
-  else
-    warn "RCov gem is required, please install it (gem install rcov)."
   end
-else
-  warn "RSpec gem is required, please install it (gem install rspec)."
 end
