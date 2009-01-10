@@ -128,7 +128,7 @@ module Rake
         task "compile:#{@name}"
       end
 
-      # Allow segmented compilation by platfrom (open door for 'cross compile')
+      # Allow segmented compilation by platform (open door for 'cross compile')
       task "compile:#{@name}:#{platf}" => ["copy:#{@name}:#{platf}"]
       task "compile:#{platf}" => ["compile:#{@name}:#{platf}"]
 
