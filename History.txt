@@ -1,3 +1,9 @@
+=== In Git
+
+* Miscellaneous:
+
+  * Better output of Rake development tasks (Thanks to Luis Parravicini).
+
 === 0.3.1 / 2009-01-09
 
 * 2 Minor Enhancements:
