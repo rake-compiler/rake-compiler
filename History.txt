@@ -9,6 +9,9 @@
       ext.ext_dir = 'custom/location'         # look into custom/location
     end                                       # instead of ext/my_extension
 
+  * Better detection of mingw target across Linux/OSX.
+    Exposed it as Rake::ExtensionCompiler
+
 === Bugfixes
 
   * Better output of Rake development tasks (Thanks to Luis Parravicini).

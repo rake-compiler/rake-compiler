@@ -21,23 +21,21 @@ require 'rake'
 require 'rake/clean'
 require 'yaml'
 
+# load compiler helpers
+# add lib directory to the search path
+libdir = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
+$LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
+
+require 'rake/extensioncompiler'
+
 USER_HOME = File.expand_path("~/.rake-compiler")
 RUBY_CC_VERSION = "ruby-#{ENV['VERSION'] || '1.8.6-p287'}"
 
 # grab the major "1.8" or "1.9" part of the version number
 MAJOR = RUBY_CC_VERSION.match(/.*-(\d.\d).\d/)[1]
 
-# Sorry!
-# On some systems (linux) you get i586 targets, on others i386 targets, at 
-# present, I only know to search for them.
-compilers = %w(i586-mingw32msvc-gcc i386-mingw32-gcc)
-paths = ENV['PATH'].split(File::PATH_SEPARATOR)
-compiler = compilers.find do |comp|
-  paths.find do |path|
-    File.exist? File.join(path, comp)
-  end
-end
-MINGW_HOST = compiler[0..-5]
+# Use Rake::ExtensionCompiler helpers to find the proper host
+MINGW_HOST = Rake::ExtensionCompiler.mingw_host
 
 # define a location where sources will be stored
 directory "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
@@ -96,7 +94,7 @@ end
 task :mingw32 do
   unless MINGW_HOST then
     warn "You need to install mingw32 cross compile functionality to be able to continue."
-    warn "Please refer to your distro documentation about installation."
+    warn "Please refer to your distribution/package manager documentation about installation."
     fail
   end
 end
@@ -113,10 +111,9 @@ end
 file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/#{RUBY_CC_VERSION}",
                                   "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in"] do |t|
 
-  # set the configure options
   options = [
-    "--host=#{MINGW_HOST}",
     '--target=i386-mingw32',
+    "--host=#{MINGW_HOST}",
     '--build=i686-linux',
     '--enable-shared',
     '--disable-install-doc',
@@ -151,10 +148,10 @@ file "#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/ruby/#{MAJOR}/i386-mingw32/rbconf
 file :update_config => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb"] do |t|
   config_file = "#{USER_HOME}/config.yml"
   if File.exist?(config_file) then
-    puts "Updating #{t.name}"
+    puts "Updating #{config_file}"
     config = YAML.load_file(config_file)
   else
-    puts "Generating #{t.name}"
+    puts "Generating #{config_file}"
     config = {}
   end
 
