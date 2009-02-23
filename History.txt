@@ -1,5 +1,14 @@
 == In Git (possible 0.4.0?)
 
+=== Enhancements
+
+  * Bended the convention for extension folder.
+    Defining <tt>ext_dir</tt> for custom extension location.
+
+    Rake::ExtensionTask.new('my_extension') do |ext|
+      ext.ext_dir = 'custom/location'         # look into custom/location
+    end                                       # instead of ext/my_extension
+
 === Bugfixes
 
   * Better output of Rake development tasks (Thanks to Luis Parravicini).
