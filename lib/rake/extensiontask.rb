@@ -157,7 +157,7 @@ module Rake
           spec = Gem::Specification.from_yaml(gem_spec.to_yaml)
 
           # adjust to specified platform
-          spec.platform = platf
+          spec.platform = Gem::Platform.new(platf)
 
           # clear the extensions defined in the specs
           spec.extensions.clear
