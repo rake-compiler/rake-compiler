@@ -1,9 +1,7 @@
 begin
-  gem 'rspec', '~> 1.1.9'
   require 'spec/rake/spectask'
 
   begin
-    gem 'rcov', '~> 0.8.1'
     require 'rcov'
   rescue LoadError
     warn "RCov gem is required, please install it (gem install rcov)."
