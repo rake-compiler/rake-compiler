@@ -68,10 +68,6 @@ describe Rake::ExtensionTask do
       @ext.tmp_dir.should == 'tmp'
     end
 
-    it 'should look for extension inside ext/' do
-      @ext.ext_dir.should == 'ext'
-    end
-
     it 'should copy build extension into lib/' do
       @ext.lib_dir.should == 'lib'
     end
@@ -191,6 +187,23 @@ describe Rake::ExtensionTask do
 
         it "should include 'tmp'" do
           CLOBBER.should include('tmp')
+        end
+      end
+    end
+
+    describe '(extension in custom location)' do
+      before :each do
+        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
+        @ext = Rake::ExtensionTask.new('extension_one') do |ext|
+          ext.ext_dir = 'custom/ext/foo'
+        end
+        @ext_bin = ext_bin('extension_one')
+        @platform = RUBY_PLATFORM
+      end
+
+      describe 'tmp/{platform}/extension_one/Makefile' do
+        it "should depend on 'custom/ext/foo/extconf.rb'" do
+          Rake::Task["tmp/#{@platform}/extension_one/Makefile"].prerequisites.should include("custom/ext/foo/extconf.rb")
         end
       end
     end

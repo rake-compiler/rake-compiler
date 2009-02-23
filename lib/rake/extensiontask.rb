@@ -37,7 +37,7 @@ module Rake
       @gem_spec = gem_spec
       @config_script = 'extconf.rb'
       @tmp_dir = 'tmp'
-      @ext_dir = 'ext'
+      @ext_dir = "ext/#{@name}"
       @lib_dir = 'lib'
       @source_pattern = "*.c"
       @config_options = []
@@ -257,7 +257,7 @@ module Rake
     end
 
     def extconf
-      "#{@ext_dir}/#{@name}/#{@config_script}"
+      "#{@ext_dir}/#{@config_script}"
     end
 
     def make
@@ -277,7 +277,7 @@ module Rake
     end
 
     def source_files
-     @source_files ||= FileList["#{@ext_dir}/#{@name}/#{@source_pattern}"]
+     @source_files ||= FileList["#{@ext_dir}/#{@source_pattern}"]
     end
   end
 end
