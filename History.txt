@@ -1,51 +1,51 @@
-=== In Git
+== In Git (possible 0.4.0?)
 
-* Miscellaneous:
+=== Bugfixes
 
   * Better output of Rake development tasks (Thanks to Luis Parravicini).
 
-=== 0.3.1 / 2009-01-09
+== 0.3.1 / 2009-01-09
 
-* 2 Minor Enhancements:
+=== Enhancements
 
   * Download cross-ruby source code using HTTP instead of FTP.
   * Disabled Tcl/Tk extension building on cross-ruby (helps with 1.9).
 
-* 3 Bug fixes:
+=== Bugfixes
 
   * Workaround bug introduced by lack of Gem::Specification cloning. Fixes DM LH #757.
   * Use proper binary extension on OSX (reported by Dirkjan Bussink).
   * Ensure lib/binary task is defined prior clear of requisites.
 
-=== 0.3.0 / 2008-12-07
+== 0.3.0 / 2008-12-07
 
-* 1 Major Enhancement:
+=== New features
 
   * Let you specify the Ruby version used for cross compilation instead 
     of default one.
 
       rake cross compile RUBY_CC_VERSION=1.8
 
-* 2 Minor Enhancements:
+=== Enhancements
 
   * Properly update rake-compiler configuration when new version is installed.
   * Automated release process to RubyForge, yay!
 
-* 1 Bug fix:
+=== Bugfixes
 
   * Corrected documentation to reflect the available options
 
-=== 0.2.1 / 2008-11-30
+== 0.2.1 / 2008-11-30
 
-* 2 Major Enhancements:
+=== New features
 
   * Allow cross compilation (cross compile) using mingw32 on Linux or OSX.
   * Allow packaging of gems for Windows on Linux or OSX.
 
-* 1 Minor Enhancement:
+=== Enhancements
 
   * Made generation of extensions safe and target folders per-platform
 
-* 1 Bug Fix:
+=== Bugfixes
 
   * Ensure binaries for the specific platform are copied before packaging.
