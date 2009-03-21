@@ -259,8 +259,8 @@ describe Rake::ExtensionTask do
         Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
         @spec = mock_gem_spec
         @config_file = File.expand_path("~/.rake-compiler/config.yml")
-        @major_ver = RUBY_VERSION.match(/(\d+.\d+)/)[1]
-        @config_path = mock_config_yml["rbconfig-#{@major_ver}"]
+        @ruby_ver = RUBY_VERSION
+        @config_path = mock_config_yml["rbconfig-#{@ruby_ver}"]
       end
 
       it 'should not generate an error if no rake-compiler configuration exist' do
@@ -281,21 +281,21 @@ describe Rake::ExtensionTask do
 
       it 'should fail if no section of config file defines running version of ruby' do
         config = mock(Hash)
-        config.should_receive(:[]).with("rbconfig-#{@major_ver}").and_return(nil)
+        config.should_receive(:[]).with("rbconfig-#{@ruby_ver}").and_return(nil)
         YAML.stub!(:load_file).and_return(config)
         lambda {
           Rake::ExtensionTask.new('extension_one') do |ext|
             ext.cross_compile = true
           end
-        }.should raise_error(RuntimeError, /no configuration section for this version of Ruby/)
+        }.should raise_error(RuntimeError, /no configuration section for specified version of Ruby/)
       end
 
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
         config = mock(Hash)
-        config.should_receive(:[]).with("rbconfig-2.0").and_return('/path/to/ruby/2.0/rbconfig.rb')
+        config.should_receive(:[]).with("rbconfig-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
         YAML.stub!(:load_file).and_return(config)
         begin
-          ENV['RUBY_CC_VERSION'] = '2.0'
+          ENV['RUBY_CC_VERSION'] = '1.9.1'
           Rake::ExtensionTask.new('extension_one') do |ext|
             ext.cross_compile = true
           end
@@ -358,8 +358,8 @@ describe Rake::ExtensionTask do
 
   def mock_config_yml
     {
-      'rbconfig-1.8' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-1.9' => '/some/path/version/1.9/to/rbconfig.rb'
+      'rbconfig-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb'
     }
   end
 end

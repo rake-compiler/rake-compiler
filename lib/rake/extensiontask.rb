@@ -202,7 +202,7 @@ module Rake
 
     def define_cross_platform_tasks
       config_path = File.expand_path("~/.rake-compiler/config.yml")
-      major_ver = (ENV['RUBY_CC_VERSION'] || RUBY_VERSION).match(/(\d+.\d+)/)[1]
+      ruby_ver = ENV['RUBY_CC_VERSION'] || RUBY_VERSION
 
       # warn the user about the need of configuration to use cross compilation.
       unless File.exist?(config_path)
@@ -215,8 +215,8 @@ module Rake
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{cross_platform}/#{@name}"
 
-      unless rbconfig_file = config_file["rbconfig-#{major_ver}"] then
-        fail "no configuration section for this version of Ruby (rbconfig-#{major_ver})"
+      unless rbconfig_file = config_file["rbconfig-#{ruby_ver}"] then
+        fail "no configuration section for specified version of Ruby (rbconfig-#{ruby_ver})"
       end
 
       # define compilation tasks for cross platfrom!
