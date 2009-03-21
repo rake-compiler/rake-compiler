@@ -165,6 +165,9 @@ file :update_config => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/ruby/#{MAJOR}/
 end
 
 task :default do
+  # Force the display of the available tasks when no option is given
+  Rake.application.options.show_task_pattern = //
+  Rake.application.display_tasks_and_comments
 end
 
 desc "Build #{RUBY_CC_VERSION} suitable for cross-platform development."
