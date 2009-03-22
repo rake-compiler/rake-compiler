@@ -141,11 +141,10 @@ file "#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/bin/ruby.exe" => ["#{USER_HOME}/build
     sh "make install"
   end
 end
+task :install => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/bin/ruby.exe"]
 
-# rbconfig.rb location
-file "#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb" => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/bin/ruby.exe"]
-
-file :update_config => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/ruby/#{MAJOR}/i386-mingw32/rbconfig.rb"] do |t|
+desc "Update rake-compiler list of installed Ruby versions"
+task 'update-config' do
   config_file = "#{USER_HOME}/config.yml"
   if File.exist?(config_file) then
     puts "Updating #{config_file}"
@@ -155,7 +154,13 @@ file :update_config => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/lib/ruby/#{MAJOR}/
     config = {}
   end
 
-  config["rbconfig-#{MAJOR}"] = File.expand_path(t.prerequisites.first)
+  files = Dir.glob("#{USER_HOME}/ruby/**/rbconfig.rb").sort
+
+  files.each do |rbconfig|
+    version = rbconfig.match(/.*-(\d.\d.\d)/)[1]
+    config["rbconfig-#{version}"] = rbconfig
+    puts "Found Ruby version #{version} (#{rbconfig})"
+  end
 
   when_writing("Saving changes into #{config_file}") {
     File.open(config_file, 'w') do |f|
@@ -171,4 +176,4 @@ task :default do
 end
 
 desc "Build #{RUBY_CC_VERSION} suitable for cross-platform development."
-task 'cross-ruby' => [:mingw32, :environment, :update_config]
+task 'cross-ruby' => [:mingw32, :environment, :install, 'update-config']

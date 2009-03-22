@@ -14,6 +14,9 @@
 
   * Display list of available tasks when calling rake-compiler script
 
+  * Track Ruby full versioning (x.y.z).
+    This will help the compilation of extensions targetting 1.8.6/7 and 1.9.1
+
 === Bugfixes
 
   * Better output of Rake development tasks (Thanks to Luis Parravicini).
