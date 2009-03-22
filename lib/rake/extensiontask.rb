@@ -102,17 +102,30 @@ module Rake
       file "#{tmp_path}/Makefile" => [tmp_path, extconf] do |t|
         options = @config_options.dup
 
+        # include current directory
+        cmd = ['-I.']
+
+        # if fake.rb is present, add to the command line
+        if t.prerequisites.include?("#{tmp_path}/fake.rb") then
+          cmd << '-rfake'
+        end
+
+        # now add the extconf script
+        cmd << File.join(Dir.pwd, extconf)
+
         # rbconfig.rb will be present if we are cross compiling
         if t.prerequisites.include?("#{tmp_path}/rbconfig.rb") then
           options.push(*@cross_config_options)
         end
 
-        parent = Dir.pwd
+        # add options to command
+        cmd.push(*options)
+
         chdir tmp_path do
           # FIXME: Rake is broken for multiple arguments system() calls.
           # Add current directory to the search path of Ruby
           # Also, include additional parameters supplied.
-          ruby ['-I.', File.join(parent, extconf), *options].join(' ')
+          ruby cmd.join(' ')
         end
       end
 
@@ -222,12 +235,19 @@ module Rake
       # define compilation tasks for cross platfrom!
       define_compile_tasks(cross_platform)
 
-      # chain rbconfig.rb to Makefile generation
-      file "#{tmp_path}/Makefile" => ["#{tmp_path}/rbconfig.rb"]
+      # chain fake.rb and rbconfig.rb to Makefile generation
+      file "#{tmp_path}/Makefile" => ["#{tmp_path}/fake.rb", "#{tmp_path}/rbconfig.rb"]
 
       # copy the file from the cross-ruby location
       file "#{tmp_path}/rbconfig.rb" => [rbconfig_file] do |t|
         cp t.prerequisites.first, t.name
+      end
+
+      # genearte fake.rb for different ruby versions
+      file "#{tmp_path}/fake.rb" do |t|
+        File.open(t.name, 'w') do |f|
+          f.write fake_rb(ruby_ver)
+        end
       end
 
       # now define native tasks for cross compiled files
@@ -278,6 +298,17 @@ module Rake
 
     def source_files
      @source_files ||= FileList["#{@ext_dir}/#{@source_pattern}"]
+    end
+
+    def fake_rb(version)
+      <<-FAKE_RB
+        class Object
+          remove_const :RUBY_PLATFORM
+          remove_const :RUBY_VERSION
+          RUBY_PLATFORM = "i386-mingw32"
+          RUBY_VERSION = "#{version}"
+        end
+FAKE_RB
     end
   end
 end

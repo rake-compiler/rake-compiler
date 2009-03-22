@@ -261,6 +261,8 @@ describe Rake::ExtensionTask do
         @config_file = File.expand_path("~/.rake-compiler/config.yml")
         @ruby_ver = RUBY_VERSION
         @config_path = mock_config_yml["rbconfig-#{@ruby_ver}"]
+
+        File.stub!(:open).and_yield(mock_fake_rb)
       end
 
       it 'should not generate an error if no rake-compiler configuration exist' do
@@ -294,14 +296,15 @@ describe Rake::ExtensionTask do
         config = mock(Hash)
         config.should_receive(:[]).with("rbconfig-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
         YAML.stub!(:load_file).and_return(config)
-        begin
-          ENV['RUBY_CC_VERSION'] = '1.9.1'
-          Rake::ExtensionTask.new('extension_one') do |ext|
-            ext.cross_compile = true
-          end
-        ensure
-          ENV.delete('RUBY_CC_VERSION')
+
+        ENV['RUBY_CC_VERSION'] = '1.9.1'
+        Rake::ExtensionTask.new('extension_one') do |ext|
+          ext.cross_compile = true
         end
+      end
+
+      after :each do
+        ENV.delete('RUBY_CC_VERSION')
       end
 
       describe "(cross for 'universal-unknown' platform)" do
@@ -309,6 +312,12 @@ describe Rake::ExtensionTask do
           @ext = Rake::ExtensionTask.new('extension_one', @spec) do |ext|
             ext.cross_compile = true
             ext.cross_platform = 'universal-unknown'
+          end
+        end
+
+        describe 'fake' do
+          it 'should chain fake task to Makefile generation' do
+            Rake::Task['tmp/universal-unknown/extension_one/Makefile'].prerequisites.should include('tmp/universal-unknown/extension_one/fake.rb')
           end
         end
 
@@ -359,7 +368,12 @@ describe Rake::ExtensionTask do
   def mock_config_yml
     {
       'rbconfig-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb'
+      'rbconfig-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-3.0.0' => '/some/fake/version/3.0.0/to/rbconfig.rb'
     }
+  end
+
+  def mock_fake_rb
+    mock(File, :write => 45)
   end
 end
