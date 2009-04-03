@@ -21,6 +21,7 @@
 
   * Better output of Rake development tasks (Thanks to Luis Parravicini).
   * Proper usage of Gem::Platform for native gems (Thanks to Dirkjan Bussink).
+  * Don't use autoload for YAML (present problems with Ruby 1.9.1).
 
 == 0.3.1 / 2009-01-09
 

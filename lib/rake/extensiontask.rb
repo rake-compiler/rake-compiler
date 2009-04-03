@@ -7,10 +7,10 @@ require 'rake'
 require 'rake/clean'
 require 'rake/tasklib'
 require 'rbconfig'
+require 'yaml'
 
 module Rake
   autoload :GemPackageTask, 'rake/gempackagetask'
-  autoload :YAML, 'yaml'
 
   class ExtensionTask < TaskLib
     attr_accessor :name
