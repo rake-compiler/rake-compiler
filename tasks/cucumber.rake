@@ -1,5 +1,5 @@
 begin
-  gem 'cucumber', '~> 0.1.8'
+  gem 'cucumber'
   require 'cucumber/rake/task'
 rescue Exception
   nil
@@ -12,3 +12,4 @@ if defined?(Cucumber)
 else
   warn "Cucumber gem is required, please install it. (gem install cucumber)"
 end
+
