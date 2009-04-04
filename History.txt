@@ -1,4 +1,4 @@
-== In Git (possible 0.4.0?)
+== 0.4.0  2009-04-03
 
 === Enhancements
 
