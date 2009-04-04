@@ -36,7 +36,7 @@ if defined?(RubyForge) then
       # read changes
       changes = begin
                   h = File.read("History.txt")
-                  h.split(/^(==.*)/)[1..2].join.strip
+                  h.split(/^(==+ .*)/)[1..6].join.strip
                 rescue
                   warn "Missing History.txt"
                   ''
