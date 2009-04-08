@@ -229,7 +229,8 @@ module Rake
       tmp_path = "#{@tmp_dir}/#{cross_platform}/#{@name}"
 
       unless rbconfig_file = config_file["rbconfig-#{ruby_ver}"] then
-        fail "no configuration section for specified version of Ruby (rbconfig-#{ruby_ver})"
+        warn "no configuration section for specified version of Ruby (rbconfig-#{ruby_ver})"
+        return
       end
 
       # define compilation tasks for cross platfrom!
