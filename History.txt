@@ -1,4 +1,16 @@
-=== 0.4.0  2009-04-03
+=== 0.4.1 / 2009-04-09
+
+* Enhancements
+  * Target specific versions of Ruby when generating binaries.
+    This avoids installing a 1.8.x binary gem in 1.9.x and viceversa.
+    (Thanks to Aaron Patterson for the patches)
+
+* Bugfixes
+  * No longer raises error if rake-compiler configuration is missing.
+    Not all users of a project would have it installed.
+    (Thanks to Aaron Patterson for the patch)
+
+=== 0.4.0 / 2009-04-03
 
 * Enhancements
   * Bended the convention for extension folder.
