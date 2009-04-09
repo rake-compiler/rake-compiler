@@ -265,13 +265,16 @@ describe Rake::ExtensionTask do
         File.stub!(:open).and_yield(mock_fake_rb)
       end
 
-      it 'should not generate an error if no rake-compiler configuration exist' do
+      it 'should warn if no rake-compiler configuration exist' do
         File.should_receive(:exist?).with(@config_file).and_return(false)
-        lambda {
+
+        out, err = capture_output do
           Rake::ExtensionTask.new('extension_one') do |ext|
             ext.cross_compile = true
           end
-        }.should_not raise_error(RuntimeError)
+        end
+
+        err.should match(/rake-compiler must be configured first to enable cross-compilation/)
       end
 
       it 'should parse the config file using YAML' do
@@ -281,15 +284,16 @@ describe Rake::ExtensionTask do
         end
       end
 
-      it 'should fail if no section of config file defines running version of ruby' do
+      it 'should warn if no section of config file defines running version of ruby' do
         config = mock(Hash)
         config.should_receive(:[]).with("rbconfig-#{@ruby_ver}").and_return(nil)
         YAML.stub!(:load_file).and_return(config)
-        lambda {
+        out, err = capture_output do
           Rake::ExtensionTask.new('extension_one') do |ext|
             ext.cross_compile = true
           end
-        }.should raise_error(RuntimeError, /no configuration section for specified version of Ruby/)
+        end
+        err.should match(/no configuration section for specified version of Ruby/)
       end
 
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
