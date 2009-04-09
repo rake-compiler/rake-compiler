@@ -190,7 +190,8 @@ module Rake
 
           # Make sure that the required ruby version matches the ruby version
           # we've used for cross compiling:
-          spec.required_ruby_version = "~> #{RUBY_VERSION.sub(/\.\d+$/, '.0')}"
+          target_version = RUBY_VERSION =~ /^1.8/ ? '1.8.6' : '1.9.0'
+          spec.required_ruby_version = "~> #{target_version}"
 
           # Generate a package for this gem
           gem_package = Rake::GemPackageTask.new(spec) do |pkg|
