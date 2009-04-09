@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
-#
-# HACK: Lousy API design, sue me. At least works ;-)
-#
-# Define a series of helpers to aid in search and usage of MinGW (GCC) Compiler
-# by gem developer/creators.
-#
-
 module Rake
+
+  #
+  # HACK: Lousy API design, sue me. At least works ;-)
+  #
+  # Define a series of helpers to aid in search and usage of MinGW (GCC) Compiler
+  # by gem developer/creators.
+  #
   module ExtensionCompiler
     # return the host portion from the installed MinGW
     def self.mingw_host
