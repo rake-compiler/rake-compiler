@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: rake-compiler
 version: !ruby/object:Gem::Version 
-  version: 0.4.0
+  version: 0.4.1
 platform: ruby
 authors: 
 - Luis Lavena
@@ -9,7 +9,7 @@ autorequire:
 bindir: bin
 cert_chain: []
 
-date: 2009-04-03 00:00:00 -03:00
+date: 2009-04-09 00:00:00 -03:00
 default_executable: 
 dependencies: 
 - !ruby/object:Gem::Dependency 
@@ -53,6 +53,7 @@ files:
 - lib/rake/extensiontask.rb
 - spec/lib/rake/extensiontask_spec.rb
 - spec/spec_helper.rb
+- spec/support/capture_output_helper.rb
 - tasks/bin/cross-ruby.rake
 - tasks/common.rake
 - tasks/cucumber.rake
