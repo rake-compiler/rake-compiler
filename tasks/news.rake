@@ -5,6 +5,8 @@ rescue Exception
   nil
 end
 
+CLEAN.include('email.txt')
+
 if defined?(RubyForge) then
   if defined?(GEM_SPEC) then
     desc 'Create news email file and post to RubyForge.'
