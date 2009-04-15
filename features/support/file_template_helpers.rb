@@ -1,5 +1,6 @@
-def template_rakefile
-<<-EOF
+module FileTemplateHelpers
+  def template_rakefile
+    <<-EOF
 # add rake-compiler lib dir to the LOAD_PATH
 $LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '../..', 'lib'))
 
@@ -9,10 +10,10 @@ require 'rake'
 # load rakefile extensions (tasks)
 Dir['tasks/*.rake'].each { |f| import f }
 EOF
-end
+  end
 
-def template_rake_gemspec(gem_name)
-<<-EOF
+  def template_rake_gemspec(gem_name)
+    <<-EOF
 require 'rake/gempackagetask'
 SPEC = Gem::Specification.new do |s|
   s.name = "#{gem_name}"
@@ -37,52 +38,55 @@ gem_package = Rake::GemPackageTask.new(SPEC) do |pkg|
   pkg.need_tar = false
 end
 EOF
-end
+  end
 
-def template_rake_extension(extension_name, gem_spec = nil)
-<<-EOF
+  def template_rake_extension(extension_name, gem_spec = nil)
+    <<-EOF
 require 'rake/extensiontask'
 Rake::ExtensionTask.new("#{extension_name}"#{', SPEC' if gem_spec})
 EOF
-end
+  end
 
-def template_rake_extension_with_platform(extension_name, platform)
-<<-EOF
+  def template_rake_extension_with_platform(extension_name, platform)
+    <<-EOF
 require 'rake/extensiontask'
 Rake::ExtensionTask.new("#{extension_name}", SPEC) do |ext|
   ext.platform = "#{platform}"
 end
 EOF
-end
+  end
 
-def template_rake_extension_cross_compile(extension_name, gem_spec = nil)
-<<-EOF
+  def template_rake_extension_cross_compile(extension_name, gem_spec = nil)
+    <<-EOF
 require 'rake/extensiontask'
 Rake::ExtensionTask.new("#{extension_name}"#{', SPEC' if gem_spec}) do |ext|
   ext.cross_compile = true
 end
 EOF
-end
+  end
 
-def template_extconf(extension_name)
-<<-EOF
+  def template_extconf(extension_name)
+    <<-EOF
 require 'mkmf'
 create_makefile("#{extension_name}")
 EOF
-end
+  end
 
-def template_source_c(extension_name)
-<<-EOF
+  def template_source_c(extension_name)
+    <<-EOF
 #include "source.h"
 void Init_#{extension_name}()
 {
   printf("source.c of extension #{extension_name}\\n");
 }
 EOF
-end
+  end
 
-def template_source_h
-<<-EOF
+  def template_source_h
+    <<-EOF
 #include "ruby.h"
 EOF
+  end
 end
+
+World(FileTemplateHelpers)
