@@ -66,7 +66,8 @@ file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.gz" => ["#{USER_HOME}/sources"
 end
 
 # Extract the sources
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => ["#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.gz"] do |t|
+source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.gz"
+file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => [source_file] do |t|
   chdir File.dirname(t.name) do
     t.prerequisites.each { |f| sh "tar xfz #{File.basename(f)}" }
   end
