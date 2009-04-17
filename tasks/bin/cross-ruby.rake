@@ -30,6 +30,7 @@ require 'rake/extensioncompiler'
 
 USER_HOME = File.expand_path("~/.rake-compiler")
 RUBY_CC_VERSION = "ruby-#{ENV['VERSION'] || '1.8.6-p287'}"
+RUBY_SOURCE = ENV['SOURCE']
 
 # grab the major "1.8" or "1.9" part of the version number
 MAJOR = RUBY_CC_VERSION.match(/.*-(\d.\d).\d/)[1]
@@ -55,7 +56,11 @@ CLOBBER.include("#{USER_HOME}/config.yml")
 file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.gz" => ["#{USER_HOME}/sources"] do |t|
   # download the source file using wget or curl
   chdir File.dirname(t.name) do
-    url = "http://ftp.ruby-lang.org/pub/ruby/#{MAJOR}/#{File.basename(t.name)}"
+    if RUBY_SOURCE
+      url = RUBY_SOURCE
+    else
+      url = "http://ftp.ruby-lang.org/pub/ruby/#{MAJOR}/#{File.basename(t.name)}"
+    end
     sh "wget #{url} || curl -O #{url}"
   end
 end
