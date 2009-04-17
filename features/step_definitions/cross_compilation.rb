@@ -17,6 +17,15 @@ Given %r{^I've installed cross compile toolchain$} do
 end
 
 Then /^binaries for platform '(.*)' get generated$/ do |platform|
-  ext_for_platform = Dir.glob("tmp/#{platform}/**/*.#{RbConfig::CONFIG['DLEXT']}")
+  ext = case platform
+    when /darwin/
+      'bundle'
+    when /mingw|mswin|linux/
+      'so'
+    else
+      RbConfig::CONFIG['DLEXT']
+  end
+
+  ext_for_platform = Dir.glob("tmp/#{platform}/**/*.#{ext}")
   ext_for_platform.should_not be_empty
 end
