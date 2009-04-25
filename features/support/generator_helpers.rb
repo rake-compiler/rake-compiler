@@ -60,6 +60,21 @@ module GeneratorHelpers
     end
   end
 
+  def generate_multi_cross_compile_extension_task_for(extension_name)
+    # create folder structure
+    FileUtils.mkdir_p "ext/#{extension_name}"
+
+    return if File.exist?("tasks/#{extension_name}.rake")
+
+    # create specific extension rakefile
+    # Building a gem?
+    if File.exist?("tasks/gem.rake") then
+      File.open("tasks/gem.rake", 'a+') do |ext_in_gem|
+        ext_in_gem.puts template_rake_extension_multi_cross_compile(extension_name)
+      end
+    end
+  end
+
   def generate_source_code_for(extension_name)
     # source C file
     File.open("ext/#{extension_name}/source.c", 'w') do |c|

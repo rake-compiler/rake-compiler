@@ -65,6 +65,16 @@ end
 EOF
   end
 
+  def template_rake_extension_multi_cross_compile(extension_name)
+    <<-EOF
+require 'rake/extensiontask'
+Rake::ExtensionTask.new("#{extension_name}", SPEC) do |ext|
+  ext.cross_compile = true
+  ext.cross_platform = ['i386-mswin32', 'i386-mingw32']
+end
+EOF
+  end
+
   def template_extconf(extension_name)
     <<-EOF
 require 'mkmf'

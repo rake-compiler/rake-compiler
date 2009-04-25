@@ -62,8 +62,13 @@ module Rake
       define_native_tasks if @gem_spec && @gem_spec.platform == 'ruby'
 
       # only define cross platform functionality when enabled
-      # FIXME: there is no value for having this on Windows or JRuby
-      define_cross_platform_tasks if @cross_compile
+      return unless @cross_compile
+
+      if cross_platform.is_a?(Array) then
+        cross_platform.each { |platf| define_cross_platform_tasks(platf) }
+      else
+        define_cross_platform_tasks(cross_platform)
+      end
     end
 
     private
@@ -218,7 +223,7 @@ module Rake
       end
     end
 
-    def define_cross_platform_tasks
+    def define_cross_platform_tasks(for_platform)
       config_path = File.expand_path("~/.rake-compiler/config.yml")
       ruby_ver = ENV['RUBY_CC_VERSION'] || RUBY_VERSION
 
@@ -231,7 +236,7 @@ module Rake
       config_file = YAML.load_file(config_path)
 
       # tmp_path
-      tmp_path = "#{@tmp_dir}/#{cross_platform}/#{@name}"
+      tmp_path = "#{@tmp_dir}/#{for_platform}/#{@name}"
 
       unless rbconfig_file = config_file["rbconfig-#{ruby_ver}"] then
         warn "no configuration section for specified version of Ruby (rbconfig-#{ruby_ver})"
@@ -239,7 +244,7 @@ module Rake
       end
 
       # define compilation tasks for cross platfrom!
-      define_compile_tasks(cross_platform)
+      define_compile_tasks(for_platform)
 
       # chain fake.rb and rbconfig.rb to Makefile generation
       file "#{tmp_path}/Makefile" => ["#{tmp_path}/fake.rb", "#{tmp_path}/rbconfig.rb"]
@@ -257,27 +262,31 @@ module Rake
       end
 
       # now define native tasks for cross compiled files
-      define_native_tasks(cross_platform) if @gem_spec && @gem_spec.platform == 'ruby'
+      define_native_tasks(for_platform) if @gem_spec && @gem_spec.platform == 'ruby'
 
       # create cross task
       task 'cross' do
         # clear compile dependencies
-        Rake::Task['compile'].prerequisites.clear
+        Rake::Task['compile'].prerequisites.reject! { |t| !compiles_cross_platform.include?(t) }
 
         # chain the cross platform ones
-        task 'compile' => ["compile:#{cross_platform}"]
+        task 'compile' => ["compile:#{for_platform}"]
 
         # clear lib/binary dependencies and trigger cross platform ones
         # check if lib/binary is defined (damn bundle versus so versus dll)
-        if Rake::Task.task_defined?("#{@lib_dir}/#{binary(cross_platform)}") then
-          Rake::Task["#{@lib_dir}/#{binary(cross_platform)}"].prerequisites.clear
+        if Rake::Task.task_defined?("#{@lib_dir}/#{binary(for_platform)}") then
+          Rake::Task["#{@lib_dir}/#{binary(for_platform)}"].prerequisites.clear
         end
-        file "#{@lib_dir}/#{binary(cross_platform)}" => ["copy:#{@name}:#{cross_platform}"]
+
+        # FIXME: targeting multiple platforms copies the file twice
+        file "#{@lib_dir}/#{binary(for_platform)}" => ["copy:#{@name}:#{for_platform}"]
 
         # if everything for native task is in place
         if @gem_spec && @gem_spec.platform == 'ruby' then
-          Rake::Task['native'].prerequisites.clear
-          task 'native' => ["native:#{cross_platform}"]
+          # double check: only cross platform native tasks should be here
+          # FIXME: Sooo brittle
+          Rake::Task['native'].prerequisites.reject! { |t| !natives_cross_platform.include?(t) }
+          task 'native' => ["native:#{for_platform}"]
         end
       end
     end
@@ -304,6 +313,14 @@ module Rake
 
     def source_files
      @source_files ||= FileList["#{@ext_dir}/#{@source_pattern}"]
+    end
+
+    def compiles_cross_platform
+      [*@cross_platform].map { |p| "compile:#{p}" }
+    end
+
+    def natives_cross_platform
+      [*@cross_platform].map { |p| "native:#{p}" }
     end
 
     def fake_rb(version)

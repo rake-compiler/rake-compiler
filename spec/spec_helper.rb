@@ -9,5 +9,7 @@ require 'spec'
 require File.expand_path(File.join(File.dirname(__FILE__), 'support/capture_output_helper'))
 
 Spec::Runner.configure do |config|
+  config.predicate_matchers[:have_defined] = :task_defined?
+
   include CaptureOutputHelper
 end

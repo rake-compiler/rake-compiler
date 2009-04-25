@@ -355,6 +355,18 @@ describe Rake::ExtensionTask do
           end
         end
       end
+
+      context '(cross for multiple platforms)' do
+        it 'should define task for each supplied platform' do
+          @ext = Rake::ExtensionTask.new('extension_one', @spec) do |ext|
+            ext.cross_compile = true
+            ext.cross_platform = ['universal-known', 'universal-unknown']
+          end
+
+          Rake::Task.should have_defined('compile:universal-known')
+          Rake::Task.should have_defined('compile:universal-unknown')
+        end
+      end
     end
   end
 
