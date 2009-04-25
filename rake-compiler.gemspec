@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: rake-compiler
 version: !ruby/object:Gem::Version 
-  version: 0.4.1
+  version: 0.5.0
 platform: ruby
 authors: 
 - Luis Lavena
@@ -9,7 +9,7 @@ autorequire:
 bindir: bin
 cert_chain: []
 
-date: 2009-04-09 00:00:00 -03:00
+date: 2009-04-25 00:00:00 -03:00
 default_executable: 
 dependencies: 
 - !ruby/object:Gem::Dependency 
@@ -25,7 +25,9 @@ dependencies:
       - !ruby/object:Gem::Version 
         version: "0.9"
     version: 
-description: Provide a standard and simplified way to build and package Ruby C extensions using Rake as glue.
+description: |-
+  Provide a standard and simplified way to build and package
+  Ruby C extensions using Rake as glue.
 email: luislavena@gmail.com
 executables: 
 - rake-compiler
@@ -38,6 +40,7 @@ extra_rdoc_files:
 files: 
 - features/compile.feature
 - features/cross-compile.feature
+- features/cross-package-multi.feature
 - features/cross-package.feature
 - features/package.feature
 - features/step_definitions/compilation.rb
@@ -46,8 +49,8 @@ files:
 - features/step_definitions/folders.rb
 - features/step_definitions/gem.rb
 - features/support/env.rb
-- features/support/file_templates.rb
-- features/support/generators.rb
+- features/support/file_template_helpers.rb
+- features/support/generator_helpers.rb
 - bin/rake-compiler
 - lib/rake/extensioncompiler.rb
 - lib/rake/extensiontask.rb
@@ -70,6 +73,8 @@ files:
 - cucumber.yml
 has_rdoc: true
 homepage: http://github.com/luislavena/rake-compiler
+licenses: 
+- MIT
 post_install_message: 
 rdoc_options: 
 - --main
@@ -93,9 +98,9 @@ required_rubygems_version: !ruby/object:Gem::Requirement
 requirements: []
 
 rubyforge_project: rake-compiler
-rubygems_version: 1.3.1
+rubygems_version: 1.3.2
 signing_key: 
-specification_version: 2
+specification_version: 3
 summary: Rake-based Ruby C Extension task generator.
 test_files: []
 
