@@ -1,4 +1,4 @@
-require 'rake/gempackagetask'
+require 'rubygems/package_task'
 
 GEM_SPEC = Gem::Specification.new do |s|
   # basic information
@@ -8,10 +8,7 @@ GEM_SPEC = Gem::Specification.new do |s|
 
   # description and details
   s.summary     = 'Rake-based Ruby C Extension task generator.'
-  s.description = <<-EOF
-    Provide a standard and simplified way to build and package
-    Ruby C extensions using Rake as glue.
-  EOF
+  s.description = "Provide a standard and simplified way to build and package\nRuby C extensions using Rake as glue."
 
   # dependencies
   s.add_dependency  'rake', '>= 0.8.3', '< 0.9'
@@ -39,13 +36,14 @@ GEM_SPEC = Gem::Specification.new do |s|
   # project information
   s.homepage          = 'http://github.com/luislavena/rake-compiler'
   s.rubyforge_project = 'rake-compiler'
+  s.licenses          = ['MIT']
 
   # author and contributors
   s.author      = 'Luis Lavena'
   s.email       = 'luislavena@gmail.com'
 end
 
-gem_package = Rake::GemPackageTask.new(GEM_SPEC) do |pkg|
+gem_package = Gem::PackageTask.new(GEM_SPEC) do |pkg|
   pkg.need_tar = false
   pkg.need_zip = false
 end
