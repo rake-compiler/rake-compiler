@@ -1,3 +1,15 @@
+=== 0.5.0 / 2009-04-25
+
+* Enhancements
+  * Allow generation of multiple gems for Windows (EXPERIMENTAL)
+    This allows build gems for both VC6 and MinGW builts of Ruby
+    (Thanks to Jonathan Stott for the suggestion)
+
+      Rake::ExtensionTask.new('my_extension', GEM_SPEC) do |ext|
+        ext.cross_compile = true
+        ext.cross_platform = ['i386-mswin32', 'i386-mingw32']
+      end
+
 === 0.4.1 / 2009-04-09
 
 * Enhancements
