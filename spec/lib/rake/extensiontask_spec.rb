@@ -4,8 +4,8 @@ require 'rake/extensiontask'
 require 'rbconfig'
 
 describe Rake::ExtensionTask do
-  describe '#new' do
-    describe '(basic)' do
+  context '#new' do
+    context '(basic)' do
       it 'should raise an error if no name is provided' do
         lambda {
           Rake::ExtensionTask.new
@@ -55,7 +55,7 @@ describe Rake::ExtensionTask do
     end
   end
 
-  describe '(defaults)' do
+  context '(defaults)' do
     before :each do
       @ext = Rake::ExtensionTask.new('extension_one')
     end
@@ -97,14 +97,14 @@ describe Rake::ExtensionTask do
     end
   end
 
-  describe '(tasks)' do
+  context '(tasks)' do
     before :each do
       Rake.application.clear
       CLEAN.clear
       CLOBBER.clear
     end
 
-    describe '(one extension)' do
+    context '(one extension)' do
       before :each do
         Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
         @ext = Rake::ExtensionTask.new('extension_one')
@@ -112,7 +112,7 @@ describe Rake::ExtensionTask do
         @platform = RUBY_PLATFORM
       end
 
-      describe 'compile' do
+      context 'compile' do
         it 'should define as task' do
           Rake::Task.task_defined?('compile').should be_true
         end
@@ -122,7 +122,7 @@ describe Rake::ExtensionTask do
         end
       end
 
-      describe 'compile:extension_one' do
+      context 'compile:extension_one' do
         it 'should define as task' do
           Rake::Task.task_defined?('compile:extension_one').should be_true
         end
@@ -132,7 +132,7 @@ describe Rake::ExtensionTask do
         end
       end
 
-      describe 'lib/extension_one.{so,bundle}' do
+      context 'lib/extension_one.{so,bundle}' do
         it 'should define as task' do
           Rake::Task.task_defined?("lib/#{@ext_bin}").should be_true
         end
@@ -142,7 +142,7 @@ describe Rake::ExtensionTask do
         end
       end
 
-      describe 'tmp/{platform}/extension_one/extension_one.{so,bundle}' do
+      context 'tmp/{platform}/extension_one/extension_one.{so,bundle}' do
         it 'should define as task' do
           Rake::Task.task_defined?("tmp/#{@platform}/extension_one/#{@ext_bin}").should be_true
         end
@@ -160,7 +160,7 @@ describe Rake::ExtensionTask do
         end
       end
 
-      describe 'tmp/{platform}/extension_one/Makefile' do
+      context 'tmp/{platform}/extension_one/Makefile' do
         it 'should define as task' do
           Rake::Task.task_defined?("tmp/#{@platform}/extension_one/Makefile").should be_true
         end
@@ -174,13 +174,13 @@ describe Rake::ExtensionTask do
         end
       end
 
-      describe 'clean' do
+      context 'clean' do
         it "should include 'tmp/{platform}/extension_one' in the pattern" do
           CLEAN.should include("tmp/#{@platform}/extension_one")
         end
       end
 
-      describe 'clobber' do
+      context 'clobber' do
         it "should include 'lib/extension_one.{so,bundle}'" do
           CLOBBER.should include("lib/#{@ext_bin}")
         end
@@ -191,7 +191,7 @@ describe Rake::ExtensionTask do
       end
     end
 
-    describe '(extension in custom location)' do
+    context '(extension in custom location)' do
       before :each do
         Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
         @ext = Rake::ExtensionTask.new('extension_one') do |ext|
@@ -201,14 +201,14 @@ describe Rake::ExtensionTask do
         @platform = RUBY_PLATFORM
       end
 
-      describe 'tmp/{platform}/extension_one/Makefile' do
+      context 'tmp/{platform}/extension_one/Makefile' do
         it "should depend on 'custom/ext/foo/extconf.rb'" do
           Rake::Task["tmp/#{@platform}/extension_one/Makefile"].prerequisites.should include("custom/ext/foo/extconf.rb")
         end
       end
     end
 
-    describe '(native tasks)' do
+    context '(native tasks)' do
       before :each do
         Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
         @spec = mock_gem_spec
@@ -216,7 +216,7 @@ describe Rake::ExtensionTask do
         @platform = RUBY_PLATFORM
       end
 
-      describe 'native' do
+      context 'native' do
         before :each do
           @spec.stub!(:platform=).and_return('ruby')
         end
@@ -243,7 +243,7 @@ describe Rake::ExtensionTask do
           Rake::Task["native"].prerequisites.should include("native:#{@platform}")
         end
 
-        describe 'native:my_gem:{platform}' do
+        context 'native:my_gem:{platform}' do
           it 'should depend on binary extension' do
             Rake::ExtensionTask.new('extension_one', @spec)
             Rake::Task["native:my_gem:#{@platform}"].prerequisites.should include("tmp/#{@platform}/extension_one/#{@ext_bin}")
@@ -252,7 +252,7 @@ describe Rake::ExtensionTask do
       end
     end
 
-    describe '(cross platform tasks)' do
+    context '(cross platform tasks)' do
       before :each do
         File.stub!(:exist?).and_return(true)
         YAML.stub!(:load_file).and_return(mock_config_yml)
@@ -311,7 +311,7 @@ describe Rake::ExtensionTask do
         ENV.delete('RUBY_CC_VERSION')
       end
 
-      describe "(cross for 'universal-unknown' platform)" do
+      context "(cross for 'universal-unknown' platform)" do
         before :each do
           @ext = Rake::ExtensionTask.new('extension_one', @spec) do |ext|
             ext.cross_compile = true
@@ -319,13 +319,13 @@ describe Rake::ExtensionTask do
           end
         end
 
-        describe 'fake' do
+        context 'fake' do
           it 'should chain fake task to Makefile generation' do
             Rake::Task['tmp/universal-unknown/extension_one/Makefile'].prerequisites.should include('tmp/universal-unknown/extension_one/fake.rb')
           end
         end
 
-        describe 'rbconfig' do
+        context 'rbconfig' do
           it 'should chain rbconfig tasks to Makefile generation' do
             Rake::Task['tmp/universal-unknown/extension_one/Makefile'].prerequisites.should include('tmp/universal-unknown/extension_one/rbconfig.rb')
           end
@@ -335,7 +335,7 @@ describe Rake::ExtensionTask do
           end
         end
 
-        describe 'compile:universal-unknown' do
+        context 'compile:universal-unknown' do
           it "should be defined" do
             Rake::Task.task_defined?('compile:universal-unknown').should be_true
           end
@@ -345,7 +345,7 @@ describe Rake::ExtensionTask do
           end
         end
 
-        describe 'native:universal-unknown' do
+        context 'native:universal-unknown' do
           it "should be defined" do
             Rake::Task.task_defined?('native:universal-unknown').should be_true
           end
