@@ -72,12 +72,12 @@ module Rake
     end
 
     private
-    def define_compile_tasks(for_platform = nil)
+    def define_compile_tasks(for_platform = nil, ruby_ver = RUBY_VERSION)
       # platform usage
       platf = for_platform || platform
 
       # tmp_path
-      tmp_path = "#{@tmp_dir}/#{platf}/#{@name}"
+      tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
 
       # cleanup and clobbering
       CLEAN.include(tmp_path)
@@ -161,11 +161,11 @@ module Rake
       end
     end
 
-    def define_native_tasks(for_platform = nil)
+    def define_native_tasks(for_platform = nil, ruby_ver = RUBY_VERSION)
       platf = for_platform || platform
 
       # tmp_path
-      tmp_path = "#{@tmp_dir}/#{platf}/#{@name}"
+      tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
 
       # create 'native:gem_name' and chain it to 'native' task
       unless Rake::Task.task_defined?("native:#{@gem_spec.name}:#{platf}")
@@ -236,7 +236,7 @@ module Rake
       config_file = YAML.load_file(config_path)
 
       # tmp_path
-      tmp_path = "#{@tmp_dir}/#{for_platform}/#{@name}"
+      tmp_path = "#{@tmp_dir}/#{for_platform}/#{@name}/#{ruby_ver}"
 
       unless rbconfig_file = config_file["rbconfig-#{ruby_ver}"] then
         warn "no configuration section for specified version of Ruby (rbconfig-#{ruby_ver})"
@@ -244,7 +244,7 @@ module Rake
       end
 
       # define compilation tasks for cross platfrom!
-      define_compile_tasks(for_platform)
+      define_compile_tasks(for_platform, ruby_ver)
 
       # chain fake.rb and rbconfig.rb to Makefile generation
       file "#{tmp_path}/Makefile" => ["#{tmp_path}/fake.rb", "#{tmp_path}/rbconfig.rb"]
@@ -262,7 +262,7 @@ module Rake
       end
 
       # now define native tasks for cross compiled files
-      define_native_tasks(for_platform) if @gem_spec && @gem_spec.platform == 'ruby'
+      define_native_tasks(for_platform, ruby_ver) if @gem_spec && @gem_spec.platform == 'ruby'
 
       # create cross task
       task 'cross' do

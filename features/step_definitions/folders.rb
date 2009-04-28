@@ -28,5 +28,5 @@ Then /^'(.*)' folder do not exist$/ do |folder|
 end
 
 Then /^no left over from '(.*)' remains in '(.*)'$/ do |name, folder|
-  Dir.glob("#{folder}/**/#{name}").should be_empty
+  Dir.glob("#{folder}/**/#{name}/#{RUBY_VERSION}").should be_empty
 end
