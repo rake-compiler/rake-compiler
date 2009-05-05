@@ -6,6 +6,10 @@
     and don't override each other.
     
     Please perform <tt>rake clobber</tt> prior compiling again.
+  * Allow optional source file URL for cross-compile tasks.
+    (Thanks to deepj for the patches)
+
+      rake-compiler cross-ruby VERSION=1.9.1-p0 SOURCE=http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.bz2 
 
 === 0.5.0 / 2009-04-25
 
