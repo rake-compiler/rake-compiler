@@ -224,8 +224,19 @@ module Rake
     end
 
     def define_cross_platform_tasks(for_platform)
+      if ruby_vers = ENV['RUBY_CC_VERSION']
+        ruby_vers = ENV['RUBY_CC_VERSION'].split(File::PATH_SEPARATOR)
+      else
+        ruby_vers = [RUBY_VERSION]
+      end
+
+      ruby_vers.each do |version|
+        define_cross_platform_tasks_with_version(for_platform, version)
+      end
+    end
+
+    def define_cross_platform_tasks_with_version(for_platform, ruby_ver)
       config_path = File.expand_path("~/.rake-compiler/config.yml")
-      ruby_ver = ENV['RUBY_CC_VERSION'] || RUBY_VERSION
 
       # warn the user about the need of configuration to use cross compilation.
       unless File.exist?(config_path)

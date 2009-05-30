@@ -310,8 +310,39 @@ describe Rake::ExtensionTask do
         end
       end
 
+      it 'should allow multiple versions be supplied to RUBY_CC_VERSION' do
+        config = mock(Hash)
+        config.should_receive(:[]).once.with("rbconfig-1.8.6").and_return('/path/to/ruby/1.8.6/rbconfig.rb')
+        config.should_receive(:[]).once.with("rbconfig-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
+        YAML.stub!(:load_file).and_return(config)
+
+        ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
+        Rake::ExtensionTask.new('extension_one') do |ext|
+          ext.cross_compile = true
+        end
+      end
+
       after :each do
         ENV.delete('RUBY_CC_VERSION')
+      end
+
+      context "(cross compile for multiple versions)" do
+        before :each do
+          config = mock(Hash)
+          config.stub!(:[]).and_return('/path/to/ruby/1.8.6/rbconfig.rb', '/path/to/ruby/1.9.1/rbconfig.rb')
+          YAML.stub!(:load_file).and_return(config)
+
+          ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
+          @ext = Rake::ExtensionTask.new('extension_one') do |ext|
+            ext.cross_compile = true
+            ext.cross_platform = 'universal-unknown'
+          end
+        end
+
+        it 'should create specific copy of binaries for each version' do
+          Rake::Task.should have_defined("copy:extension_one:universal-unknown:1.8.6")
+          Rake::Task.should have_defined("copy:extension_one:universal-unknown:1.9.1")
+        end
       end
 
       context "(cross for 'universal-unknown' platform)" do
