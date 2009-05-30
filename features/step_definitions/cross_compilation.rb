@@ -13,18 +13,11 @@ Given %r{^I've installed cross compile toolchain$} do
       File.exist? File.join(path, comp)
     end
   end
-  raise "Cannot locate '#{compiler}' in the PATH." unless compiler
+  pending "Cannot locate suitable compiler in the PATH." unless compiler
 end
 
 Then /^binaries for platform '(.*)' get generated$/ do |platform|
-  ext = case platform
-    when /darwin/
-      'bundle'
-    when /mingw|mswin|linux/
-      'so'
-    else
-      RbConfig::CONFIG['DLEXT']
-  end
+  ext = binary_extension(platform)
 
   ext_for_platform = Dir.glob("tmp/#{platform}/**/*.#{ext}")
   ext_for_platform.should_not be_empty
