@@ -243,14 +243,24 @@ module Rake
         return
       end
 
+      # mkmf
+      mkmf_file = File.expand_path(File.join(File.dirname(rbconfig_file), '..', 'mkmf.rb'))
+
       # define compilation tasks for cross platfrom!
       define_compile_tasks(for_platform, ruby_ver)
 
-      # chain fake.rb and rbconfig.rb to Makefile generation
-      file "#{tmp_path}/Makefile" => ["#{tmp_path}/fake.rb", "#{tmp_path}/rbconfig.rb"]
+      # chain fake.rb, rbconfig.rb and mkmf.rb to Makefile generation
+      file "#{tmp_path}/Makefile" => ["#{tmp_path}/fake.rb",
+                                      "#{tmp_path}/rbconfig.rb",
+                                      "#{tmp_path}/mkmf.rb"]
 
       # copy the file from the cross-ruby location
       file "#{tmp_path}/rbconfig.rb" => [rbconfig_file] do |t|
+        cp t.prerequisites.first, t.name
+      end
+
+      # copy mkmf from cross-ruby location
+      file "#{tmp_path}/mkmf.rb" => [mkmf_file] do |t|
         cp t.prerequisites.first, t.name
       end
 

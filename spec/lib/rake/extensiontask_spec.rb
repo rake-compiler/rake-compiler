@@ -338,6 +338,17 @@ describe Rake::ExtensionTask do
           end
         end
 
+        context 'mkmf' do
+          it 'should chain mkmf tasks to Makefile generation' do
+            Rake::Task["tmp/universal-unknown/extension_one/#{@ruby_ver}/Makefile"].prerequisites.should include("tmp/universal-unknown/extension_one/#{@ruby_ver}/mkmf.rb")
+          end
+
+          it 'should take mkmf from rake-compiler configuration' do
+            mkmf_path = File.expand_path(File.join(File.dirname(@config_path), '..', 'mkmf.rb'))
+            Rake::Task["tmp/universal-unknown/extension_one/#{@ruby_ver}/mkmf.rb"].prerequisites.should include(mkmf_path)
+          end
+        end
+
         context 'compile:universal-unknown' do
           it "should be defined" do
             Rake::Task.task_defined?('compile:universal-unknown').should be_true
