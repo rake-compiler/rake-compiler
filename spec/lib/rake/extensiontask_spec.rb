@@ -138,8 +138,8 @@ describe Rake::ExtensionTask do
           Rake::Task.task_defined?("lib/#{@ext_bin}").should be_true
         end
 
-        it "should depend on 'copy:extension_one:{platform}'" do
-          Rake::Task["lib/#{@ext_bin}"].prerequisites.should include("copy:extension_one:#{@platform}")
+        it "should depend on 'copy:extension_one:{platform}:{ruby_ver}'" do
+          Rake::Task["lib/#{@ext_bin}"].prerequisites.should include("copy:extension_one:#{@platform}:#{@ruby_ver}")
         end
       end
 

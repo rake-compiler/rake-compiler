@@ -90,7 +90,7 @@ module Rake
 
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
-      task "copy:#{@name}:#{platf}" => [lib_dir, "#{tmp_path}/#{binary(platf)}"] do
+      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_dir, "#{tmp_path}/#{binary(platf)}"] do
         cp "#{tmp_path}/#{binary(platf)}", "#{@lib_dir}/#{binary(platf)}"
       end
 
@@ -147,14 +147,14 @@ module Rake
       end
 
       # Allow segmented compilation by platform (open door for 'cross compile')
-      task "compile:#{@name}:#{platf}" => ["copy:#{@name}:#{platf}"]
+      task "compile:#{@name}:#{platf}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
       task "compile:#{platf}" => ["compile:#{@name}:#{platf}"]
 
       # Only add this extension to the compile chain if current
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
         # ensure file is always copied
-        file "#{@lib_dir}/#{binary(platf)}" => ["copy:#{name}:#{platf}"]
+        file "#{@lib_dir}/#{binary(platf)}" => ["copy:#{name}:#{platf}:#{ruby_ver}"]
 
         task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
         task "compile" => ["compile:#{platf}"]
@@ -186,7 +186,7 @@ module Rake
           ext_files.each do |ext|
             unless Rake::Task.task_defined?("#{@lib_dir}/#{File.basename(ext)}") then
               # strip out path and .so/.bundle
-              file "#{@lib_dir}/#{File.basename(ext)}" => ["copy:#{File.basename(ext).ext('')}:#{platf}"]
+              file "#{@lib_dir}/#{File.basename(ext)}" => ["copy:#{File.basename(ext).ext('')}:#{platf}:#{ruby_ver}"]
             end
           end
 
@@ -205,7 +205,7 @@ module Rake
           end
 
           # ensure the binaries are copied
-          task "#{gem_package.package_dir}/#{gem_package.gem_file}" => ["copy:#{@name}:#{platf}"]
+          task "#{gem_package.package_dir}/#{gem_package.gem_file}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
         end
       end
 
@@ -289,7 +289,7 @@ module Rake
         end
 
         # FIXME: targeting multiple platforms copies the file twice
-        file "#{@lib_dir}/#{binary(for_platform)}" => ["copy:#{@name}:#{for_platform}"]
+        file "#{@lib_dir}/#{binary(for_platform)}" => ["copy:#{@name}:#{for_platform}:#{ruby_ver}"]
 
         # if everything for native task is in place
         if @gem_spec && @gem_spec.platform == 'ruby' then
