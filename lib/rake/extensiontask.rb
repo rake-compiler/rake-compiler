@@ -187,13 +187,11 @@ module Rake
           spec.extensions.clear
 
           # add the binaries that this task depends on
-          # ensure the files get properly copied to lib_dir
-          ext_files = t.prerequisites.map { |ext| "#{@lib_dir}/#{File.basename(ext)}" }
-          ext_files.each do |ext|
-            unless Rake::Task.task_defined?("#{@lib_dir}/#{File.basename(ext)}") then
-              # strip out path and .so/.bundle
-              file "#{lib_path}/#{File.basename(ext)}" => ["copy:#{File.basename(ext).ext('')}:#{platf}:#{ruby_ver}"]
-            end
+          ext_files = []
+
+          # go through native prerequisites and grab the real extension files from there
+          t.prerequisites.each do |ext|
+            ext_files << ext
           end
 
           # include the files in the gem specification
@@ -209,14 +207,16 @@ module Rake
             pkg.need_zip = false
             pkg.need_tar = false
           end
-
-          # ensure the binaries are copied
-          task "#{gem_package.package_dir}/#{gem_package.gem_file}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
         end
       end
 
       # add binaries to the dependency chain
-      task "native:#{@gem_spec.name}:#{platf}" => ["#{tmp_path}/#{binary(platf)}"]
+      task "native:#{@gem_spec.name}:#{platf}" => ["#{lib_path}/#{binary(platf)}"]
+
+      # ensure the extension get copied
+      unless Rake::Task.task_defined?("#{lib_path}/#{binary(platf)}") then
+        file "#{lib_path}/#{binary(platf)}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
+      end
 
       # Allow segmented packaging by platfrom (open door for 'cross compile')
       task "native:#{platf}" => ["native:#{@gem_spec.name}:#{platf}"]
@@ -323,7 +323,7 @@ module Rake
         end
 
         # FIXME: targeting multiple platforms copies the file twice
-        file "#{@lib_dir}/#{binary(for_platform)}" => ["copy:#{@name}:#{for_platform}:#{ruby_ver}"]
+        file "#{lib_path}/#{binary(for_platform)}" => ["copy:#{@name}:#{for_platform}:#{ruby_ver}"]
 
         # if everything for native task is in place
         if @gem_spec && @gem_spec.platform == 'ruby' then

@@ -1,6 +1,13 @@
 === 0.6.0 (in Git)
 
 * Enhancements
+  * Implemented 'fat-binaries' generation for cross compiling
+    (for now). Thanks to Aaron Patterson for the suggestion and
+    original idea.
+
+      rake cross native gem RUBY_CC_VERSION=1.8.6:1.9.1
+
+    Will package extensions for 1.8 and 1.9 versions of Ruby.
   * Can now cross compile extensions for 1.9 using 1.8.x as base.
     Be warned: works from 1.8 to 1.9, but not if your default ruby is 1.9
 
