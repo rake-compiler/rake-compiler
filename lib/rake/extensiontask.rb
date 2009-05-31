@@ -76,12 +76,15 @@ module Rake
       # platform usage
       platf = for_platform || platform
 
+      # lib_path
+      lib_path = lib_dir
+
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
 
       # cleanup and clobbering
       CLEAN.include(tmp_path)
-      CLOBBER.include("#{@lib_dir}/#{binary(platf)}")
+      CLOBBER.include("#{lib_path}/#{binary(platf)}")
       CLOBBER.include("#{@tmp_dir}")
 
       # directories we need
@@ -90,8 +93,8 @@ module Rake
 
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_dir, "#{tmp_path}/#{binary(platf)}"] do
-        cp "#{tmp_path}/#{binary(platf)}", "#{@lib_dir}/#{binary(platf)}"
+      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_path, "#{tmp_path}/#{binary(platf)}"] do
+        cp "#{tmp_path}/#{binary(platf)}", "#{lib_path}/#{binary(platf)}"
       end
 
       # binary in temporary folder depends on makefile and source files
@@ -154,7 +157,7 @@ module Rake
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
         # ensure file is always copied
-        file "#{@lib_dir}/#{binary(platf)}" => ["copy:#{name}:#{platf}:#{ruby_ver}"]
+        file "#{lib_path}/#{binary(platf)}" => ["copy:#{name}:#{platf}:#{ruby_ver}"]
 
         task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
         task "compile" => ["compile:#{platf}"]
@@ -166,6 +169,9 @@ module Rake
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
+
+      # lib_path
+      lib_path = lib_dir
 
       # create 'native:gem_name' and chain it to 'native' task
       unless Rake::Task.task_defined?("native:#{@gem_spec.name}:#{platf}")
@@ -186,7 +192,7 @@ module Rake
           ext_files.each do |ext|
             unless Rake::Task.task_defined?("#{@lib_dir}/#{File.basename(ext)}") then
               # strip out path and .so/.bundle
-              file "#{@lib_dir}/#{File.basename(ext)}" => ["copy:#{File.basename(ext).ext('')}:#{platf}:#{ruby_ver}"]
+              file "#{lib_path}/#{File.basename(ext)}" => ["copy:#{File.basename(ext).ext('')}:#{platf}:#{ruby_ver}"]
             end
           end
 
@@ -249,6 +255,9 @@ module Rake
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{for_platform}/#{@name}/#{ruby_ver}"
 
+      # lib_path
+      lib_path = lib_dir
+
       unless rbconfig_file = config_file["rbconfig-#{ruby_ver}"] then
         warn "no configuration section for specified version of Ruby (rbconfig-#{ruby_ver})"
         return
@@ -295,8 +304,8 @@ module Rake
 
         # clear lib/binary dependencies and trigger cross platform ones
         # check if lib/binary is defined (damn bundle versus so versus dll)
-        if Rake::Task.task_defined?("#{@lib_dir}/#{binary(for_platform)}") then
-          Rake::Task["#{@lib_dir}/#{binary(for_platform)}"].prerequisites.clear
+        if Rake::Task.task_defined?("#{lib_path}/#{binary(for_platform)}") then
+          Rake::Task["#{lib_path}/#{binary(for_platform)}"].prerequisites.clear
         end
 
         # FIXME: targeting multiple platforms copies the file twice
