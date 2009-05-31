@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: rake-compiler
 version: !ruby/object:Gem::Version 
-  version: 0.5.0
+  version: 0.6.0
 platform: ruby
 authors: 
 - Luis Lavena
@@ -9,7 +9,7 @@ autorequire:
 bindir: bin
 cert_chain: []
 
-date: 2009-04-25 00:00:00 -03:00
+date: 2009-05-30 00:00:00 -03:00
 default_executable: 
 dependencies: 
 - !ruby/object:Gem::Dependency 
@@ -51,6 +51,7 @@ files:
 - features/support/env.rb
 - features/support/file_template_helpers.rb
 - features/support/generator_helpers.rb
+- features/support/platform_extension_helpers.rb
 - bin/rake-compiler
 - lib/rake/extensioncompiler.rb
 - lib/rake/extensiontask.rb
@@ -98,7 +99,7 @@ required_rubygems_version: !ruby/object:Gem::Requirement
 requirements: []
 
 rubyforge_project: rake-compiler
-rubygems_version: 1.3.2
+rubygems_version: 1.3.3
 signing_key: 
 specification_version: 3
 summary: Rake-based Ruby C Extension task generator.
