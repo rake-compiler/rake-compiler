@@ -225,11 +225,26 @@ And you're done, yeah.
 
 You can specify against with version of Ruby you want to build the extension:
 
-  rake cross compile RUBY_CC_VERSION=1.8
+  rake cross compile RUBY_CC_VERSION=1.8.6
 
 If you installed <tt>1.9.1</tt>, you can do:
 
-  rake cross compile RUBY_CC_VERSION=1.9
+  rake cross compile RUBY_CC_VERSION=1.9.1
+
+Even more, you can target multiple versions (ie. 1.8.6 and 1.9.1):
+
+  rake cross compile RUBY_CC_VERSION=1.8.6:1.9.1
+
+And more exiting, bundle both binaries in one "fat" Gem:
+
+  rake cross native gem RUBY_CC_VERSION=1.8.6:1.9.1
+
+That will place binaries for 1.8 and 1.9 versions of ruby inside <tt>lib_dir</tt>
+
+  lib/1.8/my_extension.so
+  lib/1.9/my_extension.so
+
+Now is up to you to make your gem load the proper one ;-)
 
 == Future
 
