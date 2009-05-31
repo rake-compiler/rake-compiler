@@ -236,8 +236,22 @@ module Rake
         ruby_vers = [RUBY_VERSION]
       end
 
+      multi = (ruby_vers.size > 1) ? true : false
+
       ruby_vers.each do |version|
+        # save original lib_dir
+        orig_lib_dir = @lib_dir
+
+        # tweak lib directory only when targeting multiple versions
+        if multi then
+          version =~ /(\d+.\d+)/
+          @lib_dir = "#{@lib_dir}/#{$1}"
+        end
+
         define_cross_platform_tasks_with_version(for_platform, version)
+
+        # restore lib_dir
+        @lib_dir = orig_lib_dir
       end
     end
 

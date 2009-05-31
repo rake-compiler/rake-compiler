@@ -22,3 +22,11 @@ Then /^binaries for platform '(.*)' get generated$/ do |platform|
   ext_for_platform = Dir.glob("tmp/#{platform}/**/*.#{ext}")
   ext_for_platform.should_not be_empty
 end
+
+Then /^binaries for platform '(.*)' version '(.*)' get copied$/ do |platform, version|
+  lib_path = "lib/#{version}"
+  ext = binary_extension(platform)
+
+  ext_for_platform = Dir.glob("#{lib_path}/*.#{ext}")
+  ext_for_platform.should_not be_empty
+end
