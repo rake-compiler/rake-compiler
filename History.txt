@@ -23,6 +23,11 @@
 
       rake-compiler cross-ruby VERSION=1.9.1-p0 SOURCE=http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.bz2 
 
+* Bugfixes
+  * Removed strict versioning for gems since it clash with fat binaries.
+    From now on, if your gem only targets a specific version of Ruby, please
+    indicate it in the Gem::Specification (<tt>required_ruby_version</tt>)
+
 === 0.5.0 / 2009-04-25
 
 * Enhancements

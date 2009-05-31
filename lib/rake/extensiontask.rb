@@ -197,11 +197,6 @@ module Rake
           # include the files in the gem specification
           spec.files += ext_files
 
-          # Make sure that the required ruby version matches the ruby version
-          # we've used for cross compiling:
-          target_version = RUBY_VERSION =~ /^1.8/ ? '1.8.6' : '1.9.0'
-          spec.required_ruby_version = "~> #{target_version}"
-
           # Generate a package for this gem
           gem_package = Rake::GemPackageTask.new(spec) do |pkg|
             pkg.need_zip = false
