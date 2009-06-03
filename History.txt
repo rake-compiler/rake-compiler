@@ -1,4 +1,4 @@
-=== 0.6.0 (in Git)
+=== 0.6.x (in Git)
 
 * Enhancements
   * Implemented 'fat-binaries' generation for cross compiling
