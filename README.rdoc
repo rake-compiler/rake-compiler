@@ -1,12 +1,12 @@
 = rake-compiler
 
 rake-compiler aims to help Gem developers while dealing with Ruby C
-extensions, simplifiying the code and reducing the duplication.
+extensions, simplifying the code and reducing the duplication.
 
-It follows *convention over configuration* and set an standarized 
+It follows *convention over configuration* and set an standardized 
 structure to build and package C extensions in your gems.
 
-This is the result of expriences dealing with several Gems that required 
+This is the result of experiences dealing with several Gems that required 
 native extensions across platforms and different user configurations 
 where details like portability and clarity of code were lacking.
 
@@ -160,7 +160,7 @@ personalize several settings for <tt>Rake::ExtensionTask</tt>:
 
 == Future is now: Cross compilation
 
-rake-compiler provides now an standarized way to generate, from Linux or OSX
+rake-compiler provides now an standardized way to generate, from Linux or OSX
 both extensions and gem binaries for Windows!
 
 It takes advantages from GCC host/target to build binaries (for target) on 
@@ -171,12 +171,12 @@ different OS (hosts).
 Besides having the development tool chain installed (GCC), you should install
 also <tt>mingw32</tt> cross compilation package.
 
-Dependending on your operating system distribution, a simple <tt>apt-get install mingw32</tt>
-will be enough.
+This depends on your operating system distribution, a simple 
+<tt>apt-get install mingw32</tt> will be enough.
 
 Please check OSX documentation about installing mingw32 from macports.
 
-=== I have my toolchain, now what?
+=== I have my tool-chain, now what?
 
 You need to build Ruby for Windows.
 
@@ -194,7 +194,7 @@ supply a <tt>VERSION</tt>:
 
 === Let's build some gems!
 
-Now, you only need to use additional options in your extension defintion:
+Now, you only need to use additional options in your extension definition:
 
     Rake::ExtensionTask.new('my_extension', gem_spec) do |ext|
       ext.cross_compile = true                # enable cross compilation (requires cross compile toolchain)
