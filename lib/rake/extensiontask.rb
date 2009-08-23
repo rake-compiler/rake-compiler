@@ -213,7 +213,7 @@ module Rake
         file "#{lib_path}/#{binary(platf)}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
       end
 
-      # Allow segmented packaging by platfrom (open door for 'cross compile')
+      # Allow segmented packaging by platform (open door for 'cross compile')
       task "native:#{platf}" => ["native:#{@gem_spec.name}:#{platf}"]
 
       # Only add this extension to the compile chain if current
@@ -275,7 +275,7 @@ module Rake
       # mkmf
       mkmf_file = File.expand_path(File.join(File.dirname(rbconfig_file), '..', 'mkmf.rb'))
 
-      # define compilation tasks for cross platfrom!
+      # define compilation tasks for cross platform!
       define_compile_tasks(for_platform, ruby_ver)
 
       # chain fake.rb, rbconfig.rb and mkmf.rb to Makefile generation
