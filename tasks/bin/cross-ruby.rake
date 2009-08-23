@@ -28,6 +28,7 @@ $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 
 require 'rake/extensioncompiler'
 
+MAKE = ENV['MAKE'] || %w[gmake make].find { |c| system(c, '-v') }
 USER_HOME = File.expand_path("~/.rake-compiler")
 RUBY_CC_VERSION = "ruby-#{ENV['VERSION'] || '1.8.6-p287'}"
 RUBY_SOURCE = ENV['SOURCE']
@@ -137,14 +138,14 @@ end
 # make
 file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/ruby.exe" => ["#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile"] do |t|
   chdir File.dirname(t.prerequisites.first) do
-    sh "make"
+    sh MAKE
   end
 end
 
 # make install
 file "#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/bin/ruby.exe" => ["#{USER_HOME}/builds/#{RUBY_CC_VERSION}/ruby.exe"] do |t|
   chdir File.dirname(t.prerequisites.first) do
-    sh "make install"
+    sh "#{MAKE} install"
   end
 end
 task :install => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/bin/ruby.exe"]
