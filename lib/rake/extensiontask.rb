@@ -334,10 +334,17 @@ module Rake
       "#{@ext_dir}/#{@config_script}"
     end
 
-    MAKE = ENV['MAKE'] || %w[gmake make].find { |c| system(c, '-v') }
 
     def make
-      RUBY_PLATFORM =~ /mswin/ ? 'nmake' : MAKE
+      unless @make
+        @make =
+          if RUBY_PLATFORM =~ /mswin/ then
+            'nmake'
+          else
+            ENV['MAKE'] || %w[gmake make].find { |c| system(c, '-v') }
+          end
+      end
+      @make
     end
 
     def binary(platform = nil)
