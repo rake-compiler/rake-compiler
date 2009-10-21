@@ -27,6 +27,7 @@ GEM_SPEC = Gem::Specification.new do |s|
                       "lib/**/*.rb", "spec/**/*.rb", "tasks/**/*.rake",
                       "Rakefile", "*.{rdoc,txt,yml}"]
 
+  s.bindir      = 'bin'
   s.executables = ['rake-compiler']
 
   s.require_path = 'lib'

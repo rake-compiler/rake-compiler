@@ -6,6 +6,7 @@
   * Usage of #dup to duplicate gemspec instead of YAML dumping.
   * No longer support Ruby older than 1.8.6
   * No longer support RubyGems older than 1.3.5
+  * Force definition of binary directory and executables. Closes GH-11
 
 === 0.6.0 / 2009-07-25
 
