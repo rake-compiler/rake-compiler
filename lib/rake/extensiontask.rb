@@ -178,7 +178,7 @@ module Rake
         task "native:#{@gem_spec.name}:#{platf}" do |t|
           # FIXME: truly duplicate the Gem::Specification
           # workaround the lack of #dup for Gem::Specification
-          spec = Gem::Specification.from_yaml(gem_spec.to_yaml)
+          spec = gem_spec.dup
 
           # adjust to specified platform
           spec.platform = Gem::Platform.new(platf)

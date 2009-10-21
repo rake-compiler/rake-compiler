@@ -10,6 +10,10 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.summary     = 'Rake-based Ruby C Extension task generator.'
   s.description = "Provide a standard and simplified way to build and package\nRuby C extensions using Rake as glue."
 
+  # requirements
+  s.required_ruby_version = ">= 1.8.6"
+  s.required_rubygems_version = ">= 1.3.5"
+
   # dependencies
   s.add_dependency  'rake', '>= 0.8.3', '< 0.9'
 
