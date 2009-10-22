@@ -1,5 +1,18 @@
 === (in Git)
 
+* Enhancements
+  * Allow alteration of the Gem Specification when cross compiling. Closes GH-3
+    This is useful to indicate a custom requirement message, like DLLs
+    installation or similar.
+
+      Rake::ExtensionTask.new('my_extension', GEM_SPEC) do |ext|
+        ext.cross_compile = true
+        # ...
+        ext.cross_compiling do |gem_spec|
+          gem_spec.post_install_message = "You've installed a binary version of this gem"
+        end
+      end
+
 * Bugfixes
   * Detect GNU make independently of distribution based naming.
     Thanks to flori for patches.

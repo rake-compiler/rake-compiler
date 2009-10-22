@@ -299,6 +299,16 @@ describe Rake::ExtensionTask do
         err.should match(/no configuration section for specified version of Ruby/)
       end
 
+      it 'should capture an action block to be executed when cross compiling' do
+        lambda {
+          Rake::ExtensionTask.new('extension_one') do |ext|
+            ext.cross_compiling do |gem_spec|
+              gem_spec.post_install_message = "Cross compiled gem"
+            end
+          end
+        }.should_not raise_error
+      end
+
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
         config = mock(Hash)
         config.should_receive(:[]).with("rbconfig-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')

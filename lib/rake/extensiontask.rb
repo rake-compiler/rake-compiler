@@ -44,6 +44,7 @@ module Rake
       @config_options = []
       @cross_compile = false
       @cross_config_options = []
+      @cross_compiling = nil
     end
 
     def platform
@@ -52,6 +53,10 @@ module Rake
 
     def cross_platform
       @cross_platform ||= 'i386-mingw32'
+    end
+
+    def cross_compiling(&block)
+      @cross_compiling = block if block_given?
     end
 
     def define
@@ -169,7 +174,7 @@ module Rake
       end
     end
 
-    def define_native_tasks(for_platform = nil, ruby_ver = RUBY_VERSION)
+    def define_native_tasks(for_platform = nil, ruby_ver = RUBY_VERSION, callback = nil)
       platf = for_platform || platform
 
       # tmp_path
@@ -201,6 +206,11 @@ module Rake
 
           # include the files in the gem specification
           spec.files += ext_files
+
+          # expose gem specification for customization
+          if callback
+            callback.call(spec)
+          end
 
           # Generate a package for this gem
           gem_package = Rake::GemPackageTask.new(spec) do |pkg|
@@ -306,7 +316,9 @@ module Rake
       end
 
       # now define native tasks for cross compiled files
-      define_native_tasks(for_platform, ruby_ver) if @gem_spec && @gem_spec.platform == 'ruby'
+      if @gem_spec && @gem_spec.platform == 'ruby' then
+        define_native_tasks(for_platform, ruby_ver, @cross_compiling)
+      end
 
       # create cross task
       task 'cross' do
