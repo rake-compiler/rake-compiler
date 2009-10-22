@@ -8,6 +8,7 @@ require 'rake/clean'
 require 'rake/tasklib'
 require 'rbconfig'
 require 'yaml'
+require 'pathname'
 
 module Rake
   autoload :GemPackageTask, 'rake/gempackagetask'
@@ -118,8 +119,12 @@ module Rake
           cmd << '-rfake'
         end
 
+        # build a relative path to extconf script
+        abs_tmp_path = Pathname.new(Dir.pwd) + tmp_path
+        abs_extconf = Pathname.new(Dir.pwd) + extconf
+
         # now add the extconf script
-        cmd << File.join(Dir.pwd, extconf)
+        cmd << abs_extconf.relative_path_from(abs_tmp_path)
 
         # rbconfig.rb will be present if we are cross compiling
         if t.prerequisites.include?("#{tmp_path}/rbconfig.rb") then
