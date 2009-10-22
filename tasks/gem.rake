@@ -52,11 +52,3 @@ gem_package = Gem::PackageTask.new(GEM_SPEC) do |pkg|
   pkg.need_tar = false
   pkg.need_zip = false
 end
-
-file "#{GEM_SPEC.name}.gemspec" => ['Rakefile', 'tasks/gem.rake'] do |t|
-  puts "Generating #{t.name}"
-  File.open(t.name, 'w') { |f| f.puts GEM_SPEC.to_yaml }
-end
-
-desc "Generate or update the standalone gemspec file for the project"
-task :gemspec => ["#{GEM_SPEC.name}.gemspec"]

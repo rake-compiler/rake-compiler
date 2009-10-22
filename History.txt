@@ -8,6 +8,7 @@
   * No longer support RubyGems older than 1.3.5
   * Force definition of binary directory and executables. Closes GH-11
   * Workaround path with spaces issues using relative paths. Closes GH-6
+  * Removed gemspec, GitHub gems no more
 
 === 0.6.0 / 2009-07-25
 
