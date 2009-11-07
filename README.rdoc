@@ -46,7 +46,7 @@ Now that you have the gem installed, let's give your project some structure.
 === Structure
 
 Let's say we want to compile an extension called 'hello_world', so we should
-organize the code and folders that will help rake-compiler do it's job:
+organize the code and folders that will help rake-compiler do its job:
 
     |-- ext
     |   `-- hello_world
