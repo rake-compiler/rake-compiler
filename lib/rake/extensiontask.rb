@@ -241,7 +241,7 @@ module Rake
 
     def define_cross_platform_tasks(for_platform)
       if ruby_vers = ENV['RUBY_CC_VERSION']
-        ruby_vers = ENV['RUBY_CC_VERSION'].split(File::PATH_SEPARATOR)
+        ruby_vers = ENV['RUBY_CC_VERSION'].split(':')
       else
         ruby_vers = [RUBY_VERSION]
       end
