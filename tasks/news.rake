@@ -1,8 +1,7 @@
 begin
-  gem 'rubyforge', '~> 1.0.1'
   require 'rubyforge'
-rescue Exception
-  nil
+rescue LoadError
+  warn "rubyforge gem is required to generate announces, please install it (gem install rubyforge)."
 end
 
 CLEAN.include('email.txt')
@@ -77,6 +76,4 @@ if defined?(RubyForge) then
   else
     warn "no GEM_SPEC is found or defined. 'announce' task cannot work without it."
   end
-else
-  warn "rubyforge gem is required to generate announces, please install it (gem install rubyforge)."
 end

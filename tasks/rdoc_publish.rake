@@ -1,8 +1,7 @@
 begin
-  gem 'rubyforge', '~> 1.0.1'
   require 'rubyforge'
-rescue Exception
-  nil
+rescue LoadError
+  warn "rubyforge gem is required to generate releases, please install it (gem install rubyforge)."
 end
 
 if defined?(RubyForge) then
@@ -39,6 +38,4 @@ if defined?(RubyForge) then
   else
     warn "You need a GEM_SPEC and DOC rdoc definitions present. task publish not defined."
   end
-else
-  warn "rubyforge gem is required to generate releases, please install it (gem install rubyforge)."
 end
