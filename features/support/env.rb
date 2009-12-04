@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'cucumber'
 require 'spec'
 require 'fileutils'
