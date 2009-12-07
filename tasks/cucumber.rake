@@ -5,8 +5,19 @@ rescue LoadError
 end
 
 if defined?(Cucumber)
-  Cucumber::Rake::Task.new do |t|
-    t.cucumber_opts = "--format pretty --no-source"
-  end
-end
+  namespace :cucumber do
+    Cucumber::Rake::Task.new('default', 'Run features testing C extension support') do |t|
+      t.profile       = 'default'
+      t.cucumber_opts = '--format pretty --no-source'
+    end
+    Cucumber::Rake::Task.new('java', 'Run features testing Java extension support') do |t|
+      t.profile       = 'java'
+      t.cucumber_opts = '--format pretty --no-source'
+    end
 
+    desc 'Run all features'
+    task :all => [:default, :java]
+  end
+  desc 'Alias for cucumber:default'
+  task :cucumber => 'cucumber:default'
+end
