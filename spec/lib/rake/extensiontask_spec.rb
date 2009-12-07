@@ -431,7 +431,7 @@ describe Rake::ExtensionTask do
   end
 
   def mock_gem_spec(stubs = {})
-    mock(Gem::Specification, 
+    mock(Gem::Specification,
       { :name => 'my_gem', :platform => 'ruby' }.merge(stubs)
     )
   end
