@@ -11,6 +11,12 @@ module Rake
     attr_accessor :classpath
     attr_accessor :debug
 
+    # Provide source compatibility with specified release
+    attr_accessor :source_version
+
+    # Generate class files for specific VM version
+    attr_accessor :target_version
+
     def platform
       @platform ||= 'java'
     end
@@ -25,6 +31,8 @@ module Rake
       @classpath      = nil
       @java_compiling = nil
       @debug          = false
+      @source_version = '1.5'
+      @target_version = '1.5'
     end
 
     def define
@@ -76,7 +84,7 @@ execute the Rake compilation task using the JRuby interpreter.
         classpath_arg = java_classpath_arg(@classpath)
         debug_arg     = @debug ? '-g' : ''
 
-        sh "javac #{java_extdirs_arg} -target 1.5 -source 1.5 -Xlint:unchecked #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
+        sh "javac #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} -Xlint:unchecked #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
 
         # Checkpoint file
         touch "#{tmp_path}/.build"
