@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-require 'pangolin'
-require File.expand_path(File.dirname(__FILE__) + '/baseextensiontask')
+
+require 'rake/baseextensiontask'
 
 # Define a series of tasks to aid in the compilation of Java extensions for
 # gem developer/creators.

@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
-require File.expand_path(File.dirname(__FILE__) + '/baseextensiontask')
+
+require 'rake/baseextensiontask'
 
 # Define a series of tasks to aid in the compilation of C extensions for
 # gem developer/creators.
