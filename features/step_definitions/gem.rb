@@ -12,6 +12,12 @@ end
 
 Then /^a gem for '(.*)' version '(.*)' platform '(.*)' do exist in '(.*)'$/ do |name, version, platform, folder|
   File.exist?(gem_file_platform(folder, name, version, platform)).should be_true
+
+  # unpack the Gem and check what's inside!
+  `gem unpack #{gem_file_platform(folder, name, version, platform)} --target tmp`
+  unpacked_gem_dir = unpacked_gem_dir_platform('tmp', name, version, platform)
+  File.exist?(unpacked_gem_dir).should be_true
+  Dir.glob(unpacked_gem_dir << "/lib/*.#{binary_extension(platform)}").should_not be_empty
 end
 
 Then /^gem for platform '(.*)' get generated$/ do |platform|
@@ -26,5 +32,11 @@ def gem_file_platform(folder, name, version, platform = nil)
   file = "#{folder}/#{name}-#{version}"
   file << "-" << (platform || Gem::Platform.new(RUBY_PLATFORM).to_s)
   file << ".gem"
+  file
+end
+
+def unpacked_gem_dir_platform(folder, name, version, platform = nil)
+  file = "#{folder}/#{name}-#{version}"
+  file << "-" << (platform || Gem::Platform.new(RUBY_PLATFORM).to_s)
   file
 end

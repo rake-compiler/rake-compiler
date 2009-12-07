@@ -6,14 +6,7 @@ Given %r{^I'm running a POSIX operating system$} do
 end
 
 Given %r{^I've installed cross compile toolchain$} do
-  compilers = %w(i586-mingw32msvc-gcc i386-mingw32-gcc)
-  paths = ENV['PATH'].split(File::PATH_SEPARATOR)
-  compiler = compilers.find do |comp|
-    paths.find do |path|
-      File.exist? File.join(path, comp)
-    end
-  end
-  pending "Cannot locate suitable compiler in the PATH." unless compiler
+  pending 'Cannot locate suitable compiler in the PATH.' unless search_path(%w(i586-mingw32msvc-gcc i386-mingw32-gcc))
 end
 
 Then /^binaries for platform '(.*)' get generated$/ do |platform|

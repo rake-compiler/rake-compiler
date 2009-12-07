@@ -75,6 +75,15 @@ end
 EOF
   end
 
+  def template_rake_extension_java_compile(extension_name, gem_spec = nil)
+      <<-EOF
+require 'rake/javaextensiontask'
+Rake::JavaExtensionTask.new("#{extension_name}"#{', SPEC' if gem_spec}) do |ext|
+  # nothing
+end
+EOF
+  end
+
   def template_extconf(extension_name)
     <<-EOF
 require 'mkmf'
@@ -97,6 +106,26 @@ EOF
 #include "ruby.h"
 EOF
   end
+
+  def template_source_java(extension_name)
+    <<-EOF
+import org.jruby.Ruby;
+import org.jruby.runtime.load.BasicLibraryService;
+
+public class #{camelize(extension_name)}Service implements BasicLibraryService {
+   public boolean basicLoad(final Ruby runtime) throws java.io.IOException {
+     System.out.println("#{camelize(extension_name)}Service.java of extension #{extension_name}\\n");
+     return true;
+   }
+}
+
+EOF
+  end
+
+  def camelize(str)
+    str.gsub(/(^|_)(.)/) { $2.upcase }
+  end
+
 end
 
 World(FileTemplateHelpers)

@@ -8,6 +8,11 @@ Given /^a extension cross-compilable '(.*)'$/ do |extension_name|
   generate_source_code_for extension_name
 end
 
+Given /^a extension Java-compilable '(.*)'$/ do |extension_name|
+  generate_java_compile_extension_task_for extension_name
+  generate_java_source_code_for extension_name
+end
+
 Given /^a extension '(.*)' multi cross\-compilable$/ do |extension_name|
   generate_multi_cross_compile_extension_task_for extension_name
   generate_source_code_for extension_name
@@ -23,10 +28,21 @@ Given /^that all my source files are in place$/ do
   Given "a extension cross-compilable 'extension_one'"
 end
 
+Given /^that all my Java source files are in place$/ do
+  Given "a safe project directory"
+  Given "a extension Java-compilable 'extension_one'"
+end
+
 Given /^that my gem source is all in place$/ do
   Given "a safe project directory"
   Given "a gem named 'gem_abc'"
   Given "a extension cross-compilable 'extension_one'"
+end
+
+Given /^that my JRuby gem source is all in place$/ do
+  Given "a safe project directory"
+  Given "a gem named 'gem_abc'"
+  Given "a extension Java-compilable 'extension_one'"
 end
 
 Given /^that my gem source is all in place to target two platforms$/ do
