@@ -9,7 +9,7 @@ module Rake
   class JavaExtensionTask < BaseExtensionTask
 
     attr_accessor :classpath
-    #attr_accessor :java_config_options
+    attr_accessor :debug
 
     def platform
       @platform ||= 'java'
@@ -21,9 +21,10 @@ module Rake
 
     def init(name = nil, gem_spec = nil)
       super
-      @source_pattern = "**/*.java"
-      @classpath = nil
+      @source_pattern = '**/*.java'
+      @classpath      = nil
       @java_compiling = nil
+      @debug          = false
     end
 
     def define
@@ -73,14 +74,7 @@ execute the Rake compilation task using the JRuby interpreter.
 
       file "#{tmp_path}/.build" => [tmp_path] + source_files do
         classpath_arg = java_classpath_arg(@classpath)
-
-        # Check if CC_JAVA_DEBUG env var was set to TRUE
-        # TRUE means compile java classes with debug info
-        debug_arg = if ENV['CC_JAVA_DEBUG'] && ENV['CC_JAVA_DEBUG'].upcase.eql?("TRUE")
-          '-g'
-        else
-          ''
-        end
+        debug_arg     = @debug ? '-g' : ''
 
         sh "javac #{java_extdirs_arg} -target 1.5 -source 1.5 -Xlint:unchecked #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
 
