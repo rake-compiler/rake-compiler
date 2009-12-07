@@ -1,54 +1,26 @@
 #!/usr/bin/env ruby
+require File.expand_path(File.dirname(__FILE__) + '/baseextensiontask')
 
 # Define a series of tasks to aid in the compilation of C extensions for
 # gem developer/creators.
 
-require 'rake'
-require 'rake/clean'
-require 'rake/tasklib'
-require 'rbconfig'
-require 'yaml'
-require 'pathname'
-
 module Rake
-  autoload :GemPackageTask, 'rake/gempackagetask'
+  class ExtensionTask < BaseExtensionTask
 
-  class ExtensionTask < TaskLib
-    attr_accessor :name
-    attr_accessor :gem_spec
     attr_accessor :config_script
-    attr_accessor :tmp_dir
-    attr_accessor :ext_dir
-    attr_accessor :lib_dir
-    attr_accessor :platform
-    attr_accessor :config_options
-    attr_accessor :source_pattern
     attr_accessor :cross_compile
     attr_accessor :cross_platform
     attr_accessor :cross_config_options
-
-    def initialize(name = nil, gem_spec = nil)
-      init(name, gem_spec)
-      yield self if block_given?
-      define
-    end
+    attr_accessor :no_native
 
     def init(name = nil, gem_spec = nil)
-      @name = name
-      @gem_spec = gem_spec
+      super
       @config_script = 'extconf.rb'
-      @tmp_dir = 'tmp'
-      @ext_dir = "ext/#{@name}"
-      @lib_dir = 'lib'
       @source_pattern = "*.c"
-      @config_options = []
       @cross_compile = false
       @cross_config_options = []
       @cross_compiling = nil
-    end
-
-    def platform
-      @platform ||= RUBY_PLATFORM
+      @no_native = false
     end
 
     def cross_platform
@@ -60,12 +32,19 @@ module Rake
     end
 
     def define
-      fail "Extension name must be provided." if @name.nil?
+      if RUBY_PLATFORM == 'java' || (defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ironruby')
+        warn <<-EOF
+WARNING: You're attempting to (cross-)compile C extensions from a platform
+(#{RUBY_ENGINE}) that does not support native extensions or mkmf.rb.
+Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
+        EOF
+        return
+      end
 
-      define_compile_tasks
+      super
 
       # only gems with 'ruby' platforms are allowed to define native tasks
-      define_native_tasks if @gem_spec && @gem_spec.platform == 'ruby'
+      define_native_tasks if !@no_native && (@gem_spec && @gem_spec.platform == 'ruby')
 
       # only define cross platform functionality when enabled
       return unless @cross_compile
@@ -351,7 +330,6 @@ module Rake
       "#{@ext_dir}/#{@config_script}"
     end
 
-
     def make
       unless @make
         @make =
@@ -362,18 +340,6 @@ module Rake
           end
       end
       @make
-    end
-
-    def binary(platform = nil)
-      ext = case platform
-        when /darwin/
-          'bundle'
-        when /mingw|mswin|linux/
-          'so'
-        else
-          RbConfig::CONFIG['DLEXT']
-      end
-      "#{@name}.#{ext}"
     end
 
     def source_files
@@ -398,5 +364,6 @@ module Rake
         end
 FAKE_RB
     end
+
   end
 end
