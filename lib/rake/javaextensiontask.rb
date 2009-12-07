@@ -189,6 +189,7 @@ execute the Rake compilation task using the JRuby interpreter.
     # of ways to discover the Java classpath correctly.
     #
     def java_classpath_arg(*args)
+      jruby_cpath = nil
       if RUBY_PLATFORM =~ /java/
         begin
           cpath  = Java::java.lang.System.getProperty('java.class.path').split(File::PATH_SEPARATOR)
@@ -199,7 +200,8 @@ execute the Rake compilation task using the JRuby interpreter.
       end
       unless jruby_cpath
         jruby_cpath = ENV['JRUBY_PARENT_CLASSPATH'] || ENV['JRUBY_HOME'] &&
-          FileList["#{ENV['JRUBY_HOME']}/lib/*.jar"].join(File::PATH_SEPARATOR)
+          Dir.glob("#{File.expand_path(ENV['JRUBY_HOME'])}/lib/*.jar").
+            join(File::PATH_SEPARATOR)
       end
       raise "JRUBY_HOME or JRUBY_PARENT_CLASSPATH are not set" unless jruby_cpath
       jruby_cpath += File::PATH_SEPARATOR + args.join(File::PATH_SEPARATOR) unless args.empty?
