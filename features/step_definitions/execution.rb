@@ -48,8 +48,5 @@ Then /^output of rake task '(.*)' (contains|do not contain) \/(.*)\/$/ do |task_
 end
 
 Then /^output of rake task '(.*)' warns$/ do |task_name, warning|
-  STDERR.puts task_name.inspect
-  STDERR.puts @output[task_name].inspect
-  STDERR.puts warning.inspect
   @output[task_name].should include(warning)
 end
