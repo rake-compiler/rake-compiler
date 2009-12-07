@@ -76,5 +76,9 @@ module Rake
       @@already_warned = true
       warn message
     end
+
+    def windows?
+      Rake.application.windows?
+    end
   end
 end

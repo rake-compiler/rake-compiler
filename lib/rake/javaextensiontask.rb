@@ -77,7 +77,18 @@ execute the Rake compilation task using the JRuby interpreter.
       warn_once(not_jruby_compile_msg) unless defined?(JRUBY_VERSION)
 
       file "#{tmp_path}/#{binary(platf)}" => "#{tmp_path}/.build" do
-        sh "jar cf #{tmp_path}/#{binary(platf)} -C #{tmp_path} ."
+
+        class_files = FileList["#{tmp_path}/**/*.class"].
+          gsub("#{tmp_path}/", '')
+
+        # avoid environment variable expansion using backslash
+        class_files.gsub!('$', '\$') unless windows?
+
+        args = class_files.map { |path|
+          ["-C #{tmp_path}", path]
+        }.flatten
+
+        sh "jar cf #{tmp_path}/#{binary(platf)} #{args.join(' ')}"
       end
 
       file "#{tmp_path}/.build" => [tmp_path] + source_files do

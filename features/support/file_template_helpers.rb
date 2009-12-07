@@ -114,8 +114,15 @@ import org.jruby.runtime.load.BasicLibraryService;
 
 public class #{camelize(extension_name)}Service implements BasicLibraryService {
    public boolean basicLoad(final Ruby runtime) throws java.io.IOException {
-     System.out.println("#{camelize(extension_name)}Service.java of extension #{extension_name}\\n");
+     HelloWorldPrinter hwp = new HelloWorldPrinter();
+     hwp.tellTheWorld();
      return true;
+   }
+
+   private class HelloWorldPrinter {
+     void tellTheWorld() throws java.io.IOException {
+       System.out.println("#{camelize(extension_name)}Service.java of extension #{extension_name}\\n");
+     }
    }
 }
 
