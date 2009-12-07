@@ -1,6 +1,22 @@
 === (in Git)
 
 * Enhancements
+  * Allow generation of JRuby extensions. Thanks to Alex Coles (myabc) for the
+    contribution.
+    This will allow, with proper JDK tools, cross compilation of JRuby gems
+    from MRI.
+
+      Rake::JavaExtensionTask.new('my_java_extension', GEM_SPEC) do |ext|
+        # most of ExtensionTask options can be used
+        # plus, java_compiling:
+        ext.java_compiling do |gem_spec|
+          gem_spec.post_install_message = "This is a native JRuby gem!"
+        end
+      end
+
+    Please note that cross-compiling JRuby gems requires either JRUBY_HOME or
+    JRUBY_PARENT_CLASSPATH environment variables being properly set.
+
   * Allow alteration of the Gem Specification when cross compiling. Closes GH-3
     This is useful to indicate a custom requirement message, like DLLs
     installation or similar.
