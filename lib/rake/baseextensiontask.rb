@@ -69,5 +69,12 @@ module Rake
     def source_files
       @source_files ||= FileList["#{@ext_dir}/#{@source_pattern}"]
     end
+
+    def warn_once(message)
+      @@already_warned ||= false
+      return if @@already_warned
+      @@already_warned = true
+      warn message
+    end
   end
 end

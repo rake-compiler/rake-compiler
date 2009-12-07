@@ -65,7 +65,7 @@ correctly detected, then either check the appropriate environment variables or
 execute the Rake compilation task using the JRuby interpreter.
 (e.g. `jruby -S rake compile:java`)
       EOF
-      warn(not_jruby_compile_msg) unless defined?(JRUBY_VERSION)
+      warn_once(not_jruby_compile_msg) unless defined?(JRUBY_VERSION)
 
       file "#{tmp_path}/#{binary(platf)}" => "#{tmp_path}/.build" do
         sh "jar cf #{tmp_path}/#{binary(platf)} -C #{tmp_path} ."
