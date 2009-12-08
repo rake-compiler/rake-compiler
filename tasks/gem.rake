@@ -3,12 +3,12 @@ require 'rubygems/package_task'
 GEM_SPEC = Gem::Specification.new do |s|
   # basic information
   s.name        = "rake-compiler"
-  s.version     = "0.6.0"
+  s.version     = "0.7.0"
   s.platform    = Gem::Platform::RUBY
 
   # description and details
-  s.summary     = 'Rake-based Ruby C Extension task generator.'
-  s.description = "Provide a standard and simplified way to build and package\nRuby C extensions using Rake as glue."
+  s.summary     = 'Rake-based Ruby Extension (C, Java) task generator.'
+  s.description = "Provide a standard and simplified way to build and package\nRuby extensions (C, Java) using Rake as glue."
 
   # requirements
   s.required_ruby_version = ">= 1.8.6"
@@ -18,9 +18,9 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.add_dependency  'rake', '>= 0.8.3', '< 0.9'
 
   # development dependencies
-  #s.add_development_dependency 'rspec', '~> 1.1.9'
-  #s.add_development_dependency 'rcov', '~> 0.8.1'
-  #s.add_development_dependency 'cucumber', '~> 0.1.8'
+  s.add_development_dependency 'rspec', '~> 1.2.9'
+  s.add_development_dependency 'cucumber', '~> 0.4.4'
+  #s.add_development_dependency 'rcov', '~> 0.9.6'
 
   # components, files and paths
   s.files = FileList["features/**/*.{feature,rb}", "bin/rake-compiler",
