@@ -1,4 +1,4 @@
-=== (in Git)
+=== 0.7.0 / 2009-12-08
 
 * Enhancements
   * Allow generation of JRuby extensions. Thanks to Alex Coles (myabc) for the
@@ -38,6 +38,14 @@
   * Force definition of binary directory and executables. Closes GH-11
   * Workaround path with spaces issues using relative paths. Closes GH-6
   * Removed gemspec, GitHub gems no more
+
+* Known issues
+  * Usage of rake-compiler under projects with Jeweler requires some tweaks
+    Please read issue GH-73 for Jeweler:
+    http://github.com/technicalpickles/jeweler/issues#issue/73
+
+    For a workaround, look here:
+    http://gist.github.com/251663
 
 === 0.6.0 / 2009-07-25
 
