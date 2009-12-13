@@ -337,10 +337,16 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
           if RUBY_PLATFORM =~ /mswin/ then
             'nmake'
           else
-            ENV['MAKE'] || %w[gmake make].find { |c| system(c, '-v') }
+            ENV['MAKE'] || %w[gmake make].find { |c|
+              system("#{c} -v >> #{dev_null} 2>&1")
+            }
           end
       end
       @make
+    end
+
+    def dev_null
+      windows? ? 'NUL' : '/dev/null'
     end
 
     def source_files
