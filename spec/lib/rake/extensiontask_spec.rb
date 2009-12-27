@@ -439,6 +439,7 @@ describe Rake::ExtensionTask do
   def mock_config_yml
     {
       'rbconfig-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
       'rbconfig-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb',
       'rbconfig-3.0.0' => '/some/fake/version/3.0.0/to/rbconfig.rb'
     }
