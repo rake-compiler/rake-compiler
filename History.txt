@@ -3,6 +3,7 @@
 * Bugfixes:
   * Update gem files to make "gem install -t" works. Closes GH-14
   * Update mocks to work under 1.8.7. Closes GH-15 [luisparravicini]
+  * Do not allow cross-ruby be executed under Windows. Closes GH-22
 
 === 0.7.0 / 2009-12-08
 

@@ -26,6 +26,11 @@ require 'yaml'
 libdir = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
 $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 
+if RUBY_PLATFORM =~ /mingw|mswin/ then
+  puts "This command is meant to be executed under Linux or OSX, not Windows (is for cross-compilation)"
+  exit(1)
+end
+
 require 'rake/extensioncompiler'
 
 MAKE = ENV['MAKE'] || %w[gmake make].find { |c| system(c, '-v') }
