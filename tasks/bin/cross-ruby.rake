@@ -166,7 +166,7 @@ task 'update-config' do
     config = {}
   end
 
-  files = Dir.glob("#{USER_HOME}/ruby/**/rbconfig.rb").sort
+  files = Dir.glob("#{USER_HOME}/ruby/*/**/rbconfig.rb").sort
 
   files.each do |rbconfig|
     version = rbconfig.match(/.*-(\d.\d.\d)/)[1]
