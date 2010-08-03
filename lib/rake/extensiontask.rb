@@ -32,8 +32,20 @@ module Rake
       @cross_compiling = block if block_given?
     end
 
+    def binary(platform = nil)
+      if platform == "java"
+	warn_once <<-EOF
+Compiling a native C extension on JRuby. This is discouraged and a 
+Java extension should be preferred.
+        EOF
+        "#{name}.#{RbConfig::MAKEFILE_CONFIG['DLEXT']}"
+      else
+        super
+      end
+    end
+
     def define
-      if RUBY_PLATFORM == 'java' || (defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ironruby')
+      if (defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ironruby')
         warn_once <<-EOF
 WARNING: You're attempting to (cross-)compile C extensions from a platform
 (#{RUBY_ENGINE}) that does not support native extensions or mkmf.rb.
