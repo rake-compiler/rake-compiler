@@ -1,9 +1,14 @@
-=== (In Git)
+=== 0.7.1 / 2010-08-07
 
 * Bugfixes:
   * Update gem files to make "gem install -t" works. Closes GH-14
   * Update mocks to work under 1.8.7. Closes GH-15 [luisparravicini]
   * Do not allow cross-ruby be executed under Windows. Closes GH-22
+
+* Experimental:
+  * Allow JRuby to compile C extensions [timfel].
+    It is now possible compile C extensions using latest JRuby. Offered
+    in experimental mode since JRuby cext hasn't been officially released.
 
 === 0.7.0 / 2009-12-08
 
@@ -72,12 +77,12 @@
   * Allow simultaneous versions of Ruby to compile extensions.
     This change allow 1.8.x compiles co-exist with 1.9.x ones
     and don't override each other.
-    
+
     Please perform <tt>rake clobber</tt> prior compiling again.
   * Allow optional source file URL for cross-compile tasks.
     (Thanks to deepj for the patches)
 
-      rake-compiler cross-ruby VERSION=1.9.1-p0 SOURCE=http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.bz2 
+      rake-compiler cross-ruby VERSION=1.9.1-p0 SOURCE=http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.bz2
 
 * Bugfixes
   * Removed strict versioning for gems since it clash with fat binaries.
@@ -143,7 +148,7 @@
 === 0.3.0 / 2008-12-07
 
 * New features
-  * Let you specify the Ruby version used for cross compilation instead 
+  * Let you specify the Ruby version used for cross compilation instead
     of default one.
 
       rake cross compile RUBY_CC_VERSION=1.8
