@@ -376,13 +376,31 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
     def fake_rb(version)
       <<-FAKE_RB
         class Object
+          CROSS_COMPILING = RUBY_PLATFORM
           remove_const :RUBY_PLATFORM
           remove_const :RUBY_VERSION
+          remove_const :RUBY_DESCRIPTION if defined?(RUBY_DESCRIPTION)
           RUBY_PLATFORM = "i386-mingw32"
           RUBY_VERSION = "#{version}"
+          RUBY_DESCRIPTION = "ruby \#{RUBY_VERSION} (\#{RUBY_RELEASE_DATE}) [\#{RUBY_PLATFORM}]"
         end
+        if RUBY_PLATFORM =~ /mswin|bccwin|mingw/
+          class File
+            remove_const :ALT_SEPARATOR
+            ALT_SEPARATOR = "\\\\"
+          end
+        end
+
+        posthook = proc do
+          $ruby = "#{base_ruby}"
+          untrace_var(:$ruby, posthook)
+        end
+        trace_var(:$ruby, posthook)
 FAKE_RB
     end
 
+    def base_ruby
+      RbConfig::CONFIG['ruby_install_name']
+    end
   end
 end
