@@ -6,6 +6,12 @@
   * Usage of Gem.ruby instead of RbConfig ruby_install_name
     This solve issues with ruby vs. ruby.exe and jruby.exe
 
+* Experimental:
+  * Allow setting of HOST during cross-compilation. This enable usage
+    of mingw-w64 compiler and not the first one found in the PATH.
+
+      rake-compiler cross-ruby VERSION=1.9.2-p0 HOST=i686-w64-mingw32
+
 === 0.7.1 / 2010-08-07
 
 * Bugfixes:
