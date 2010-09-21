@@ -1,3 +1,10 @@
+=== (in Git)
+
+* Bugfixes:
+  * Generate a fake.rb compatible with Ruby 1.9.2. Closes GH-25
+  * Usage of Gem.ruby instead of RbConfig ruby_install_name
+    This solve issues with ruby vs. ruby.exe and jruby.exe
+
 === 0.7.1 / 2010-08-07
 
 * Bugfixes:
