@@ -11,6 +11,8 @@
     of mingw-w64 compiler and not the first one found in the PATH.
 
       rake-compiler cross-ruby VERSION=1.9.2-p0 HOST=i686-w64-mingw32
+      rake-compiler cross-ruby HOST=i386-mingw32 (OSX mingw32 port)
+      rake-compiler cross-ruby HOST=i586-pc-mingw32 (Debian/Ubuntu mingw32)
 
 === 0.7.1 / 2010-08-07
 

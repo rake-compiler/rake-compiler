@@ -221,6 +221,15 @@ supply a <tt>VERSION</tt>:
 
   rake-compiler cross-ruby VERSION=1.8.6-p114
 
+If you, like me, have multiple versions of MinGW packages, you can specify the
+HOST that will be used to cross compile ruby:
+
+  rake-compiler cross-ruby HOST=i386-mingw32 # (OSX mingw32 port)
+
+The host will vary depending on provider (mingw32 versus mingw-w64 projects).
+Consult the documentation and website of the MinGW package provider before
+reporting any issue.
+
 === Let's build some gems!
 
 Now, you only need to use additional options in your extension definition:
