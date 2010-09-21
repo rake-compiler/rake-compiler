@@ -109,7 +109,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
         options = @config_options.dup
 
         # include current directory
-        cmd = ['-I.']
+        cmd = [Gem.ruby, '-I.']
 
         # if fake.rb is present, add to the command line
         if t.prerequisites.include?("#{tmp_path}/fake.rb") then
@@ -135,7 +135,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
           # FIXME: Rake is broken for multiple arguments system() calls.
           # Add current directory to the search path of Ruby
           # Also, include additional parameters supplied.
-          ruby cmd.join(' ')
+          sh cmd.join(' ')
         end
       end
 
@@ -392,15 +392,11 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
         end
 
         posthook = proc do
-          $ruby = "#{base_ruby}"
+          $ruby = "#{Gem.ruby}"
           untrace_var(:$ruby, posthook)
         end
         trace_var(:$ruby, posthook)
 FAKE_RB
-    end
-
-    def base_ruby
-      RbConfig::CONFIG['ruby_install_name']
     end
   end
 end
