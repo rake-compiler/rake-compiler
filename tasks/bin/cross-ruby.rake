@@ -111,14 +111,6 @@ task :mingw32 do
   end
 end
 
-task :environment do
-  ENV['ac_cv_func_getpgrp_void'] =  'no'
-  ENV['ac_cv_func_setpgrp_void'] = 'yes'
-  ENV['rb_cv_negative_time_t'] = 'no'
-  ENV['ac_cv_func_memcmp_working'] = 'yes'
-  ENV['rb_cv_binary_elf' ] = 'no'
-end
-
 # generate the makefile in a clean build location
 file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/#{RUBY_CC_VERSION}",
                                   "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in"] do |t|
@@ -186,4 +178,4 @@ task :default do
 end
 
 desc "Build #{RUBY_CC_VERSION} suitable for cross-platform development."
-task 'cross-ruby' => [:mingw32, :environment, :install, 'update-config']
+task 'cross-ruby' => [:mingw32, :install, 'update-config']
