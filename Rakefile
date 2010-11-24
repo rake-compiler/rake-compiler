@@ -12,11 +12,9 @@
 #
 
 begin
-  require 'rake'
-rescue LoadError
-  require 'rubygems'
-  gem 'rake', '~> 0.8.3.1'
-  require 'rake'
+  require 'isolate/now'
+rescue LoadError => e
+  fail "This project uses Isolate to manage development dependencies. Please `gem install isolate` first and try again."
 end
 
 # load rakefile extensions (tasks)
