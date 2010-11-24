@@ -376,7 +376,6 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
     def fake_rb(version)
       <<-FAKE_RB
         class Object
-          CROSS_COMPILING = RUBY_PLATFORM
           remove_const :RUBY_PLATFORM
           remove_const :RUBY_VERSION
           remove_const :RUBY_DESCRIPTION if defined?(RUBY_DESCRIPTION)
