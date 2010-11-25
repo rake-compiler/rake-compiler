@@ -70,7 +70,7 @@ EOF
 require 'rake/extensiontask'
 Rake::ExtensionTask.new("#{extension_name}", SPEC) do |ext|
   ext.cross_compile = true
-  ext.cross_platform = ['i386-mswin32', 'i386-mingw32']
+  ext.cross_platform = ['x86-mswin32', 'x86-mingw32']
 end
 EOF
   end
