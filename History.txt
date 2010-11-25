@@ -1,5 +1,8 @@
 === (in Git)
 
+* Enhancements:
+  * Promoted stable version for cross-compilation to 1.8.6-p398. Closes GH-19
+
 * Bugfixes:
   * Generate a fake.rb compatible with Ruby 1.9.2. Closes GH-25
   * fake.rb will not try to mimic Ruby's own fake to the letter. Closes GH-28

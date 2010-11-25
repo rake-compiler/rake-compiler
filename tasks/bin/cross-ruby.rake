@@ -35,7 +35,7 @@ require 'rake/extensioncompiler'
 
 MAKE = ENV['MAKE'] || %w[gmake make].find { |c| system("#{c} -v > /dev/null 2>&1") }
 USER_HOME = File.expand_path("~/.rake-compiler")
-RUBY_CC_VERSION = "ruby-#{ENV['VERSION'] || '1.8.6-p287'}"
+RUBY_CC_VERSION = "ruby-#{ENV['VERSION'] || '1.8.6-p398'}"
 RUBY_SOURCE = ENV['SOURCE']
 
 # grab the major "1.8" or "1.9" part of the version number
