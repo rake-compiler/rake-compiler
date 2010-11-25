@@ -59,7 +59,7 @@ CLOBBER.include("#{USER_HOME}/ruby/#{RUBY_CC_VERSION}")
 CLOBBER.include("#{USER_HOME}/config.yml")
 
 # ruby source file should be stored there
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.gz" => ["#{USER_HOME}/sources"] do |t|
+file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.bz2" => ["#{USER_HOME}/sources"] do |t|
   # download the source file using wget or curl
   chdir File.dirname(t.name) do
     if RUBY_SOURCE
@@ -72,10 +72,10 @@ file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.gz" => ["#{USER_HOME}/sources"
 end
 
 # Extract the sources
-source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.gz"
+source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.bz2"
 file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => ["#{USER_HOME}/sources/#{source_file}"] do |t|
   chdir File.dirname(t.name) do
-    t.prerequisites.each { |f| sh "tar xfz #{File.basename(f)}" }
+    t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
   end
 end
 
@@ -179,3 +179,4 @@ end
 
 desc "Build #{RUBY_CC_VERSION} suitable for cross-platform development."
 task 'cross-ruby' => [:mingw32, :install, 'update-config']
+
