@@ -3,6 +3,7 @@
 * Bugfixes:
   * Generate a fake.rb compatible with Ruby 1.9.2. Closes GH-25
   * fake.rb will not try to mimic Ruby's own fake to the letter. Closes GH-28
+  * Expand symlinks for tmp_dir. Closes GH-24
   * Silence make output during rake-compiler invocation.
   * Usage of Gem.ruby instead of RbConfig ruby_install_name
     This solve issues with ruby vs. ruby.exe and jruby.exe

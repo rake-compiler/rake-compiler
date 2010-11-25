@@ -117,8 +117,8 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
         end
 
         # build a relative path to extconf script
-        abs_tmp_path = Pathname.new(Dir.pwd) + tmp_path
-        abs_extconf = Pathname.new(Dir.pwd) + extconf
+        abs_tmp_path = (Pathname.new(Dir.pwd) + tmp_path).realpath
+        abs_extconf = (Pathname.new(Dir.pwd) + extconf).realpath
 
         # now add the extconf script
         cmd << abs_extconf.relative_path_from(abs_tmp_path)
