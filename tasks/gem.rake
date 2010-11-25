@@ -3,7 +3,7 @@ require 'rubygems/package_task'
 GEM_SPEC = Gem::Specification.new do |s|
   # basic information
   s.name        = "rake-compiler"
-  s.version     = "0.7.1"
+  s.version     = "0.7.5"
   s.platform    = Gem::Platform::RUBY
 
   # description and details
@@ -15,7 +15,7 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.5"
 
   # dependencies
-  s.add_dependency  'rake', '>= 0.8.3', '< 0.9'
+  s.add_dependency  'rake'
 
   # development dependencies
   s.add_development_dependency 'rspec', '~> 1.2.9'
@@ -25,7 +25,8 @@ GEM_SPEC = Gem::Specification.new do |s|
   # components, files and paths
   s.files = FileList["features/**/*.{feature,rb}", "bin/rake-compiler",
                       "lib/**/*.rb", "spec/spec.opts", "spec/**/*.rb",
-                      "tasks/**/*.rake", "Rakefile", "*.{rdoc,txt,yml}"]
+                      "tasks/**/*.rake", "Rakefile", "Isolate",
+                      "*.{rdoc,txt,yml}"]
 
   s.bindir      = 'bin'
   s.executables = ['rake-compiler']

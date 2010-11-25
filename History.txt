@@ -1,4 +1,4 @@
-=== (in Git)
+=== 0.7.5 / 2010-11-25
 
 * Enhancements:
   * Promoted stable version for cross-compilation to 1.8.6-p398. Closes GH-19
