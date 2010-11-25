@@ -304,11 +304,11 @@ development of it! (and contributions too!)
 
 You can find more information about rake-compiler:
 
-Blog:      http://blog.mmediasys.com
-RubyForge: http://rubyforge.org/projects/rake-compiler
-GitHub:    http://github.com/luislavena/rake-compiler
-Issues:    http://github.com/luislavena/rake-compiler/issues
-Wiki:      http://github.com/luislavena/rake-compiler/wiki
+* GitHub:    https://github.com/luislavena/rake-compiler
+* Issues:    https://github.com/luislavena/rake-compiler/issues
+* Blog:      http://blog.mmediasys.com
+* Docs:      http://rubydoc.info/gems/rake-compiler
+* Wiki:      https://github.com/luislavena/rake-compiler/wiki
 
 == Disclaimer
 

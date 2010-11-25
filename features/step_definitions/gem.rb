@@ -17,7 +17,11 @@ Then /^a gem for '(.*)' version '(.*)' platform '(.*)' do exist in '(.*)'$/ do |
   `gem unpack #{gem_file_platform(folder, name, version, platform)} --target tmp`
   unpacked_gem_dir = unpacked_gem_dir_platform('tmp', name, version, platform)
   File.exist?(unpacked_gem_dir).should be_true
-  Dir.glob(unpacked_gem_dir << "/lib/*.#{binary_extension(platform)}").should_not be_empty
+
+  files = Dir.glob("#{unpacked_gem_dir}/lib/*.#{binary_extension(platform)}")
+  files << Dir.glob("#{unpacked_gem_dir}/lib/*/*.#{binary_extension(platform)}")
+
+  files.flatten.uniq.should_not be_empty
 end
 
 Then /^gem for platform '(.*)' get generated$/ do |platform|
