@@ -43,6 +43,7 @@ MAJOR = RUBY_CC_VERSION.match(/.*-(\d.\d).\d/)[1]
 
 # Use Rake::ExtensionCompiler helpers to find the proper host
 MINGW_HOST = ENV['HOST'] || Rake::ExtensionCompiler.mingw_host
+MINGW_TARGET = MINGW_HOST.gsub('msvc', '')
 
 # define a location where sources will be stored
 directory "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
@@ -117,6 +118,7 @@ file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/
 
   options = [
     "--host=#{MINGW_HOST}",
+    "--target=#{MINGW_TARGET}",
     '--enable-shared',
     '--disable-install-doc',
     '--without-tk',
