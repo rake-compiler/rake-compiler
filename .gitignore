@@ -4,3 +4,4 @@ coverage
 doc/api
 tmp
 pkg
+isolated
