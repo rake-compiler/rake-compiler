@@ -1,13 +1,13 @@
-= What is the rake-compiler?
+= What is rake-compiler?
 
-Rake-compiler is first and foremost a productivity tool for RubyGem developers.
+rake-compiler is first and foremost a productivity tool for Ruby developers.
 It's goal is to make the busy developer's life easier by simplifying the building
 and packaging of Ruby extensions by simplifying code and reducing duplication.
 
 It follows *convention over configuration* by advocating a standardized build and
 package structure for both C and Java based RubyGems.
 
-Rake-compiler is the result of many hard-won experiences dealing with several
+rake-compiler is the result of many hard-won experiences dealing with several
 diverse RubyGems that provided native extensions for different platforms and
 different user configurations in different ways. Details such as differences in
 code portability, differences in code clarity, and differences in project directory
@@ -131,7 +131,7 @@ Creating native gems is really easy with rake-compiler's <tt>Rake::ExtensionTask
     end
 
     # add your default gem packing task
-    Rake::GemPackageTask.new(spec) do |pkg|
+    Gem::PackageTask.new(spec) do |pkg|
     end
 
     # feed the ExtensionTask with your spec
@@ -149,7 +149,7 @@ As expected, you can still build your pure-ruby gem in the usual way
     File: my_gem-0.1.0.gem
   mv my_gem-0.1.0.gem pkg/my_gem-0.1.0.gem
 
-Plus, the rake-compiler tasks give you the extra functionality needed to build
+Plus, rake-compiler tasks give you the extra functionality needed to build
 native gems by running:
 
   # rake native gem
@@ -228,17 +228,7 @@ On OSX, <tt>mingw32</tt> is available via MacPorts via <tt>port install i386-min
 
 === I've got my tool-chain installed, now what?
 
-First, you need to create a correctly configured <tt>~/.rake-compiler/config.yml</tt>
-file so that rake-compiler knows where to find the <tt>rbconfig.rb</tt> file that
-matches the Ruby version on the Windows host system you're cross-compiling for.
-
-  # File: ~/.rake-compiler/config.yml
-
-  rbconfig-1.8.6: /path/to/ruby-1.8.6/rbconfig.rb
-  rbconfig-1.8.7: /path/to/ruby-1.8.7/rbconfig.rb
-  rbconfig-1.9.2: /path/to/ruby-1.9.2/rbconfig.rb
-
-Next, you need to build Ruby for Windows on your Linux or OSX system.
+First, you need to build Ruby for Windows on your Linux or OSX system.
 
 Relax, no need to freak out! Let rake-compiler do all the heavy lifting for you:
 
@@ -247,6 +237,16 @@ Relax, no need to freak out! Let rake-compiler do all the heavy lifting for you:
 And you're done. It will automatically download, configure and compile the latest
 stable version of Ruby for Windows, and place it into your <tt>~/.rake-compiler</tt>
 directory.
+
+This will create <tt>~/.rake-compiler/config.yml</tt> file so that rake-compiler
+knows where to find the <tt>rbconfig.rb</tt> file that matches the Ruby version
+on the Windows host system you're cross-compiling for. An example:
+
+  # File: ~/.rake-compiler/config.yml
+
+  rbconfig-1.8.6: /path/to/ruby-1.8.6/rbconfig.rb
+  rbconfig-1.8.7: /path/to/ruby-1.8.7/rbconfig.rb
+  rbconfig-1.9.2: /path/to/ruby-1.9.2/rbconfig.rb
 
 If, instead, you want to build a different Ruby version than the default one, please
 supply a <tt>VERSION</tt>:
@@ -298,7 +298,7 @@ And you're done, yeah.
 
 === But wait, there's more
 
-You can specify with version of Ruby to build the extension against:
+You can specify which version of Ruby to build the extension against:
 
   rake cross compile RUBY_CC_VERSION=1.8.6
 
@@ -324,7 +324,7 @@ extensions inside your project's <tt>lib_dir</tt> directory:
 
 NOTE: building "fat" gems is currently only supported by rake-compiler when
 cross compiling from a Linux or OSX host. Patches are welcome if building
-"fat" gems from Windows hosts is desired :)
+"fat" gems from Windows hosts is desired, or natively for your platform :-)
 
 Now is up to you to make your gem load the proper binary at runtime. Here's a hint ;-)
 
@@ -343,7 +343,7 @@ http://github.com/luislavena/rake-compiler/wiki/projects-using-rake-compiler
 
 == Future
 
-The rake-compiler is a work in progress and we appreciate any and all feedback
+rake-compiler is a work in progress and we appreciate any and all feedback
 during the development of it! (and contributions too!)
 
 You can find more information about rake-compiler:
