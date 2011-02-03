@@ -108,8 +108,12 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       file "#{tmp_path}/Makefile" => [tmp_path, extconf] do |t|
         options = @config_options.dup
 
+        # filter includes from options
+        includes = options.select { |opt| opt if opt.size >= 2 and opt[0..1] == "-I" }
+        options = options - includes
+
         # include current directory
-        cmd = [Gem.ruby, '-I.']
+        cmd = [Gem.ruby, '-I.'] + includes
 
         # if fake.rb is present, add to the command line
         if t.prerequisites.include?("#{tmp_path}/fake.rb") then
