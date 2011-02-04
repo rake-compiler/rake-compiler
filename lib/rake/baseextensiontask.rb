@@ -4,6 +4,12 @@ require 'rake'
 require 'rake/clean'
 require 'rake/tasklib'
 require 'rbconfig'
+
+begin
+  require 'psych'
+rescue LoadError
+end
+
 require 'yaml'
 require 'pathname'
 

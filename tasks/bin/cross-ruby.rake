@@ -19,6 +19,12 @@
 
 require 'rake'
 require 'rake/clean'
+
+begin
+  require 'psych'
+rescue LoadError
+end
+
 require 'yaml'
 
 # load compiler helpers
