@@ -1,3 +1,8 @@
+=== 0.7.6 / 2011-02-04
+
+* Bugfixes:
+  * Prefer Psych over Syck for YAML parsing on Ruby 1.9.2. [tenderlove]
+
 === 0.7.5 / 2010-11-25
 
 * Enhancements:
