@@ -18,9 +18,9 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.add_dependency  'rake'
 
   # development dependencies
-  s.add_development_dependency 'rspec', '~> 1.2.9'
-  s.add_development_dependency 'cucumber', '~> 0.4.4'
-  #s.add_development_dependency 'rcov', '~> 0.9.6'
+  s.add_development_dependency 'rspec', '~> 1.3.1'
+  s.add_development_dependency 'cucumber', '~> 0.9.4'
+  #s.add_development_dependency 'rcov', '~> 0.9.9'
 
   # components, files and paths
   s.files = FileList["features/**/*.{feature,rb}", "bin/rake-compiler",
