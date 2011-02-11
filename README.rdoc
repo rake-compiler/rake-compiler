@@ -326,10 +326,21 @@ NOTE: building "fat" gems is currently only supported by rake-compiler when
 cross compiling from a Linux or OSX host. Patches are welcome if building
 "fat" gems from Windows hosts is desired, or natively for your platform :-)
 
-Now is up to you to make your gem load the proper binary at runtime. Here's a hint ;-)
+Now is up to you to make your gem load the proper binary at runtime:
 
-  RUBY_VERSION =~ /(\d+.\d+)/
-  require "#{$1}/my_extension"
+  begin
+    RUBY_VERSION =~ /(\d+.\d+)/
+    require "#{$1}/my_extension"
+  rescue LoadError
+    require "my_extension"
+  end
+
+The above technique will lookup first for 1.8 or 1.9 version of the extension
+and when not found, will look for the plain extension.
+
+This approach catch the cases of provided fat binaries or gems compiled by the
+end user installing the gem. It has also been implemented successfully in
+several projects.
 
 === What are you talking about? (Give me examples)
 
