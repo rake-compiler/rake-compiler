@@ -13,6 +13,7 @@ module Rake
     attr_accessor :cross_platform
     attr_accessor :cross_config_options
     attr_accessor :no_native
+    attr_accessor :config_includes
 
     def init(name = nil, gem_spec = nil)
       super
@@ -22,6 +23,7 @@ module Rake
       @cross_config_options = []
       @cross_compiling = nil
       @no_native = false
+      @config_includes = []
     end
 
     def cross_platform
@@ -109,7 +111,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
         options = @config_options.dup
 
         # include current directory
-        cmd = [Gem.ruby, '-I.']
+        cmd = [Gem.ruby, '-I.'] + @config_includes
 
         # if fake.rb is present, add to the command line
         if t.prerequisites.include?("#{tmp_path}/fake.rb") then
