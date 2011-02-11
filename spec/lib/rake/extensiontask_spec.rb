@@ -80,6 +80,10 @@ describe Rake::ExtensionTask do
       @ext.config_options.should be_empty
     end
 
+    it "should have no includes preset to delegate" do
+      @ext.config_includes.should be_empty
+    end
+
     it 'should default to current platform' do
       @ext.platform.should == RUBY_PLATFORM
     end
