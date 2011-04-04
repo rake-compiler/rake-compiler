@@ -1,4 +1,4 @@
-=== (In Git)
+=== 0.7.7 / 2011-04-04
 
 * Bugfixes:
   * Use Winsock2 as default to match Ruby 1.9.2 library linking.
