@@ -131,6 +131,9 @@ file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/
     '--without-tcl'
   ]
 
+  # Force Winsock2 for Ruby 1.8, 1.9 defaults to it
+  options << "--with-winsock2" if MAJOR == "1.8"
+
   chdir File.dirname(t.name) do
     prefix = File.expand_path("../../ruby/#{RUBY_CC_VERSION}")
     options << "--prefix=#{prefix}"
