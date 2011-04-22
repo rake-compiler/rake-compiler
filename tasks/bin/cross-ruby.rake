@@ -26,6 +26,7 @@ rescue LoadError
 end
 
 require 'yaml'
+require "rbconfig"
 
 # load compiler helpers
 # add lib directory to the search path
@@ -43,6 +44,7 @@ MAKE = ENV['MAKE'] || %w[gmake make].find { |c| system("#{c} -v > /dev/null 2>&1
 USER_HOME = File.expand_path("~/.rake-compiler")
 RUBY_CC_VERSION = "ruby-#{ENV['VERSION'] || '1.8.6-p398'}"
 RUBY_SOURCE = ENV['SOURCE']
+RUBY_BUILD = RbConfig::CONFIG["host"]
 
 # grab the major "1.8" or "1.9" part of the version number
 MAJOR = RUBY_CC_VERSION.match(/.*-(\d.\d).\d/)[1]
@@ -125,6 +127,7 @@ file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/
   options = [
     "--host=#{MINGW_HOST}",
     "--target=#{MINGW_TARGET}",
+    "--build=#{RUBY_BUILD}",
     '--enable-shared',
     '--disable-install-doc',
     '--without-tk',

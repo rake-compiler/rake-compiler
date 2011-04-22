@@ -10,6 +10,7 @@
 
 * Bugfixes:
   * Warn if compiled files exists in extension's source directory. Closes GH-35
+  * Workaround issue with WINE using proper build option. Closes GH-37
 
 === 0.7.7 / 2011-04-04
 
