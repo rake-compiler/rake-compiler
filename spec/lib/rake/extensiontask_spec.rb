@@ -110,7 +110,7 @@ describe Rake::ExtensionTask do
 
     context '(one extension)' do
       before :each do
-        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
+        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"], [])
         @ext = Rake::ExtensionTask.new('extension_one')
         @ext_bin = ext_bin('extension_one')
         @platform = RUBY_PLATFORM
@@ -194,11 +194,22 @@ describe Rake::ExtensionTask do
           CLOBBER.should include('tmp')
         end
       end
+
+      it "should warn when pre-compiled files exist in extension directory" do
+        Rake::FileList.stub!(:[]).
+          and_return(["ext/extension_one/source.c"],
+                      ["ext/extension_one/source.o"])
+
+        _, err = capture_output do
+          Rake::ExtensionTask.new('extension_one')
+        end
+        err.should match(/rake-compiler found compiled files in 'ext\/extension_one' directory. Please remove them./)
+      end
     end
 
     context '(extension in custom location)' do
       before :each do
-        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
+        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"], [])
         @ext = Rake::ExtensionTask.new('extension_one') do |ext|
           ext.ext_dir = 'custom/ext/foo'
         end
@@ -216,7 +227,7 @@ describe Rake::ExtensionTask do
 
     context '(native tasks)' do
       before :each do
-        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
+        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"], [])
         @spec = mock_gem_spec
         @ext_bin = ext_bin('extension_one')
         @platform = RUBY_PLATFORM
@@ -263,7 +274,7 @@ describe Rake::ExtensionTask do
       before :each do
         File.stub!(:exist?).and_return(true)
         YAML.stub!(:load_file).and_return(mock_config_yml)
-        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"])
+        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.c"], [])
         @spec = mock_gem_spec
         @config_file = File.expand_path("~/.rake-compiler/config.yml")
         @ruby_ver = RUBY_VERSION

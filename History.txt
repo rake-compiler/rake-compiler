@@ -8,6 +8,9 @@
       ext.config_includes << File.expand_path("my", "custom", "dir")
     end
 
+* Bugfixes:
+  * Warn if compiled files exists in extension's source directory. Closes GH-35
+
 === 0.7.7 / 2011-04-04
 
 * Bugfixes:

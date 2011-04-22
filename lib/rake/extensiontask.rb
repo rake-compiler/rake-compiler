@@ -19,6 +19,7 @@ module Rake
       super
       @config_script = 'extconf.rb'
       @source_pattern = "*.c"
+      @compiled_pattern = "*.{o,obj,so,bundle,dSYM}"
       @cross_compile = false
       @cross_config_options = []
       @cross_compiling = nil
@@ -57,6 +58,10 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       end
 
       super
+
+      unless compiled_files.empty?
+        warn "WARNING: rake-compiler found compiled files in '#{@ext_dir}' directory. Please remove them."
+      end
 
       # only gems with 'ruby' platforms are allowed to define native tasks
       define_native_tasks if !@no_native && (@gem_spec && @gem_spec.platform == 'ruby')
@@ -364,8 +369,8 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       windows? ? 'NUL' : '/dev/null'
     end
 
-    def source_files
-     @source_files ||= FileList["#{@ext_dir}/#{@source_pattern}"]
+    def compiled_files
+      FileList["#{@ext_dir}/#{@compiled_pattern}"]
     end
 
     def compiles_cross_platform
