@@ -99,7 +99,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_path, "#{tmp_path}/#{binary(platf)}"] do
-        cp "#{tmp_path}/#{binary(platf)}", "#{lib_path}/#{binary(platf)}"
+        install "#{tmp_path}/#{binary(platf)}", "#{lib_path}/#{binary(platf)}"
       end
 
       # binary in temporary folder depends on makefile and source files

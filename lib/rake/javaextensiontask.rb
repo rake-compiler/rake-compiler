@@ -64,7 +64,7 @@ module Rake
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
       task "copy:#{@name}:#{platf}" => [lib_path, "#{tmp_path}/#{binary(platf)}"] do
-        cp "#{tmp_path}/#{binary(platf)}", "#{lib_path}/#{binary(platf)}"
+        install "#{tmp_path}/#{binary(platf)}", "#{lib_path}/#{binary(platf)}"
       end
 
       not_jruby_compile_msg = <<-EOF
