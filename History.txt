@@ -1,3 +1,13 @@
+=== (In Git)
+
+* Enhancements:
+  * ExtensionTask now support config_includes to load additional directories.
+    [jfinkhaeuser]
+
+    Rake::ExtensionTask.new("myext", GEM_SPEC) do |ext|
+      ext.config_includes << File.expand_path("my", "custom", "dir")
+    end
+
 === 0.7.7 / 2011-04-04
 
 * Bugfixes:
