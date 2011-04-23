@@ -223,8 +223,26 @@ host machines, a simple <tt>apt-get install mingw32</tt> will be enough.
 
 On Arch, <tt>mingw32</tt> is installed by running <tt>pacman -S mingw32-gcc</tt>
 
-On OSX, <tt>mingw32</tt> is available via MacPorts via <tt>port install i386-mingw32-gcc</tt>
-(ensure your ports tree is updated as <tt>mingw32</tt> has been broken in the past).
+On OSX, we no longer recommend the usage of MacPorts <tt>mingw32</tt> package because
+it stagnated in GCC version 3.4.5.
+
+Instead we recommend you download mingw-w64 automated build packages available at
+SourceForge:
+
+http://sourceforge.net/downloads/mingw-w64/
+
+Browse into <em>Toolchains targetting Win32</em> and then <em>Automated Builds</em>.
+
+Files will be ordered by recency, find the latest one with version 1.0 in it,
+like this one:
+
+  mingw-w32-1.0-bin_i686-darwin_20110422.tar.bz2
+
+Download and extract. After that, make sure the bin directory is added to the PATH, eg:
+
+  export PATH=~/mingw-w64/w32/bin:$PATH
+
+You can add this to your <tt>.profile</tt> to avoid the repitition.
 
 === I've got my tool-chain installed, now what?
 
