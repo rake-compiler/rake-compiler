@@ -12,6 +12,7 @@
   * Warn if compiled files exists in extension's source directory. Closes GH-35
   * Workaround issue with WINE using proper build option. Closes GH-37
   * Use FileUtils#install instead of cp. Closes GH-33 [Eric Wong]
+  * Update README instructions for OSX. Closes GH-29 [tmm1]
 
 === 0.7.7 / 2011-04-04
 
