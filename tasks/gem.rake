@@ -34,7 +34,6 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.require_path = 'lib'
 
   # documentation
-  s.has_rdoc = true
   s.rdoc_options << '--main'  << 'README.rdoc' << '--title' << 'rake-compiler -- Documentation'
 
   s.extra_rdoc_files = %w(README.rdoc LICENSE.txt History.txt)
