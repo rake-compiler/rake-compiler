@@ -311,7 +311,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       # genearte fake.rb for different ruby versions
       file "#{tmp_path}/fake.rb" do |t|
         File.open(t.name, 'w') do |f|
-          f.write fake_rb(ruby_ver)
+          f.write fake_rb(for_platform, ruby_ver)
         end
       end
 
@@ -381,13 +381,13 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       [*@cross_platform].map { |p| "native:#{p}" }
     end
 
-    def fake_rb(version)
+    def fake_rb(platform, version)
       <<-FAKE_RB
         class Object
           remove_const :RUBY_PLATFORM
           remove_const :RUBY_VERSION
           remove_const :RUBY_DESCRIPTION if defined?(RUBY_DESCRIPTION)
-          RUBY_PLATFORM = "i386-mingw32"
+          RUBY_PLATFORM = "#{platform}"
           RUBY_VERSION = "#{version}"
           RUBY_DESCRIPTION = "ruby \#{RUBY_VERSION} (\#{RUBY_RELEASE_DATE}) [\#{RUBY_PLATFORM}]"
         end
