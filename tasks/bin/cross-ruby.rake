@@ -81,10 +81,26 @@ file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.bz2" => ["#{USER_HOME}/sources
 end
 
 # Extract the sources
-source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.bz2"
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => ["#{USER_HOME}/sources/#{source_file}"] do |t|
-  chdir File.dirname(t.name) do
-    t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
+if RUBY_CC_VERSION == "ruby-1.9.3"
+  file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" do |t|
+    chdir File.dirname(t.name) do
+      base_name = File.basename(t.name)
+      if File.exist?("#{base_name}/.svn")
+        sh "svn up #{base_name}"
+      else
+        sh "svn co http://svn.ruby-lang.org/repos/ruby/trunk #{base_name}"
+      end
+      chdir base_name do
+        sh "autoreconf"
+      end
+    end
+  end
+else
+  source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.bz2"
+  file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => ["#{USER_HOME}/sources/#{source_file}"] do |t|
+    chdir File.dirname(t.name) do
+      t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
+    end
   end
 end
 
@@ -173,7 +189,7 @@ task 'update-config' do
   files = Dir.glob("#{USER_HOME}/ruby/*/**/rbconfig.rb").sort
 
   files.each do |rbconfig|
-    version = rbconfig.match(/.*-(\d.\d.\d)/)[1]
+    version = rbconfig.match(/\A#{Regexp.escape(USER_HOME)}\/ruby\/ruby-(.+?)\//)[1]
     config["rbconfig-#{version}"] = rbconfig
     puts "Found Ruby version #{version} (#{rbconfig})"
   end
