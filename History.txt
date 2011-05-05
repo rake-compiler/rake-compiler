@@ -1,3 +1,8 @@
+=== (In Git)
+
+* Bugfixes:
+  * Use correct platform in fake.rb. Pull #39 [kou]
+
 === 0.7.8 / 2011-04-26
 
 * Enhancements:
