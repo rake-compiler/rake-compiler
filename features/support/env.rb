@@ -1,5 +1,5 @@
 require 'cucumber'
-require 'spec'
+require 'rspec'
 require 'fileutils'
 require 'rbconfig'
 
