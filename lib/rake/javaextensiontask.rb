@@ -134,9 +134,10 @@ execute the Rake compilation task using the JRuby interpreter.
 
       if @gem_spec && !Rake::Task.task_defined?("java:#{@gem_spec.name}")
         task "java:#{@gem_spec.name}" do |t|
-
-          # FIXME: truly duplicate the Gem::Specification
+          # FIXME: workaround Gem::Specification limitation around cache_file:
+          # http://github.com/rubygems/rubygems/issues/78
           spec = gem_spec.dup
+          spec.instance_variable_set(:"@cache_file", nil) if spec.respond_to?(:cache_file)
 
           # adjust to specified platform
           spec.platform = Gem::Platform.new('java')
@@ -161,7 +162,7 @@ execute the Rake compilation task using the JRuby interpreter.
           end
 
           # Generate a package for this gem
-          gem_package = Rake::GemPackageTask.new(spec) do |pkg|
+          Gem::PackageTask.new(spec) do |pkg|
             pkg.need_zip = false
             pkg.need_tar = false
           end
