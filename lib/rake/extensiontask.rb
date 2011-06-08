@@ -187,9 +187,10 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       # create 'native:gem_name' and chain it to 'native' task
       unless Rake::Task.task_defined?("native:#{@gem_spec.name}:#{platf}")
         task "native:#{@gem_spec.name}:#{platf}" do |t|
-          # FIXME: truly duplicate the Gem::Specification
-          # workaround the lack of #dup for Gem::Specification
+          # FIXME: workaround Gem::Specification limitation around cache_file:
+          # http://github.com/rubygems/rubygems/issues/78
           spec = gem_spec.dup
+          spec.instance_variable_set(:"@cache_file", nil) if spec.respond_to?(:cache_file)
 
           # adjust to specified platform
           spec.platform = Gem::Platform.new(platf)
