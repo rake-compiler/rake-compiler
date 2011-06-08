@@ -1,7 +1,12 @@
-=== (In Git)
+=== 0.7.9 / 2011-06-08
+
+* Enhancements:
+  * Consistently use RubyGems features available since version 1.3.2 and avoid
+    deprecation warnings with Rake > 0.8.7.
 
 * Bugfixes:
   * Use correct platform in fake.rb. Pull #39 [kou]
+  * Workaround Gem::Specification and Gem::PackageTask limitations. Closes #43
 
 === 0.7.8 / 2011-04-26
 
