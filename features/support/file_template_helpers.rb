@@ -14,17 +14,16 @@ EOF
 
   def template_rake_gemspec(gem_name)
     <<-EOF
-require 'rake/gempackagetask'
+require 'rubygems/package_task'
 SPEC = Gem::Specification.new do |s|
   s.name = "#{gem_name}"
   s.version = "0.1.0"
   s.summary = "#{gem_name} test gem for rake-compiler"
+  s.description = "#{gem_name} is a fake gem for testing under rake-compiler"
 
   s.files = FileList["ext/**/*.{rb,c,h}", "Rakefile", "tasks/*.rake", "lib/**/*.rb"]
 
   s.extensions = FileList["ext/**/extconf.rb"]
-
-  s.has_rdoc = true
 
   s.homepage = 'http://github.com/luislavena/rake-compiler'
   s.rubyforge_project = 'TODO'
@@ -33,7 +32,7 @@ SPEC = Gem::Specification.new do |s|
   s.email = ["luislavena@gmail.com"]
 end
 
-gem_package = Rake::GemPackageTask.new(SPEC) do |pkg|
+Gem::PackageTask.new(SPEC) do |pkg|
   pkg.need_zip = false
   pkg.need_tar = false
 end
