@@ -1,5 +1,5 @@
 desc 'Package gems and upload to RubyGems'
-task :release, :version, :needs => [:package] do |t, args|
+task :release, [:version] => [:package] do |t, args|
   args.with_defaults(:version => "")
   ver = args.version
 
