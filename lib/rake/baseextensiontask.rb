@@ -14,8 +14,6 @@ require 'yaml'
 require 'pathname'
 
 module Rake
-  autoload :GemPackageTask, 'rake/gempackagetask'
-
   class BaseExtensionTask < TaskLib
 
     attr_accessor :name

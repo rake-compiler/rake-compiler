@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rake/baseextensiontask'
+require "rubygems/package_task"
 
 # Define a series of tasks to aid in the compilation of C extensions for
 # gem developer/creators.
@@ -213,7 +214,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
           end
 
           # Generate a package for this gem
-          gem_package = Rake::GemPackageTask.new(spec) do |pkg|
+          Gem::PackageTask.new(spec) do |pkg|
             pkg.need_zip = false
             pkg.need_tar = false
           end
