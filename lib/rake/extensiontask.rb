@@ -38,10 +38,6 @@ module Rake
 
     def binary(platform = nil)
       if platform == "java"
-	warn_once <<-EOF
-Compiling a native C extension on JRuby. This is discouraged and a 
-Java extension should be preferred.
-        EOF
         "#{name}.#{RbConfig::MAKEFILE_CONFIG['DLEXT']}"
       else
         super
@@ -106,6 +102,12 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       # binary in temporary folder depends on makefile and source files
       # tmp/extension_name/extension_name.{so,bundle}
       file "#{tmp_path}/#{binary(platf)}" => ["#{tmp_path}/Makefile"] + source_files do
+        jruby_compile_msg = <<-EOF
+Compiling a native C extension on JRuby. This is discouraged and a 
+Java extension should be preferred.
+        EOF
+        warn_once(jruby_compile_msg) if defined?(JRUBY_VERSION)
+
         chdir tmp_path do
           sh make
         end
