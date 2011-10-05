@@ -142,7 +142,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
 
         # add any extra command line options
         unless extra_options.empty?
-          cmd.push('--', *extra_options)
+          cmd.push(*extra_options)
         end
 
         chdir tmp_path do

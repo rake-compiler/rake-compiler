@@ -13,6 +13,14 @@ Feature: Compile C code into Ruby extensions.
     And binary extension 'extension_one' do exist in 'lib'
     And 'tmp' folder is created
 
+  Scenario: compile an extension with extra options
+    Given a safe project directory
+    And a extension named 'extension_one'
+    And 'tmp' folder is deleted
+    When rake task 'compile -- --with-opt-dir=/opt/local' is invoked
+    Then rake task 'compile -- --with-opt-dir=/opt/local' succeeded
+    And output of rake task 'compile -- --with-opt-dir=/opt/local' contains /with-opt-dir/
+
   Scenario: not recompile unmodified extension
     Given a safe project directory
     And a extension named 'extension_one'
