@@ -24,6 +24,7 @@ module Rake
     attr_accessor :platform
     attr_accessor :config_options
     attr_accessor :source_pattern
+    attr_accessor :extra_options
 
     def platform
       @platform ||= RUBY_PLATFORM
@@ -42,6 +43,7 @@ module Rake
       @ext_dir = "ext/#{@name}"
       @lib_dir = 'lib'
       @config_options = []
+      @extra_options = ARGV.select { |i| i =~ /\A--?/ }
     end
 
     def define

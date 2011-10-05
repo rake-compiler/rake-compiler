@@ -140,10 +140,14 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
         # add options to command
         cmd.push(*options)
 
+        # add any extra command line options
+        unless extra_options.empty?
+          cmd.push('--', *extra_options)
+        end
+
         chdir tmp_path do
           # FIXME: Rake is broken for multiple arguments system() calls.
           # Add current directory to the search path of Ruby
-          # Also, include additional parameters supplied.
           sh cmd.join(' ')
         end
       end
