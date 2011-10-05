@@ -2,9 +2,12 @@
 
 * Enhancements:
   * Invocation from command line now support extra options similar to RubyGems.
-    Closes #4 from pull #47 [jonforums]
+    Closes #4 from Pull #47 [jonforums]
 
       $ rake compile -- --with-opt-dir=/opt/local
+
+* Bugfixes:
+  * Only emit warnings when invoking cross-compilation tasks. Pull #45 [jfirebaugh]
 
 === 0.7.9 / 2011-06-08
 
