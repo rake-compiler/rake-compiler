@@ -67,15 +67,6 @@ module Rake
         install "#{tmp_path}/#{binary(platf)}", "#{lib_path}/#{binary(platf)}"
       end
 
-      not_jruby_compile_msg = <<-EOF
-WARNING: You're cross-compiling a binary extension for JRuby, but are using
-another interpreter. If your Java classpath or extension dir settings are not
-correctly detected, then either check the appropriate environment variables or
-execute the Rake compilation task using the JRuby interpreter.
-(e.g. `jruby -S rake compile:java`)
-      EOF
-      warn_once(not_jruby_compile_msg) unless defined?(JRUBY_VERSION)
-
       file "#{tmp_path}/#{binary(platf)}" => "#{tmp_path}/.build" do
 
         class_files = FileList["#{tmp_path}/**/*.class"].
@@ -92,6 +83,15 @@ execute the Rake compilation task using the JRuby interpreter.
       end
 
       file "#{tmp_path}/.build" => [tmp_path] + source_files do
+        not_jruby_compile_msg = <<-EOF
+WARNING: You're cross-compiling a binary extension for JRuby, but are using
+another interpreter. If your Java classpath or extension dir settings are not
+correctly detected, then either check the appropriate environment variables or
+execute the Rake compilation task using the JRuby interpreter.
+(e.g. `jruby -S rake compile:java`)
+        EOF
+        warn_once(not_jruby_compile_msg) unless defined?(JRUBY_VERSION)
+
         classpath_arg = java_classpath_arg(@classpath)
         debug_arg     = @debug ? '-g' : ''
 
