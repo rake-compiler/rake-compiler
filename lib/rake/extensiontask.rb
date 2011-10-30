@@ -278,7 +278,7 @@ Java extension should be preferred.
 
       # warn the user about the need of configuration to use cross compilation.
       unless File.exist?(config_path)
-        warn "rake-compiler must be configured first to enable cross-compilation"
+        define_dummy_cross_platform_tasks
         return
       end
 
@@ -351,6 +351,15 @@ Java extension should be preferred.
           # FIXME: Sooo brittle
           Rake::Task['native'].prerequisites.reject! { |t| !natives_cross_platform.include?(t) }
           task 'native' => ["native:#{for_platform}"]
+        end
+      end
+    end
+
+    def define_dummy_cross_platform_tasks
+      task 'cross' do
+        Rake::Task['compile'].clear
+        task 'compile' do
+          raise "rake-compiler must be configured first to enable cross-compilation"
         end
       end
     end
