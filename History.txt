@@ -6,8 +6,13 @@
 
       $ rake compile -- --with-opt-dir=/opt/local
 
+  * Only emit cross-compilation warnings for C when `cross` is invoked.
+    Closes #16 from Pull #48 [mvz]
+
 * Bugfixes:
-  * Only emit warnings when invoking cross-compilation tasks. Pull #45 [jfirebaugh]
+  * Only emit warnings when invoking cross-compilation tasks for JRuby.
+    Pull #45 [jfirebaugh]
+  * USe x86 MinGW cross-compiler. Pull #49 [larskanis]
 
 === 0.7.9 / 2011-06-08
 
