@@ -283,16 +283,29 @@ describe Rake::ExtensionTask do
         File.stub!(:open).and_yield(mock_fake_rb)
       end
 
-      it 'should warn if no rake-compiler configuration exist' do
-        File.should_receive(:exist?).with(@config_file).and_return(false)
+      context 'if no rake-compiler configuration exists' do
+        before :each do
+          File.should_receive(:exist?).with(@config_file).and_return(false)
 
-        out, err = capture_output do
-          Rake::ExtensionTask.new('extension_one') do |ext|
-            ext.cross_compile = true
+          _, @err = capture_output do
+            Rake::ExtensionTask.new('extension_one') do |ext|
+              ext.cross_compile = true
+            end
           end
         end
 
-        err.should match(/rake-compiler must be configured first to enable cross-compilation/)
+        it 'should not generate a warning' do
+          @err.should eq("")
+        end
+
+        it 'should create a dummy nested cross-compile target that raises an error' do
+          Rake::Task.should have_defined("cross")
+          Rake::Task["cross"].invoke
+          lambda {
+            Rake::Task["compile"].invoke
+          }.should raise_error(RuntimeError,
+                               /rake-compiler must be configured first to enable cross-compilation/)
+        end
       end
 
       it 'should parse the config file using YAML' do
