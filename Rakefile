@@ -12,9 +12,9 @@
 #
 
 begin
-  require 'isolate/now'
+  require "isolate/now"
 rescue LoadError => e
-  fail "This project uses Isolate to manage development dependencies. Please `gem install isolate` first and try again."
+  abort "This project requires Isolate to work. Please `gem install isolate` and try again."
 end
 
 # load rakefile extensions (tasks)
