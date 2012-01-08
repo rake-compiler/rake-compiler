@@ -24,31 +24,31 @@ Given /^a extension '(.*)' with forced platform '(.*)'$/ do |extension_name, for
 end
 
 Given /^that all my source files are in place$/ do
-  Given "a safe project directory"
-  Given "a extension cross-compilable 'extension_one'"
+  step "a safe project directory"
+  step "a extension cross-compilable 'extension_one'"
 end
 
 Given /^that all my Java source files are in place$/ do
-  Given "a safe project directory"
-  Given "a extension Java-compilable 'extension_one'"
+  step "a safe project directory"
+  step "a extension Java-compilable 'extension_one'"
 end
 
 Given /^that my gem source is all in place$/ do
-  Given "a safe project directory"
-  Given "a gem named 'gem_abc'"
-  Given "a extension cross-compilable 'extension_one'"
+  step "a safe project directory"
+  step "a gem named 'gem_abc'"
+  step "a extension cross-compilable 'extension_one'"
 end
 
 Given /^that my JRuby gem source is all in place$/ do
-  Given "a safe project directory"
-  Given "a gem named 'gem_abc'"
-  Given "a extension Java-compilable 'extension_one'"
+  step "a safe project directory"
+  step "a gem named 'gem_abc'"
+  step "a extension Java-compilable 'extension_one'"
 end
 
 Given /^that my gem source is all in place to target two platforms$/ do
-  Given "a safe project directory"
-  Given "a gem named 'gem_abc'"
-  Given "a extension 'extension_one' multi cross-compilable"
+  step "a safe project directory"
+  step "a gem named 'gem_abc'"
+  step "a extension 'extension_one' multi cross-compilable"
 end
 
 Given /^not changed any file since$/ do
