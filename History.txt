@@ -1,4 +1,4 @@
-=== (In Git)
+=== 0.8.0 / 2012-01-08
 
 * Enhancements:
   * Invocation from command line now support extra options similar to RubyGems.
@@ -6,13 +6,12 @@
 
       $ rake compile -- --with-opt-dir=/opt/local
 
+* Bugfixes:
   * Only emit cross-compilation warnings for C when `cross` is invoked.
     Closes #16 from Pull #48 [mvz]
-
-* Bugfixes:
   * Only emit warnings when invoking cross-compilation tasks for JRuby.
     Pull #45 [jfirebaugh]
-  * USe x86 MinGW cross-compiler. Pull #49 [larskanis]
+  * Use x86 MinGW cross-compiler. Pull #49 [larskanis]
 
 === 0.7.9 / 2011-06-08
 
