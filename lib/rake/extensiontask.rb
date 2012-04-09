@@ -378,6 +378,7 @@ Java extension should be preferred.
               system("#{c} -v >> #{dev_null} 2>&1")
             }
           end
+        raise 'make executable not found in path?' unless @make
       end
       @make
     end
