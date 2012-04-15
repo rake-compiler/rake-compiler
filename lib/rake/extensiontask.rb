@@ -379,6 +379,11 @@ Java extension should be preferred.
             }
           end
       end
+
+      unless @make
+        raise "Couldn't find a suitable `make` tool. Use `MAKE` env to set an alternative."
+      end
+
       @make
     end
 

@@ -1,3 +1,8 @@
+=== (in Git)
+
+* Bugfixes:
+  * Raise error when either make or gmake could be found. Closes #53, #54
+
 === 0.8.0 / 2012-01-08
 
 * Enhancements:
