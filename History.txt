@@ -1,4 +1,4 @@
-=== (in Git)
+=== 0.8.1 / 2012-04-15
 
 * Bugfixes:
   * Raise error when either make or gmake could be found. Closes #53, #54
