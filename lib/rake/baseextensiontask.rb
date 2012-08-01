@@ -73,7 +73,7 @@ module Rake
     end
 
     def source_files
-      @source_files ||= FileList["#{@ext_dir}/#{@source_pattern}"]
+      FileList["#{@ext_dir}/#{@source_pattern}"]
     end
 
     def warn_once(message)
