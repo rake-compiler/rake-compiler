@@ -69,6 +69,12 @@ contribute back to your project.
 Now the fun part. It's time to introduce the code to your projects Rakefile
 to tell it to use rake-compiler to build your extension:
 
+    # File: extconf.rb
+
+    # this line should already exist
+    create_makefile('hello_world')
+
+
     # File: Rakefile
 
     require 'rake/extensiontask'
@@ -77,6 +83,12 @@ to tell it to use rake-compiler to build your extension:
 
 That's it? Yes, that's it! No other lines of code are needed for
 rake-compiler to work its magic.
+
+Though, you need to make sure the parameter to <tt>create_makefile</tt>
+and <tt>ExtensionTask.new</tt> are the same or rake-compiler will not mimic
+the RubyGems standard install process. You can override this standard
+behaviour if needed, see the instructions for "non-standard project structure"
+below for details.
 
 If you want to do the same for a JRuby extension written in Java, it's just
 as easy:
