@@ -53,6 +53,11 @@ MAJOR = RUBY_CC_VERSION.match(/.*-(\d.\d).\d/)[1]
 MINGW_HOST = ENV['HOST'] || Rake::ExtensionCompiler.mingw_host
 MINGW_TARGET = MINGW_HOST.gsub('msvc', '')
 
+# Unset any possible variable that might affect compilation
+["CC", "CXX", "CPPFLAGS", "LDFLAGS", "RUBYOPT"].each do |var|
+  ENV.delete(var)
+end
+
 # define a location where sources will be stored
 directory "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
 directory "#{USER_HOME}/builds/#{RUBY_CC_VERSION}"
