@@ -1,4 +1,4 @@
-=== (unreleased)
+=== 0.8.2 / 2013-01-11
 
 * Bugfixes:
   * Unset CC, LDFLAGS and CPPFLAGS prior cross-compiling. Closes #55
