@@ -25,7 +25,7 @@ Then /^a gem for '(.*)' version '(.*)' platform '(.*)' do exist in '(.*)'$/ do |
 end
 
 Then /^gem for platform '(.*)' get generated$/ do |platform|
-  Then "a gem for 'gem_abc' version '0.1.0' platform '#{platform}' do exist in 'pkg'"
+  step "a gem for 'gem_abc' version '0.1.0' platform '#{platform}' do exist in 'pkg'"
 end
 
 def gem_file(folder, name, version)

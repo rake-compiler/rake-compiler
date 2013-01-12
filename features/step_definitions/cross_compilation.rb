@@ -6,7 +6,9 @@ Given %r{^I'm running a POSIX operating system$} do
 end
 
 Given %r{^I've installed cross compile toolchain$} do
-  pending 'Cannot locate suitable compiler in the PATH.' unless search_path(%w(i586-mingw32msvc-gcc i386-mingw32-gcc))
+  unless search_path(%w(i586-mingw32msvc-gcc i386-mingw32-gcc i686-w64-mingw32-gcc))
+    pending 'Cannot locate suitable compiler in the PATH.'
+  end
 end
 
 Then /^binaries for platform '(.*)' get generated$/ do |platform|
