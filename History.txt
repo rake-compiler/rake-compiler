@@ -1,4 +1,4 @@
-=== (in Git)
+=== 0.8.3 / 2013-02-16
 
 * Bugfixes:
   * Support FreeBSD 'mingw32-gcc' cross compiler. Closes #72 [knu]
