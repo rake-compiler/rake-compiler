@@ -471,6 +471,7 @@ describe Rake::ExtensionTask do
       'rbconfig-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb',
       'rbconfig-1.9.2' => '/some/path/version/1.9.1/to/rbconfig.rb',
       'rbconfig-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-2.0.0' => '/some/path/version/1.9.1/to/rbconfig.rb',
       'rbconfig-3.0.0' => '/some/fake/version/3.0.0/to/rbconfig.rb'
     }
   end
