@@ -12,7 +12,7 @@ module Rake
     attr_accessor :config_script
     attr_accessor :cross_compile
     attr_accessor :cross_platform
-    attr_accessor :cross_config_options
+    attr_writer :cross_config_options
     attr_accessor :no_native
     attr_accessor :config_includes
 
@@ -71,6 +71,19 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       else
         define_cross_platform_tasks(cross_platform)
       end
+    end
+
+    def cross_config_options(for_platform=nil)
+      return @cross_config_options unless for_platform
+
+      # apply options for this platform, only
+      @cross_config_options.map do |option|
+        if option.kind_of?(Hash)
+          option[for_platform] || []
+        else
+          option
+        end
+      end.flatten
     end
 
     private
@@ -136,7 +149,7 @@ Java extension should be preferred.
 
         # rbconfig.rb will be present if we are cross compiling
         if t.prerequisites.include?("#{tmp_path}/rbconfig.rb") then
-          options.push(*@cross_config_options)
+          options.push(*cross_config_options(platf))
         end
 
         # add options to command
