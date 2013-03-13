@@ -290,8 +290,8 @@ Java extension should be preferred.
       # lib_path
       lib_path = lib_dir
 
-      unless rbconfig_file = config_file["rbconfig-#{ruby_ver}"] then
-        warn "no configuration section for specified version of Ruby (rbconfig-#{ruby_ver})"
+      unless rbconfig_file = config_file["rbconfig-#{for_platform}-#{ruby_ver}"] then
+        warn "no configuration section for specified version of Ruby (rbconfig-#{for_platform}-#{ruby_ver})"
         return
       end
 

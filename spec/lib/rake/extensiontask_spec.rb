@@ -278,7 +278,8 @@ describe Rake::ExtensionTask do
         @spec = mock_gem_spec
         @config_file = File.expand_path("~/.rake-compiler/config.yml")
         @ruby_ver = RUBY_VERSION
-        @config_path = mock_config_yml["rbconfig-#{@ruby_ver}"]
+        @platform = 'i386-mingw32'
+        @config_path = mock_config_yml["rbconfig-#{@platform}-#{@ruby_ver}"]
 
         File.stub!(:open).and_yield(mock_fake_rb)
       end
@@ -317,7 +318,7 @@ describe Rake::ExtensionTask do
 
       it 'should warn if no section of config file defines running version of ruby' do
         config = mock(Hash)
-        config.should_receive(:[]).with("rbconfig-#{@ruby_ver}").and_return(nil)
+        config.should_receive(:[]).with("rbconfig-#{@platform}-#{@ruby_ver}").and_return(nil)
         YAML.stub!(:load_file).and_return(config)
         out, err = capture_output do
           Rake::ExtensionTask.new('extension_one') do |ext|
@@ -339,7 +340,7 @@ describe Rake::ExtensionTask do
 
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
         config = mock(Hash)
-        config.should_receive(:[]).with("rbconfig-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
+        config.should_receive(:[]).with("rbconfig-i386-mingw32-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
         YAML.stub!(:load_file).and_return(config)
 
         ENV['RUBY_CC_VERSION'] = '1.9.1'
@@ -350,8 +351,8 @@ describe Rake::ExtensionTask do
 
       it 'should allow multiple versions be supplied to RUBY_CC_VERSION' do
         config = mock(Hash)
-        config.should_receive(:[]).once.with("rbconfig-1.8.6").and_return('/path/to/ruby/1.8.6/rbconfig.rb')
-        config.should_receive(:[]).once.with("rbconfig-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
+        config.should_receive(:[]).once.with("rbconfig-i386-mingw32-1.8.6").and_return('/path/to/ruby/1.8.6/rbconfig.rb')
+        config.should_receive(:[]).once.with("rbconfig-i386-mingw32-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
         YAML.stub!(:load_file).and_return(config)
 
         ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
@@ -466,13 +467,20 @@ describe Rake::ExtensionTask do
 
   def mock_config_yml
     {
-      'rbconfig-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-1.9.2' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
-      'rbconfig-3.0.0' => '/some/fake/version/3.0.0/to/rbconfig.rb'
+      'rbconfig-i386-mingw32-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-i386-mingw32-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-universal-known-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.9.2' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-i386-mingw32-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-known-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-i386-mingw32-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
+      'rbconfig-x64-mingw32-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
+      'rbconfig-x64-mingw32-3.0.0' => '/some/fake/version/3.0.0/to/rbconfig.rb'
     }
   end
 
