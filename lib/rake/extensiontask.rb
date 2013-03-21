@@ -122,11 +122,6 @@ Java extension should be preferred.
         include_dirs = ['.'].concat(@config_includes).uniq.join(File::PATH_SEPARATOR)
         cmd = [Gem.ruby, "-I#{include_dirs}"]
 
-        # if fake.rb is present, add to the command line
-        if t.prerequisites.include?("#{tmp_path}/fake.rb") then
-          cmd << '-rfake'
-        end
-
         # build a relative path to extconf script
         abs_tmp_path = (Pathname.new(Dir.pwd) + tmp_path).realpath
         abs_extconf = (Pathname.new(Dir.pwd) + extconf).realpath
@@ -308,7 +303,10 @@ Java extension should be preferred.
 
       # copy the file from the cross-ruby location
       file "#{tmp_path}/rbconfig.rb" => [rbconfig_file] do |t|
-        cp t.prerequisites.first, t.name
+        File.open(t.name, 'w') do |f|
+          f.write "require 'fake.rb'\n\n"
+          f.write File.read(t.prerequisites.first)
+        end
       end
 
       # copy mkmf from cross-ruby location
