@@ -96,14 +96,17 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
+      stage_path = "#{@tmp_dir}/#{platf}/stage"
 
       # cleanup and clobbering
       CLEAN.include(tmp_path)
+      CLEAN.include(stage_path)
       CLOBBER.include("#{lib_path}/#{binary(platf)}")
       CLOBBER.include("#{@tmp_dir}")
 
       # directories we need
       directory tmp_path
+      directory "#{stage_path}/#{lib_path}"
       directory lib_dir
 
       # copy binary from temporary location to final lib
@@ -111,12 +114,36 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_path, "#{tmp_path}/#{binary(platf)}"] do
         install "#{tmp_path}/#{binary(platf)}", "#{lib_path}/#{binary(platf)}"
       end
+      # copy binary from temporary location to staging directory
+      task "copy:#{@name}:#{platf}:#{ruby_ver}" => ["#{stage_path}/#{lib_path}", "#{tmp_path}/#{binary(platf)}"] do
+        cp "#{tmp_path}/#{binary(platf)}", "#{stage_path}/#{lib_path}/#{binary(platf)}"
+      end
+
+      # copy other gem files to staging directory
+      if @gem_spec
+        @gem_spec.files.each do |gem_file|
+          # ignore directories and the binary extension
+          next if File.directory?(gem_file) || gem_file == "#{lib_path}/#{binary(platf)}"
+          stage_file = "#{stage_path}/#{gem_file}"
+
+          # copy each file from base to stage directory
+          unless Rake::Task.task_defined?(stage_file) then
+            directory File.dirname(stage_file)
+            file stage_file => [File.dirname(stage_file), gem_file] do
+              cp gem_file, stage_file
+            end
+          end
+
+          # append each file to the copy task
+          task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_file]
+        end
+      end
 
       # binary in temporary folder depends on makefile and source files
       # tmp/extension_name/extension_name.{so,bundle}
       file "#{tmp_path}/#{binary(platf)}" => ["#{tmp_path}/Makefile"] + source_files do
         jruby_compile_msg = <<-EOF
-Compiling a native C extension on JRuby. This is discouraged and a 
+Compiling a native C extension on JRuby. This is discouraged and a
 Java extension should be preferred.
         EOF
         warn_once(jruby_compile_msg) if defined?(JRUBY_VERSION)
@@ -199,6 +226,7 @@ Java extension should be preferred.
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
+      stage_path = "#{@tmp_dir}/#{platf}/stage"
 
       # lib_path
       lib_path = lib_dir
@@ -222,7 +250,8 @@ Java extension should be preferred.
 
           # go through native prerequisites and grab the real extension files from there
           t.prerequisites.each do |ext|
-            ext_files << ext
+            # strip stage path and keep lib/... only
+            ext_files << ext.sub(stage_path+"/", '')
           end
 
           # include the files in the gem specification
@@ -234,20 +263,46 @@ Java extension should be preferred.
           end
 
           # Generate a package for this gem
-          Gem::PackageTask.new(spec) do |pkg|
+          pkg = Gem::PackageTask.new(spec) do |pkg|
             pkg.need_zip = false
             pkg.need_tar = false
+            # Do not copy any files per PackageTask, because
+            # we need the files from the staging directory
+            pkg.package_files.clear
+          end
+
+          # Copy from staging directory to gem package directory.
+          # This is derived from the code of Gem::PackageTask
+          # but uses stage_path as source directory.
+          stage_files = spec.files.map do |gem_file|
+            File.join(stage_path, gem_file)
+          end
+          file pkg.package_dir_path => stage_files do
+            mkdir_p pkg.package_dir rescue nil
+            spec.files.each do |ft|
+              fn = File.join(stage_path, ft)
+              f = File.join(pkg.package_dir_path, ft)
+              fdir = File.dirname(f)
+              mkdir_p(fdir) if !File.exist?(fdir)
+              if File.directory?(fn)
+                mkdir_p(f)
+              else
+                rm_f f
+                safe_ln(fn, f)
+              end
+            end
           end
         end
       end
 
       # add binaries to the dependency chain
-      task "native:#{@gem_spec.name}:#{platf}" => ["#{lib_path}/#{binary(platf)}"]
+      task "native:#{@gem_spec.name}:#{platf}" => ["#{stage_path}/#{lib_dir}/#{binary(platf)}"]
 
       # ensure the extension get copied
       unless Rake::Task.task_defined?("#{lib_path}/#{binary(platf)}") then
         file "#{lib_path}/#{binary(platf)}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
       end
+      file "#{stage_path}/#{lib_dir}/#{binary(platf)}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
 
       # Allow segmented packaging by platform (open door for 'cross compile')
       task "native:#{platf}" => ["native:#{@gem_spec.name}:#{platf}"]

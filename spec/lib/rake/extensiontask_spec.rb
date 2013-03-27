@@ -264,7 +264,7 @@ describe Rake::ExtensionTask do
         context 'native:my_gem:{platform}' do
           it 'should depend on binary extension' do
             Rake::ExtensionTask.new('extension_one', @spec)
-            Rake::Task["native:my_gem:#{@platform}"].prerequisites.should include("lib/#{@ext_bin}")
+            Rake::Task["native:my_gem:#{@platform}"].prerequisites.should include("tmp/#{@platform}/stage/lib/#{@ext_bin}")
           end
         end
       end
@@ -470,7 +470,7 @@ describe Rake::ExtensionTask do
 
   def mock_gem_spec(stubs = {})
     mock(Gem::Specification,
-      { :name => 'my_gem', :platform => 'ruby' }.merge(stubs)
+      { :name => 'my_gem', :platform => 'ruby', :files => [] }.merge(stubs)
     )
   end
 
