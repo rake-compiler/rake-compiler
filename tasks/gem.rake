@@ -11,8 +11,8 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.description = "Provide a standard and simplified way to build and package\nRuby extensions (C, Java) using Rake as glue."
 
   # requirements
-  s.required_ruby_version = ">= 1.8.6"
-  s.required_rubygems_version = ">= 1.3.5"
+  s.required_ruby_version = ">= 1.8.7"
+  s.required_rubygems_version = ">= 1.8.25"
 
   # dependencies
   s.add_dependency  'rake'

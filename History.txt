@@ -1,3 +1,8 @@
+=== (in Git)
+
+* Deprecations:
+  * Requires minimum Ruby 1.8.7 and RubyGems 1.8.25
+
 === 0.8.3 / 2013-02-16
 
 * Bugfixes:
