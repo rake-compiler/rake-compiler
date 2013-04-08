@@ -1,6 +1,8 @@
+source "https://rubygems.org"
+
 gem "rake"
 
-env :development do
+group :development do
   gem "rspec",    "~> 2.8.0"
   gem "cucumber", "~> 1.1.4"
 end

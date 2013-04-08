@@ -11,11 +11,5 @@
 # Thank You.
 #
 
-begin
-  require "isolate/now"
-rescue LoadError => e
-  abort "This project requires Isolate to work. Please `gem install isolate` and try again."
-end
-
 # load rakefile extensions (tasks)
 Dir['tasks/*.rake'].sort.each { |f| load f }
