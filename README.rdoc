@@ -274,9 +274,9 @@ on the Windows host system you're cross-compiling for. An example:
 
   # File: ~/.rake-compiler/config.yml
 
-  rbconfig-1.8.6: /path/to/ruby-1.8.6/rbconfig.rb
-  rbconfig-1.8.7: /path/to/ruby-1.8.7/rbconfig.rb
-  rbconfig-1.9.2: /path/to/ruby-1.9.2/rbconfig.rb
+  rbconfig-i386-mingw32-1.8.6: /path/to/ruby-1.8.6/rbconfig.rb
+  rbconfig-i386-mingw32-1.8.7: /path/to/ruby-1.8.7/rbconfig.rb
+  rbconfig-i386-mingw32-1.9.2: /path/to/ruby-1.9.2/rbconfig.rb
 
 If, instead, you want to build a different Ruby version than the default one, please
 supply a <tt>VERSION</tt>:
@@ -298,7 +298,7 @@ Now, you only need specify a few additional options in your extension definition
 
     Rake::ExtensionTask.new('my_extension', gem_spec) do |ext|
       ext.cross_compile = true                # enable cross compilation (requires cross compile toolchain)
-      ext.cross_platform = 'i386-mswin32'     # forces the Windows platform instead of the default one
+      ext.cross_platform = 'i386-mswin32-60'     # forces the Windows platform instead of the default one
                                               # configure options only for cross compile
       ext.cross_config_options << '--with-something'
 
@@ -312,7 +312,7 @@ By default, cross compilation targets 'i386-mingw32' which is the default GCC
 platform for Ruby.
 
 To target gems for MRI Ruby's current official distribution, please force the
-platform to the one (i386-mswin32) previously shown.
+platform to the one (i386-mswin32-60) previously shown.
 
 === Warning, magician about to do some tricks, don't blink!
 
