@@ -180,6 +180,13 @@ task 'update-config' do
   files.each do |rbconfig|
     version, platform = rbconfig.match(/.*-(\d.\d.\d).*\/([-\w]+)\/rbconfig/)[1,2]
     config["rbconfig-#{platform}-#{version}"] = rbconfig
+
+    # fake alternate (binary compatible) i386-mswin32-60 platform
+    if platform == "i386-mingw32"
+      alt_platform = "i386-mswin32-60"
+      config["rbconfig-#{alt_platform}-#{version}"] = rbconfig
+    end
+
     puts "Found Ruby version #{version} for platform #{platform} (#{rbconfig})"
   end
 
