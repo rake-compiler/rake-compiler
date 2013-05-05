@@ -1,7 +1,24 @@
 === (in Git)
 
+* Enhancements:
+  * Add support for cross-builds and multiple platforms (x86/x64).
+    Pull #74 [larskanis]
+
+      $ rake-compiler cross-ruby VERSION=1.8.7-p371
+      $ rake-compiler cross-ruby VERSION=1.9.3-p392
+      $ rake-compiler cross-ruby VERSION=2.0.0-p0
+      $ rake-compiler cross-ruby VERSION=2.0.0-p0 HOST=x86_64-w64-mingw32
+      $ rake cross compile RUBY_CC_VERSION=1.8.7:1.9.3:2.0.0
+
+      # Rakefile
+      ext.cross_platform = %w[i386-mingw32 x64-mingw32]
+
+* Bugfixes:
+  * Correct fat-gems support caused by RubyGems issues. Pull #76 [knu]
+
 * Deprecations:
   * Requires minimum Ruby 1.8.7 and RubyGems 1.8.25
+  * Usage of 'i386-mswin32' needs to be changed to 'i386-mswin32-60'
 
 === 0.8.3 / 2013-02-16
 
