@@ -13,6 +13,12 @@
       # Rakefile
       ext.cross_platform = %w[i386-mingw32 x64-mingw32]
 
+  * Support for cross-platform specific options. Pull #74 [larskanis]
+
+      # Rakefile
+      ext.cross_config_options << "--with-common-option"
+      ext.cross_config_options << {"x64-mingw32" => "--enable-64bits"}
+
 * Bugfixes:
   * Correct fat-gems support caused by RubyGems issues. Pull #76 [knu]
 
