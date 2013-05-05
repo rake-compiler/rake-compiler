@@ -60,16 +60,16 @@ end
 
 # define a location where sources will be stored
 directory "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
-directory "#{USER_HOME}/builds/#{RUBY_CC_VERSION}"
+directory "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
 
 # clean intermediate files and folders
 CLEAN.include("#{USER_HOME}/sources/#{RUBY_CC_VERSION}")
-CLEAN.include("#{USER_HOME}/builds/#{RUBY_CC_VERSION}")
+CLEAN.include("#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
 
 # remove the final products and sources
 CLOBBER.include("#{USER_HOME}/sources")
 CLOBBER.include("#{USER_HOME}/builds")
-CLOBBER.include("#{USER_HOME}/ruby/#{RUBY_CC_VERSION}")
+CLOBBER.include("#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
 CLOBBER.include("#{USER_HOME}/config.yml")
 
 # ruby source file should be stored there
@@ -126,7 +126,7 @@ task :mingw32 do
 end
 
 # generate the makefile in a clean build location
-file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/#{RUBY_CC_VERSION}",
+file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}",
                                   "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in"] do |t|
 
   options = [
@@ -143,26 +143,26 @@ file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/
   options << "--with-winsock2" if MAJOR == "1.8"
 
   chdir File.dirname(t.name) do
-    prefix = File.expand_path("../../ruby/#{RUBY_CC_VERSION}")
+    prefix = File.expand_path("../../../ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
     options << "--prefix=#{prefix}"
-    sh File.expand_path("../../sources/#{RUBY_CC_VERSION}/configure"), *options
+    sh File.expand_path("../../../sources/#{RUBY_CC_VERSION}/configure"), *options
   end
 end
 
 # make
-file "#{USER_HOME}/builds/#{RUBY_CC_VERSION}/ruby.exe" => ["#{USER_HOME}/builds/#{RUBY_CC_VERSION}/Makefile"] do |t|
+file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/ruby.exe" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile"] do |t|
   chdir File.dirname(t.prerequisites.first) do
     sh MAKE
   end
 end
 
 # make install
-file "#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/bin/ruby.exe" => ["#{USER_HOME}/builds/#{RUBY_CC_VERSION}/ruby.exe"] do |t|
+file "#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/ruby.exe"] do |t|
   chdir File.dirname(t.prerequisites.first) do
     sh "#{MAKE} install"
   end
 end
-task :install => ["#{USER_HOME}/ruby/#{RUBY_CC_VERSION}/bin/ruby.exe"]
+task :install => ["#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe"]
 
 desc "Update rake-compiler list of installed Ruby versions"
 task 'update-config' do
@@ -175,12 +175,12 @@ task 'update-config' do
     config = {}
   end
 
-  files = Dir.glob("#{USER_HOME}/ruby/*/**/rbconfig.rb").sort
+  files = Dir.glob("#{USER_HOME}/ruby/*/*/**/rbconfig.rb").sort
 
   files.each do |rbconfig|
-    version = rbconfig.match(/.*-(\d.\d.\d)/)[1]
-    config["rbconfig-#{version}"] = rbconfig
-    puts "Found Ruby version #{version} (#{rbconfig})"
+    version, platform = rbconfig.match(/.*-(\d.\d.\d).*\/([-\w]+)\/rbconfig/)[1,2]
+    config["rbconfig-#{platform}-#{version}"] = rbconfig
+    puts "Found Ruby version #{version} for platform #{platform} (#{rbconfig})"
   end
 
   when_writing("Saving changes into #{config_file}") {
