@@ -486,7 +486,9 @@ describe Rake::ExtensionTask do
       'rbconfig-universal-unknown-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
       'rbconfig-i386-mingw32-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
       'rbconfig-universal-known-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-known-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
       'rbconfig-universal-unknown-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-unknown-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
       'rbconfig-i386-mingw32-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
       'rbconfig-x64-mingw32-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
       'rbconfig-x64-mingw32-3.0.0' => '/some/fake/version/3.0.0/to/rbconfig.rb'
