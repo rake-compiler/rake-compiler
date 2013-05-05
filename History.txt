@@ -1,4 +1,4 @@
-=== (in Git)
+=== 0.9.0.pre.1 / 2013-05-05
 
 * Enhancements:
   * Add support for cross-builds and multiple platforms (x86/x64).
