@@ -11,5 +11,5 @@ Feature: Generate multiple Windows gems from Linux
     And I've already successfully executed rake task 'cross compile'
     When rake task 'cross native gem' is invoked
     Then rake task 'cross native gem' succeeded
-    And gem for platform 'x86-mswin32' get generated
+    And gem for platform 'x86-mswin32-60' get generated
     And gem for platform 'x86-mingw32' get generated
