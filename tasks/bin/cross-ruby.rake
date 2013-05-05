@@ -42,7 +42,7 @@ require 'rake/extensioncompiler'
 
 MAKE = ENV['MAKE'] || %w[gmake make].find { |c| system("#{c} -v > /dev/null 2>&1") }
 USER_HOME = File.expand_path("~/.rake-compiler")
-RUBY_CC_VERSION = "ruby-" << ENV.fetch("VERSION", "1.8.7-p334")
+RUBY_CC_VERSION = "ruby-" << ENV.fetch("VERSION", "1.8.7-p371")
 RUBY_SOURCE = ENV['SOURCE']
 RUBY_BUILD = RbConfig::CONFIG["host"]
 
