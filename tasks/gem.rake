@@ -24,7 +24,7 @@ GEM_SPEC = Gem::Specification.new do |s|
   # components, files and paths
   s.files = FileList["features/**/*.{feature,rb}", "bin/rake-compiler",
                       "lib/**/*.rb", "spec/spec.opts", "spec/**/*.rb",
-                      "tasks/**/*.rake", "Rakefile", "Isolate",
+                      "tasks/**/*.rake", "Rakefile", "Gemfile",
                       "*.{rdoc,txt,yml}"]
 
   s.bindir      = 'bin'
