@@ -264,7 +264,7 @@ describe Rake::ExtensionTask do
         context 'native:my_gem:{platform}' do
           it 'should depend on binary extension' do
             Rake::ExtensionTask.new('extension_one', @spec)
-            Rake::Task["native:my_gem:#{@platform}"].prerequisites.should include("lib/#{@ext_bin}")
+            Rake::Task["native:my_gem:#{@platform}"].prerequisites.should include("tmp/#{@platform}/stage/lib/#{@ext_bin}")
           end
         end
       end
@@ -278,7 +278,8 @@ describe Rake::ExtensionTask do
         @spec = mock_gem_spec
         @config_file = File.expand_path("~/.rake-compiler/config.yml")
         @ruby_ver = RUBY_VERSION
-        @config_path = mock_config_yml["rbconfig-#{@ruby_ver}"]
+        @platform = 'i386-mingw32'
+        @config_path = mock_config_yml["rbconfig-#{@platform}-#{@ruby_ver}"]
 
         File.stub!(:open).and_yield(mock_fake_rb)
       end
@@ -317,7 +318,7 @@ describe Rake::ExtensionTask do
 
       it 'should warn if no section of config file defines running version of ruby' do
         config = mock(Hash)
-        config.should_receive(:[]).with("rbconfig-#{@ruby_ver}").and_return(nil)
+        config.should_receive(:[]).with("rbconfig-#{@platform}-#{@ruby_ver}").and_return(nil)
         YAML.stub!(:load_file).and_return(config)
         out, err = capture_output do
           Rake::ExtensionTask.new('extension_one') do |ext|
@@ -339,7 +340,7 @@ describe Rake::ExtensionTask do
 
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
         config = mock(Hash)
-        config.should_receive(:[]).with("rbconfig-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
+        config.should_receive(:[]).with("rbconfig-i386-mingw32-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
         YAML.stub!(:load_file).and_return(config)
 
         ENV['RUBY_CC_VERSION'] = '1.9.1'
@@ -350,8 +351,8 @@ describe Rake::ExtensionTask do
 
       it 'should allow multiple versions be supplied to RUBY_CC_VERSION' do
         config = mock(Hash)
-        config.should_receive(:[]).once.with("rbconfig-1.8.6").and_return('/path/to/ruby/1.8.6/rbconfig.rb')
-        config.should_receive(:[]).once.with("rbconfig-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
+        config.should_receive(:[]).once.with("rbconfig-i386-mingw32-1.8.6").and_return('/path/to/ruby/1.8.6/rbconfig.rb')
+        config.should_receive(:[]).once.with("rbconfig-i386-mingw32-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
         YAML.stub!(:load_file).and_return(config)
 
         ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
@@ -440,14 +441,23 @@ describe Rake::ExtensionTask do
       end
 
       context '(cross for multiple platforms)' do
-        it 'should define task for each supplied platform' do
+        before :each do
           @ext = Rake::ExtensionTask.new('extension_one', @spec) do |ext|
             ext.cross_compile = true
             ext.cross_platform = ['universal-known', 'universal-unknown']
+            ext.cross_config_options << '--with-something'
+            ext.cross_config_options << {'universal-known' => '--with-known'}
           end
+        end
 
+        it 'should define task for each supplied platform' do
           Rake::Task.should have_defined('compile:universal-known')
           Rake::Task.should have_defined('compile:universal-unknown')
+        end
+
+        it 'should filter options for each supplied platform' do
+          @ext.cross_config_options('universal-unknown').should eq(%w[--with-something])
+          @ext.cross_config_options('universal-known').should eq(%w[--with-something --with-known])
         end
       end
     end
@@ -460,19 +470,26 @@ describe Rake::ExtensionTask do
 
   def mock_gem_spec(stubs = {})
     mock(Gem::Specification,
-      { :name => 'my_gem', :platform => 'ruby' }.merge(stubs)
+      { :name => 'my_gem', :platform => 'ruby', :files => [] }.merge(stubs)
     )
   end
 
   def mock_config_yml
     {
-      'rbconfig-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-1.9.2' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
-      'rbconfig-3.0.0' => '/some/fake/version/3.0.0/to/rbconfig.rb'
+      'rbconfig-i386-mingw32-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-i386-mingw32-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-universal-known-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.9.2' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-i386-mingw32-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-known-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-universal-unknown-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
+      'rbconfig-i386-mingw32-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
+      'rbconfig-x64-mingw32-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
+      'rbconfig-x64-mingw32-3.0.0' => '/some/fake/version/3.0.0/to/rbconfig.rb'
     }
   end
 
