@@ -1,4 +1,4 @@
-=== 0.9.0.pre.1 / 2013-05-05
+=== 0.9.0 / 2013-08-03
 
 * Enhancements:
   * Add support for cross-builds and multiple platforms (x86/x64).
@@ -25,6 +25,10 @@
 * Deprecations:
   * Requires minimum Ruby 1.8.7 and RubyGems 1.8.25
   * Usage of 'i386-mswin32' needs to be changed to 'i386-mswin32-60'
+
+=== 0.9.0.pre.1 / 2013-05-05
+
+See 0.9.0 changes.
 
 === 0.8.3 / 2013-02-16
 
