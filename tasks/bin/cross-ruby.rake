@@ -179,12 +179,18 @@ task 'update-config' do
 
   files.each do |rbconfig|
     version, platform = rbconfig.match(/.*-(\d.\d.\d).*\/([-\w]+)\/rbconfig/)[1,2]
-    config["rbconfig-#{platform}-#{version}"] = rbconfig
+    platforms = [platform]
 
     # fake alternate (binary compatible) i386-mswin32-60 platform
-    if platform == "i386-mingw32"
-      alt_platform = "i386-mswin32-60"
-      config["rbconfig-#{alt_platform}-#{version}"] = rbconfig
+    platform == "i386-mingw32" and
+      platforms.push "i386-mswin32-60"
+
+    platforms.each do |plat|
+      config["rbconfig-#{plat}-#{version}"] = rbconfig
+
+      # also store RubyGems-compatible version
+      gem_platform = Gem::Platform.new(plat)
+      config["rbconfig-#{gem_platform}-#{version}"] = rbconfig
     end
 
     puts "Found Ruby version #{version} for platform #{platform} (#{rbconfig})"
