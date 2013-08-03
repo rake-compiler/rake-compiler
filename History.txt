@@ -1,3 +1,5 @@
+=== 0.9.1 / 2013-08-03
+
 * Bugfixes:
   * Restore compatibility with RubyGems platforms for cross-compilation
     (i386-mingw32 and x86-mingw32 are the same and supported)
