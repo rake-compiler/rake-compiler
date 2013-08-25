@@ -380,6 +380,17 @@ Java extension should be preferred.
       # copy mkmf from cross-ruby location
       file "#{tmp_path}/mkmf.rb" => [mkmf_file] do |t|
         cp t.prerequisites.first, t.name
+        if ruby_ver < "1.9" && "1.9" <= RUBY_VERSION
+          File.open(t.name, 'r+t') do |f|
+            content = f.read
+            content.sub!(/^(      break )\*(defaults)$/, '\\1\\2.first')
+            content.sub!(/^(    return )\*(defaults)$/, '\\1\\2.first')
+            content.sub!(/^(  mfile\.)print( configuration\(srcprefix\))$/, '\\1puts\\2')
+            f.rewind
+            f.write content
+            f.truncate(f.tell)
+          end
+        end
       end
 
       # genearte fake.rb for different ruby versions
