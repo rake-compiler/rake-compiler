@@ -225,7 +225,16 @@ How can this be you say? Simple, rake-compiler's cross compilation features
 take advantage of GCC's host/target capabilities to build 'target' binaries on
 different 'host' OS's.
 
-=== How I do this from Linux or OSX?
+=== How do I do this from Linux or OSX?
+
+==== The Easy Way
+
+Use rake-compiler-dev-box, a virtual machine provisioned with all the necessary
+build tools.  With one command, you can cross-compile and package your gem into
+native, Java, and Windows fat binaries (with 1.8, 1.9, and 2.0 support).  See
+https://github.com/tjschuck/rake-compiler-dev-box for more information.
+
+==== The Manual Way
 
 In addition to having the development tool chain installed (GCC), you also need to
 install your platform's <tt>mingw32</tt> cross compilation package.
@@ -256,7 +265,7 @@ Download and extract. After that, make sure the bin directory is added to the PA
 
 You can add this to your <tt>.profile</tt> to avoid the repitition.
 
-=== I've got my tool-chain installed, now what?
+==== I've got my tool-chain installed, now what?
 
 First, you need to build Ruby for Windows on your Linux or OSX system.
 
@@ -292,7 +301,7 @@ The host will vary depending on provider (mingw32 versus mingw-w64 projects).
 Please consult the documentation and website of the MinGW package provider before
 reporting any issues.
 
-=== OK, let's cross compile some gems!
+==== OK, let's cross compile some gems!
 
 Now, you only need specify a few additional options in your extension definition:
 
@@ -314,7 +323,7 @@ platform for Ruby.
 To target gems for MRI Ruby's current official distribution, please force the
 platform to the one (i386-mswin32-60) previously shown.
 
-=== Warning, magician about to do some tricks, don't blink!
+==== Warning, magician about to do some tricks, don't blink!
 
 Cross compiling is still very simple:
 
@@ -326,7 +335,7 @@ And now, building gems for your Windows users is just 5 more letters:
 
 And you're done, yeah.
 
-=== But wait, there's more
+==== But wait, there's more
 
 You can specify which version of Ruby to build the extension against:
 
@@ -372,7 +381,7 @@ This approach catch the cases of provided fat binaries or gems compiled by the
 end user installing the gem. It has also been implemented successfully in
 several projects.
 
-=== What are you talking about? (Give me examples)
+== What are you talking about? (Give me examples)
 
 I know all the above sounds like a complete foreign language (it does even for me!).
 So, what if I show you some examples?
