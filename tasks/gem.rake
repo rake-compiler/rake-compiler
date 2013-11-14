@@ -3,7 +3,7 @@ require 'rubygems/package_task'
 GEM_SPEC = Gem::Specification.new do |s|
   # basic information
   s.name        = "rake-compiler"
-  s.version     = "0.9.1"
+  s.version     = "0.9.2"
   s.platform    = Gem::Platform::RUBY
 
   # description and details

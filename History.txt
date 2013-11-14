@@ -1,4 +1,4 @@
-=== (In Git)
+=== 0.9.2 / 2013-11-14
 
 * Bugfixes:
   * Pre-load resolver to avoid Bundler blow up during cross-compilation
