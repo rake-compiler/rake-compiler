@@ -482,6 +482,11 @@ Java extension should be preferred.
 
     def fake_rb(platform, version)
       <<-FAKE_RB
+        # Pre-load resolver library before faking, in order to avoid error
+        # "cannot load such file -- win32/resolv" when it is required later on.
+        # See also: https://github.com/tjschuck/rake-compiler-dev-box/issues/5
+        require 'resolv'
+
         class Object
           remove_const :RUBY_PLATFORM
           remove_const :RUBY_VERSION
