@@ -1,3 +1,9 @@
+=== (In Git)
+
+* Bugfixes:
+  * Pre-load resolver to avoid Bundler blow up during cross-compilation
+    Pull #83 [larskanis]
+
 === 0.9.1 / 2013-08-03
 
 * Bugfixes:
