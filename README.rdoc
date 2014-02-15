@@ -71,7 +71,8 @@ to tell it to use rake-compiler to build your extension:
 
     # File: extconf.rb
 
-    # this line should already exist
+    # these lines must exist already
+    require 'mkmf'
     create_makefile('hello_world')
 
 
