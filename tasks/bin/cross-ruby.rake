@@ -13,7 +13,7 @@
 # http://eigenclass.org/hiki/cross+compiling+rcovrt
 #
 # This recipe only cleanup the dependency chain and automate it.
-# Also opens the door to usage different ruby versions 
+# Also opens the door to usage different ruby versions
 # for cross-compilation.
 #
 
