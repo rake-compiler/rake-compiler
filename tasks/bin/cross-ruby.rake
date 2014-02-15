@@ -79,7 +79,7 @@ file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.bz2" => ["#{USER_HOME}/sources
     if RUBY_SOURCE
       url = RUBY_SOURCE
     else
-      url = "http://ftp.ruby-lang.org/pub/ruby/#{MAJOR}/#{File.basename(t.name)}"
+      url = "http://cache.ruby-lang.org/pub/ruby/#{MAJOR}/#{File.basename(t.name)}"
     end
     sh "wget #{url} || curl -O #{url}"
   end
