@@ -232,7 +232,7 @@ different 'host' OS's.
 
 Use rake-compiler-dev-box, a virtual machine provisioned with all the necessary
 build tools.  With one command, you can cross-compile and package your gem into
-native, Java, and Windows fat binaries (with 1.8, 1.9, and 2.0 support).  See
+native, Java, and Windows fat binaries (with 1.8, 1.9, 2.0, and 2.1 support).  See
 https://github.com/tjschuck/rake-compiler-dev-box for more information.
 
 ==== The Manual Way
