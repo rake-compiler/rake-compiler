@@ -1,4 +1,4 @@
-=== (in Git)
+=== 0.9.3 / 2014-08-03
 
 * Bugfixes:
   * Fix specs to run (and pass) on Ruby 2.1 and beyond.
