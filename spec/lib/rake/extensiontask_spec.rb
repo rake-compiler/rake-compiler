@@ -340,7 +340,7 @@ describe Rake::ExtensionTask do
 
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
         config = mock(Hash)
-        config.should_receive(:[]).with("rbconfig-i386-mingw32-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
+        config.should_receive(:[]).with("rbconfig-i386-mingw32-1.9.1").and_return('/rubies/1.9.1/rbconfig.rb')
         YAML.stub!(:load_file).and_return(config)
 
         ENV['RUBY_CC_VERSION'] = '1.9.1'
@@ -351,8 +351,8 @@ describe Rake::ExtensionTask do
 
       it 'should allow multiple versions be supplied to RUBY_CC_VERSION' do
         config = mock(Hash)
-        config.should_receive(:[]).once.with("rbconfig-i386-mingw32-1.8.6").and_return('/path/to/ruby/1.8.6/rbconfig.rb')
-        config.should_receive(:[]).once.with("rbconfig-i386-mingw32-1.9.1").and_return('/path/to/ruby/1.9.1/rbconfig.rb')
+        config.should_receive(:[]).once.with("rbconfig-i386-mingw32-1.8.6").and_return('/rubies/1.8.6/rbconfig.rb')
+        config.should_receive(:[]).once.with("rbconfig-i386-mingw32-1.9.1").and_return('/rubies/1.9.1/rbconfig.rb')
         YAML.stub!(:load_file).and_return(config)
 
         ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
@@ -368,7 +368,7 @@ describe Rake::ExtensionTask do
       context "(cross compile for multiple versions)" do
         before :each do
           config = mock(Hash)
-          config.stub!(:[]).and_return('/path/to/ruby/1.8.6/rbconfig.rb', '/path/to/ruby/1.9.1/rbconfig.rb')
+          config.stub!(:[]).and_return('/rubies/1.8.6/rbconfig.rb', '/rubies/1.9.1/rbconfig.rb')
           YAML.stub!(:load_file).and_return(config)
 
           ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
