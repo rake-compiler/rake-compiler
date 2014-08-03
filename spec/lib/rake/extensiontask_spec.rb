@@ -475,27 +475,34 @@ describe Rake::ExtensionTask do
   end
 
   def mock_config_yml
-    {
-      'rbconfig-i386-mingw32-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-universal-unknown-1.8.6' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-i386-mingw32-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-universal-known-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-universal-unknown-1.8.7' => '/some/path/version/1.8/to/rbconfig.rb',
-      'rbconfig-universal-unknown-1.9.1' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-universal-unknown-1.9.2' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-universal-unknown-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-i386-mingw32-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-universal-known-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-universal-known-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
-      'rbconfig-universal-unknown-1.9.3' => '/some/path/version/1.9.1/to/rbconfig.rb',
-      'rbconfig-universal-unknown-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
-      'rbconfig-i386-mingw32-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
-      'rbconfig-x64-mingw32-2.0.0' => '/some/path/version/2.0.0/to/rbconfig.rb',
-      'rbconfig-x64-mingw32-3.0.0' => '/some/fake/version/3.0.0/to/rbconfig.rb',
-      'rbconfig-i386-mingw32-2.1.2' => '/some/path/version/2.1.2/to/rbconfig.rb',
-      'rbconfig-universal-unknown-2.1.2' => '/some/path/version/2.1.2/to/rbconfig.rb',
-      'rbconfig-universal-known-2.1.2' => '/some/path/version/2.1.2/to/rbconfig.rb'
+    return @mock_config_yml if @mock_config_yml
+
+    versions = {
+      "1.8.6"      => "1.8",
+      "1.8.7"      => "1.8",
+      "1.9.3"      => "1.9.1",
+      "2.0.0"      => "2.0.0",
+      "2.1.2"      => "2.1.0",
+      RUBY_VERSION => RbConfig::CONFIG["ruby_version"]
     }
+
+    platforms = [
+      "i386-mingw32",
+      "universal-known",
+      "universal-unknown",
+      "x64-mingw32",
+      RUBY_PLATFORM
+    ]
+
+    @mock_config_yml = {}
+
+    platforms.collect do |platform|
+      versions.each do |version, api_version|
+        @mock_config_yml["rbconfig-#{platform}-#{version}"] = "/rubies/#{api_version}/rbconfig.rb"
+      end
+    end
+
+    @mock_config_yml
   end
 
   def mock_fake_rb
