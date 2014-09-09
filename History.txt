@@ -1,3 +1,9 @@
+=== (In Git)
+
+* Bugfixes:
+  * Loose RubyGems dependency a little bit to ease old Debian/Ubuntu.
+    Closes #93
+
 === 0.9.3 / 2014-08-03
 
 * Bugfixes:

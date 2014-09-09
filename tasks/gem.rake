@@ -12,7 +12,7 @@ GEM_SPEC = Gem::Specification.new do |s|
 
   # requirements
   s.required_ruby_version = ">= 1.8.7"
-  s.required_rubygems_version = ">= 1.8.25"
+  s.required_rubygems_version = ">= 1.8.23"
 
   # dependencies
   s.add_dependency  'rake'
