@@ -59,11 +59,12 @@ MINGW_TARGET = MINGW_HOST.gsub('msvc', '')
 end
 
 # define a location where sources will be stored
-directory "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
+RUBY_CC_SOURCE = "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
+directory RUBY_CC_SOURCE
 directory "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
 
 # clean intermediate files and folders
-CLEAN.include("#{USER_HOME}/sources/#{RUBY_CC_VERSION}")
+CLEAN.include(RUBY_CC_SOURCE)
 CLEAN.include("#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
 
 # remove the final products and sources
@@ -73,7 +74,7 @@ CLOBBER.include("#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
 CLOBBER.include("#{USER_HOME}/config.yml")
 
 # ruby source file should be stored there
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.bz2" => ["#{USER_HOME}/sources"] do |t|
+file "#{RUBY_CC_SOURCE}.tar.bz2" => ["#{USER_HOME}/sources"] do |t|
   # download the source file using wget or curl
   chdir File.dirname(t.name) do
     if RUBY_SOURCE
@@ -87,19 +88,19 @@ end
 
 # Extract the sources
 source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.bz2"
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => ["#{USER_HOME}/sources/#{source_file}"] do |t|
+file RUBY_CC_SOURCE => ["#{USER_HOME}/sources/#{source_file}"] do |t|
   chdir File.dirname(t.name) do
     t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
   end
 end
 
 # backup makefile.in
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in.bak" => ["#{USER_HOME}/sources/#{RUBY_CC_VERSION}"] do |t|
-  cp "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in", t.name
+file "#{RUBY_CC_SOURCE}/Makefile.in.bak" => [RUBY_CC_SOURCE] do |t|
+  cp "#{RUBY_CC_SOURCE}/Makefile.in", t.name
 end
 
 # correct the makefiles
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in" => ["#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in.bak"] do |t|
+file "#{RUBY_CC_SOURCE}/Makefile.in" => ["#{RUBY_CC_SOURCE}/Makefile.in.bak"] do |t|
   content = File.open(t.name, 'rb') { |f| f.read }
 
   out = ""
@@ -127,7 +128,7 @@ end
 
 # generate the makefile in a clean build location
 file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}",
-                                  "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in"] do |t|
+                                  "#{RUBY_CC_SOURCE}/Makefile.in"] do |t|
 
   options = [
     "--host=#{MINGW_HOST}",
