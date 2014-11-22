@@ -61,6 +61,8 @@ end
 # define a location where sources will be stored
 RUBY_CC_SOURCE = "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
 RUBY_CC_BUILD = "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
+RUBY_CC_SHIM = "#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
+
 directory RUBY_CC_SOURCE
 directory RUBY_CC_BUILD
 
@@ -71,7 +73,7 @@ CLEAN.include(RUBY_CC_BUILD)
 # remove the final products and sources
 CLOBBER.include("#{USER_HOME}/sources")
 CLOBBER.include("#{USER_HOME}/builds")
-CLOBBER.include("#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
+CLOBBER.include(RUBY_CC_SHIM)
 CLOBBER.include("#{USER_HOME}/config.yml")
 
 # ruby source file should be stored there
@@ -158,12 +160,12 @@ file "#{RUBY_CC_BUILD}/ruby.exe" => ["#{RUBY_CC_BUILD}/Makefile"] do |t|
 end
 
 # make install
-file "#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe" => ["#{RUBY_CC_BUILD}/ruby.exe"] do |t|
+file "#{RUBY_CC_SHIM}/bin/ruby.exe" => ["#{RUBY_CC_BUILD}/ruby.exe"] do |t|
   chdir File.dirname(t.prerequisites.first) do
     sh "#{MAKE} install"
   end
 end
-task :install => ["#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe"]
+task :install => ["#{RUBY_CC_SHIM}/bin/ruby.exe"]
 
 desc "Update rake-compiler list of installed Ruby versions"
 task 'update-config' do
