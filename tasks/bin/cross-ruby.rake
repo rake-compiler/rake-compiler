@@ -58,7 +58,7 @@ MINGW_TARGET = MINGW_HOST.gsub('msvc', '')
   ENV.delete(var)
 end
 
-# define a location where sources will be stored
+# define locations where sources, builds, and shims will be stored
 RUBY_CC_SOURCE = "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
 RUBY_CC_BUILD = "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
 RUBY_CC_SHIM = "#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
