@@ -43,8 +43,8 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.licenses          = ['MIT']
 
   # author and contributors
-  s.author      = 'Luis Lavena'
-  s.email       = 'luislavena@gmail.com'
+  s.authors     = ['Kouhei Sutou', 'Luis Lavena']
+  s.email       = ['kou@cozmixng.org', 'luislavena@gmail.com']
 end
 
 gem_package = Gem::PackageTask.new(GEM_SPEC) do |pkg|
