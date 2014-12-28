@@ -390,7 +390,7 @@ So, what if I show you some examples?
 Check our wiki with links to the proper rake files used by many developers and
 projects and how they use rake-compiler.
 
-http://github.com/luislavena/rake-compiler/wiki/projects-using-rake-compiler
+http://github.com/rake-compiler/rake-compiler/wiki/projects-using-rake-compiler
 
 == Future
 
@@ -399,11 +399,10 @@ during the development of it! (and contributions too!)
 
 You can find more information about rake-compiler:
 
-* GitHub:    https://github.com/luislavena/rake-compiler
-* Issues:    https://github.com/luislavena/rake-compiler/issues
-* Blog:      http://blog.mmediasys.com
+* GitHub:    https://github.com/rake-compiler/rake-compiler
+* Issues:    https://github.com/rake-compiler/rake-compiler/issues
 * Docs:      http://rubydoc.info/gems/rake-compiler
-* Wiki:      https://github.com/luislavena/rake-compiler/wiki
+* Wiki:      https://github.com/rake-compiler/rake-compiler/wiki
 
 == Disclaimer
 
