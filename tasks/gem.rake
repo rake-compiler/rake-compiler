@@ -38,7 +38,7 @@ GEM_SPEC = Gem::Specification.new do |s|
   s.extra_rdoc_files = %w(README.rdoc LICENSE.txt History.txt)
 
   # project information
-  s.homepage          = 'http://github.com/luislavena/rake-compiler'
+  s.homepage          = 'https://github.com/rake-compiler/rake-compiler'
   s.rubyforge_project = 'rake-compiler'
   s.licenses          = ['MIT']
 
