@@ -1,4 +1,10 @@
-=== (In Git)
+=== 0.9.4 / 2014-12-28
+
+* Notes:
+  * Change maintainer to Kouhei Sutou from Luis Lavena.
+    Thanks Luis Lavena for your great works!
+  * Change repository to https://github.com/rake-compiler/rake-compiler
+    from https://github.com/luislavena/rake-compiler .
 
 * Bugfixes:
   * Loose RubyGems dependency a little bit to ease old Debian/Ubuntu.
