@@ -1,4 +1,7 @@
 language: ruby
+notifications:
+  recipients:
+    - rake-compiler-commit@googlegroups.com
 before_script:
   - gem update --system $RUBYGEMS_VERSION
 rvm:
