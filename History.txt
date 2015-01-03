@@ -1,3 +1,9 @@
+=== 0.9.5 / 2015-01-03
+
+* Enhancements
+  * Support adding bundled files in cross_compiling block.
+    Closes #100 [Patch by Aaron Stone]
+
 === 0.9.4 / 2014-12-28
 
 * Notes:
