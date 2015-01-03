@@ -338,6 +338,36 @@ describe Rake::ExtensionTask do
         }.should_not raise_error
       end
 
+      it 'should generate additional rake tasks if files are added when cross compiling' do
+        config = mock(Hash)
+        config.stub!(:[]).and_return('/rubies/1.9.1/rbconfig.rb')
+        YAML.stub!(:load_file).and_return(config)
+
+        # Use a real spec instead of a mock because define_native_tasks dups and
+        # calls methods on Gem::Specification, which is more than mock can do.
+        spec = Gem::Specification.new do |s|
+          s.name = 'my_gem'
+          s.platform = Gem::Platform::RUBY
+        end
+
+        # Gem::PackageTask calls Rake::PackageTask which sets Gem.configuration.verbose,
+        # which initializes Gem::ConfigFile,
+        # which gets mad if it cannot find `sysconfdir`/gemrc
+        Gem.stub_chain(:configuration, :verbose=).and_return(true)
+
+        ENV['RUBY_CC_VERSION'] = '1.9.1'
+        Rake::ExtensionTask.new('extension_one', spec) do |ext|
+          ext.cross_compile = true
+          ext.cross_platform = 'universal-unknown'
+          ext.cross_compiling do |gem_spec|
+            gem_spec.files << 'somedir/somefile'
+          end
+        end
+        Rake::Task['native:my_gem:universal-unknown'].execute
+        Rake::Task.should have_defined("tmp/universal-unknown/stage/somedir")
+        Rake::Task.should have_defined("tmp/universal-unknown/stage/somedir/somefile")
+      end
+
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
         config = mock(Hash)
         config.should_receive(:[]).with("rbconfig-i386-mingw32-1.9.1").and_return('/rubies/1.9.1/rbconfig.rb')

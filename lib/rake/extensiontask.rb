@@ -87,6 +87,26 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
     end
 
     private
+    # copy other gem files to staging directory
+    def define_staging_file_tasks(files, lib_path, stage_path, platf, ruby_ver)
+      files.each do |gem_file|
+        # ignore directories and the binary extension
+        next if File.directory?(gem_file) || gem_file == "#{lib_path}/#{binary(platf)}"
+        stage_file = "#{stage_path}/#{gem_file}"
+
+        # copy each file from base to stage directory
+        unless Rake::Task.task_defined?(stage_file) then
+          directory File.dirname(stage_file)
+          file stage_file => [File.dirname(stage_file), gem_file] do
+            cp gem_file, stage_file
+          end
+        end
+
+        # append each file to the copy task
+        task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_file]
+      end
+    end
+
     def define_compile_tasks(for_platform = nil, ruby_ver = RUBY_VERSION)
       # platform usage
       platf = for_platform || platform
@@ -120,24 +140,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       end
 
       # copy other gem files to staging directory
-      if @gem_spec
-        @gem_spec.files.each do |gem_file|
-          # ignore directories and the binary extension
-          next if File.directory?(gem_file) || gem_file == "#{lib_path}/#{binary(platf)}"
-          stage_file = "#{stage_path}/#{gem_file}"
-
-          # copy each file from base to stage directory
-          unless Rake::Task.task_defined?(stage_file) then
-            directory File.dirname(stage_file)
-            file stage_file => [File.dirname(stage_file), gem_file] do
-              cp gem_file, stage_file
-            end
-          end
-
-          # append each file to the copy task
-          task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_file]
-        end
-      end
+      define_staging_file_tasks(@gem_spec.files, lib_path, stage_path, platf, ruby_ver) if @gem_spec
 
       # binary in temporary folder depends on makefile and source files
       # tmp/extension_name/extension_name.{so,bundle}
@@ -253,9 +256,7 @@ Java extension should be preferred.
           spec.files += ext_files
 
           # expose gem specification for customization
-          if callback
-            callback.call(spec)
-          end
+          callback.call(spec) if callback
 
           # Generate a package for this gem
           pkg = Gem::PackageTask.new(spec) do |pkg|
@@ -265,6 +266,9 @@ Java extension should be preferred.
             # we need the files from the staging directory
             pkg.package_files.clear
           end
+
+          # copy other gem files to staging directory if added by the callback
+          define_staging_file_tasks(spec.files, lib_path, stage_path, platf, ruby_ver)
 
           # Copy from staging directory to gem package directory.
           # This is derived from the code of Gem::PackageTask
