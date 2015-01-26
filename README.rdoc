@@ -1,7 +1,7 @@
 = What is rake-compiler?
 
 rake-compiler is first and foremost a productivity tool for Ruby developers.
-It's goal is to make the busy developer's life easier by simplifying the building
+Its goal is to make the busy developer's life easier by simplifying the building
 and packaging of Ruby extensions by simplifying code and reducing duplication.
 
 It follows *convention over configuration* by advocating a standardized build and
