@@ -330,7 +330,7 @@ Cross compiling is still very simple:
 
   rake cross compile
 
-And now, building gems for your Windows users is just 5 more letters:
+And now, building gems for your Windows users is just 6 more letters:
 
   rake cross native gem
 
@@ -366,7 +366,7 @@ NOTE: building "fat" gems is currently only supported by rake-compiler when
 cross compiling from a Linux or OSX host. Patches are welcome if building
 "fat" gems from Windows hosts is desired, or natively for your platform :-)
 
-Now is up to you to make your gem load the proper binary at runtime:
+Now it's up to you to make your gem load the proper binary at runtime:
 
   begin
     RUBY_VERSION =~ /(\d+.\d+)/
