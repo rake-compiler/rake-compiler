@@ -284,9 +284,9 @@ on the Windows host system you're cross-compiling for. An example:
 
   # File: ~/.rake-compiler/config.yml
 
-  rbconfig-i386-mingw32-1.8.6: /path/to/ruby-1.8.6/rbconfig.rb
-  rbconfig-i386-mingw32-1.8.7: /path/to/ruby-1.8.7/rbconfig.rb
-  rbconfig-i386-mingw32-1.9.2: /path/to/ruby-1.9.2/rbconfig.rb
+  rbconfig-x86-mingw32-1.8.6: /path/to/ruby-1.8.6/rbconfig.rb
+  rbconfig-x86-mingw32-1.8.7: /path/to/ruby-1.8.7/rbconfig.rb
+  rbconfig-x86-mingw32-1.9.2: /path/to/ruby-1.9.2/rbconfig.rb
 
 If, instead, you want to build a different Ruby version than the default one, please
 supply a <tt>VERSION</tt>:
@@ -296,7 +296,7 @@ supply a <tt>VERSION</tt>:
 If you, like me, have multiple versions of MinGW packages installed, you can
 specify the HOST that will be used to cross compile Ruby:
 
-  rake-compiler cross-ruby HOST=i386-mingw32 # (OSX mingw32 port)
+  rake-compiler cross-ruby HOST=x86-mingw32 # (OSX mingw32 port)
 
 The host will vary depending on provider (mingw32 versus mingw-w64 projects).
 Please consult the documentation and website of the MinGW package provider before
@@ -307,22 +307,41 @@ reporting any issues.
 Now, you only need specify a few additional options in your extension definition:
 
     Rake::ExtensionTask.new('my_extension', gem_spec) do |ext|
-      ext.cross_compile = true                # enable cross compilation (requires cross compile toolchain)
-      ext.cross_platform = 'i386-mswin32-60'     # forces the Windows platform instead of the default one
-                                              # configure options only for cross compile
-      ext.cross_config_options << '--with-something'
+      # enable cross compilation (requires cross compile toolchain)
+      ext.cross_compile = true
+
+      # set a single platform or an array of platforms to target
+      ext.cross_platform = ['x86-mingw32', 'x86-mswin32-60', 'x64-mingw32']
+
+      # cross-compile options will be passed to extconf.rb for each
+      # platform build, with platform-specific options in a hash.
+      ext.cross_config_options << '--with-common-option'
+      ext.cross_config_options << {
+        'x86-mswin32-60 => '--with-some-option',
+        'x64-mingw32'   => '--enable-64bits',
+      }
+      ext.cross_config_options << '--with-final-option'
 
       # perform alterations on the gemspec when cross compiling
       ext.cross_compiling do |gem_spec|
+        # such as packaging a file that isn't specified in the gemspec
+        gem_spec.files << 'lib/generated_file.rb'
+        # or adding a new installation message
         gem_spec.post_install_message = "You installed the binary version of this gem!"
       end
     end
 
-By default, cross compilation targets 'i386-mingw32' which is the default GCC
-platform for Ruby.
+By default, cross compilation targets 'i386-mingw32' which is the default
+GCC platform for Ruby. MRI Ruby's current official distribution uses
+<tt>i386-mswin32-60</tt>. The RubyInstaller distribution uses
+<tt>x86-mingw32</tt> and <tt>x64-mingw32</tt> for 32-bit and 64-bit
+Windows targets, respectively. Note that <tt>i386</tt> and <tt>x86</tt>
+are synonymous here; <tt>x86</tt> is preferred going forward.
 
-To target gems for MRI Ruby's current official distribution, please force the
-platform to the one (i386-mswin32-60) previously shown.
+The format for <tt>cross_config_options</tt> is an array of strings and
+hashes. Hashes will be fetched for each value of <tt>cross_platform</tt>
+as the build iterates, or ignored if there is no value for that platform.
+You can mix-and-match strings and hashes to get desired option ordering.
 
 ==== Warning, magician about to do some tricks, don't blink!
 
