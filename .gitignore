@@ -1,8 +1,7 @@
-.*.sw[pon]
-.ruby-version
-.rvmrc
-coverage
-doc/api
-Gemfile.lock
-pkg
-tmp
+/.ruby-version
+/.rvmrc
+/Gemfile.lock
+/coverage/
+/doc/api/
+/pkg/
+/tmp/
