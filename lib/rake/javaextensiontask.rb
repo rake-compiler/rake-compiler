@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'rake/baseextensiontask'
 
 # Define a series of tasks to aid in the compilation of Java extensions for

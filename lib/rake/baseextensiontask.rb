@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'rake'
 require 'rake/clean'
 require 'rake/tasklib'
