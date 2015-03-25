@@ -6,12 +6,6 @@ require "rubygems/package_task"
 
 module Rake
   class ExtensionTask < BaseExtensionTask
-    MAKE_PROGRAM_DETECTION = {
-      'gmake -v'        => 'gmake',
-      'make -v'         => 'make',
-      'command -v make' => 'make'
-    }.freeze
-
     attr_accessor :config_script
     attr_accessor :cross_compile
     attr_accessor :cross_platform
@@ -458,9 +452,7 @@ Java extension should be preferred.
           if RUBY_PLATFORM =~ /mswin/ then
             'nmake'
           else
-            ENV['MAKE'] || MAKE_PROGRAM_DETECTION.find { |test, program|
-              system("#{test} >> #{dev_null} 2>&1")
-            }[1]
+            ENV['MAKE'] || find_make
           end
       end
 
@@ -471,8 +463,18 @@ Java extension should be preferred.
       @make
     end
 
-    def dev_null
-      windows? ? 'NUL' : '/dev/null'
+    def find_make
+      candidates = ["gmake", "make"]
+      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
+
+      candidates.each do |candidate|
+        paths.each do |path|
+          make = File.join(path, candidate)
+          return make if File.executable?(make)
+        end
+      end
+
+      nil
     end
 
     def compiled_files
