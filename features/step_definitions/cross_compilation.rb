@@ -1,6 +1,6 @@
-# Naive way of looking into platforms, please include others like FreeBSD?
+# Naive way of looking into platforms
 Given %r{^I'm running a POSIX operating system$} do
-  unless RbConfig::CONFIG['host_os'] =~ /linux|darwin/ then
+  unless RbConfig::CONFIG['host_os'] =~ /linux|darwin|bsd|dragonfly/ then
     raise Cucumber::Pending.new("You need a POSIX operating system, no cheating ;-)")
   end
 end
