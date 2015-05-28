@@ -135,8 +135,7 @@ file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile" => ["#{USER
     "--build=#{RUBY_BUILD}",
     '--enable-shared',
     '--disable-install-doc',
-    '--without-tk',
-    '--without-tcl'
+    '--with-ext='
   ]
 
   # Force Winsock2 for Ruby 1.8, 1.9 defaults to it
