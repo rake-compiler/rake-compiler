@@ -118,6 +118,10 @@ Simply calling <tt>compile</tt> like
 performs the entire compile and build process for you and places the resulting
 extension inside the <tt>lib</tt> directory of your project.
 
+To pass <tt>dir_config</tt> options to the compilation, add to the command line:
+
+  $ rake compile -- --with-foo-[dir|lib|bin|...]=/path/to/foo
+
 NOTE: Please be aware that building C extensions requires the proper
 development environment for your Platform, including libraries, headers
 and build tools. Check your distro / vendor documentation on how to install
