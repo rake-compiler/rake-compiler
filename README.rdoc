@@ -234,10 +234,11 @@ different 'host' OS's.
 
 ==== The Easy Way
 
-Use rake-compiler-dev-box, a virtual machine provisioned with all the necessary
-build tools.  With one command, you can cross-compile and package your gem into
-native, Java, and Windows fat binaries (with 1.8, 1.9, and 2.0 support).  See
-https://github.com/tjschuck/rake-compiler-dev-box for more information.
+Use rake-compiler-dock, a gem that makes use of a virtual machine provisioned with
+all the necessary build tools.  You can add a task to your Rakefile, that
+cross-compiles and packages your gem into Windows fat binaries (with 1.8 to 2.2
+and x86/x64 support). See https://github.com/larskanis/rake-compiler-dock for more
+information.
 
 ==== The Manual Way
 
