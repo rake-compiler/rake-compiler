@@ -237,7 +237,7 @@ different 'host' OS's.
 Use rake-compiler-dock, a gem that makes use of a virtual machine provisioned with
 all the necessary build tools.  You can add a task to your Rakefile, that
 cross-compiles and packages your gem into Windows fat binaries (with 1.8 to 2.2
-and x86/x64 support). See https://github.com/larskanis/rake-compiler-dock for more
+and x86/x64 support). See https://github.com/rake-compiler/rake-compiler-dock for more
 information.
 
 ==== The Manual Way
