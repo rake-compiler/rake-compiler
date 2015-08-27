@@ -15,6 +15,9 @@ module Rake
     # Generate class files for specific VM version
     attr_accessor :target_version
 
+    # Specify lint option
+    attr_accessor :lint_option
+
     def platform
       @platform ||= 'java'
     end
@@ -31,6 +34,7 @@ module Rake
       @debug          = false
       @source_version = '1.5'
       @target_version = '1.5'
+      @lint_option    = 'unchecked'
     end
 
     def define
@@ -93,7 +97,7 @@ execute the Rake compilation task using the JRuby interpreter.
         classpath_arg = java_classpath_arg(@classpath)
         debug_arg     = @debug ? '-g' : ''
 
-        sh "javac #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} -Xlint:unchecked #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
+        sh "javac #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} -Xlint:#{@lint_option} #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
 
         # Checkpoint file
         touch "#{tmp_path}/.build"
