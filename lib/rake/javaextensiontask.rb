@@ -19,6 +19,9 @@ module Rake
 
     attr_accessor :encoding
 
+    # Specify lint option
+    attr_accessor :lint_option
+
     def platform
       @platform ||= 'java'
     end
@@ -36,6 +39,7 @@ module Rake
       @target_version = '1.6'
       @encoding       = nil
       @java_compiling = nil
+      @lint_option    = 'unchecked'
     end
 
     def define
@@ -98,7 +102,7 @@ execute the Rake compilation task using the JRuby interpreter.
         classpath_arg = java_classpath_arg(@classpath)
         debug_arg     = @debug ? '-g' : ''
 
-        sh "javac #{java_encoding_arg} #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} -Xlint:unchecked #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
+        sh "javac #{java_encoding_arg} #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} -Xlint:#{@lint_option} #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
 
         # Checkpoint file
         touch "#{tmp_path}/.build"
