@@ -316,7 +316,7 @@ Now, you only need specify a few additional options in your extension definition
       ext.cross_compile = true
 
       # set a single platform or an array of platforms to target
-      ext.cross_platform = ['x86-mingw32', 'x86-mswin32-60', 'x64-mingw32']
+      ext.cross_platform = ['x86-mingw32', 'x64-mingw32']
 
       # cross-compile options will be passed to extconf.rb for each
       # platform build, with platform-specific options in a hash.
