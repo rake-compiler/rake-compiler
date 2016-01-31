@@ -426,15 +426,9 @@ describe Rake::ExtensionTask do
           it 'should chain fake task to Makefile generation' do
             Rake::Task["tmp/universal-unknown/extension_one/#{@ruby_ver}/Makefile"].prerequisites.should include("tmp/universal-unknown/extension_one/#{@ruby_ver}/fake.rb")
           end
-        end
 
-        context 'rbconfig' do
-          it 'should chain rbconfig tasks to Makefile generation' do
-            Rake::Task["tmp/universal-unknown/extension_one/#{@ruby_ver}/Makefile"].prerequisites.should include("tmp/universal-unknown/extension_one/#{@ruby_ver}/rbconfig.rb")
-          end
-
-          it 'should take rbconfig from rake-compiler configuration' do
-            Rake::Task["tmp/universal-unknown/extension_one/#{@ruby_ver}/rbconfig.rb"].prerequisites.should include(@config_path)
+          it 'should chain rbconfig tasks to fake.rb generation' do
+            Rake::Task["tmp/universal-unknown/extension_one/#{@ruby_ver}/fake.rb"].prerequisites.should include(@config_path)
           end
         end
 
