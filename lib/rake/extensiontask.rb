@@ -169,8 +169,8 @@ Java extension should be preferred.
         # now add the extconf script
         cmd << abs_extconf.relative_path_from(abs_tmp_path)
 
-        # rbconfig.rb will be present if we are cross compiling
-        if t.prerequisites.include?("#{tmp_path}/rbconfig.rb") then
+        # fake.rb will be present if we are cross compiling
+        if t.prerequisites.include?("#{tmp_path}/fake.rb") then
           options.push(*cross_config_options(platf))
         end
 
@@ -365,39 +365,30 @@ Java extension should be preferred.
       # define compilation tasks for cross platform!
       define_compile_tasks(for_platform, ruby_ver)
 
-      # chain fake.rb, rbconfig.rb and mkmf.rb to Makefile generation
+      # chain fake.rb and mkmf.rb to Makefile generation
       file "#{tmp_path}/Makefile" => ["#{tmp_path}/fake.rb",
-                                      "#{tmp_path}/rbconfig.rb",
                                       "#{tmp_path}/mkmf.rb"]
 
-      # copy the file from the cross-ruby location
-      file "#{tmp_path}/rbconfig.rb" => [rbconfig_file] do |t|
+      # copy the rbconfig from the cross-ruby location and
+      # genearte fake.rb for different ruby versions
+      file "#{tmp_path}/fake.rb" => [rbconfig_file] do |t|
         File.open(t.name, 'w') do |f|
-          f.write "require 'fake.rb'\n\n"
+          f.write fake_rb(for_platform, ruby_ver)
           f.write File.read(t.prerequisites.first)
         end
       end
 
       # copy mkmf from cross-ruby location
       file "#{tmp_path}/mkmf.rb" => [mkmf_file] do |t|
-        cp t.prerequisites.first, t.name
-        if ruby_ver < "1.9" && "1.9" <= RUBY_VERSION
-          File.open(t.name, 'r+t') do |f|
-            content = f.read
+        File.open(t.name, 'w') do |f|
+          content = File.read(t.prerequisites.first)
+          content.sub!(/^(require ')rbconfig(')$/, '\\1fake\\2')
+          if ruby_ver < "1.9" && "1.9" <= RUBY_VERSION
             content.sub!(/^(      break )\*(defaults)$/, '\\1\\2.first')
             content.sub!(/^(    return )\*(defaults)$/, '\\1\\2.first')
             content.sub!(/^(  mfile\.)print( configuration\(srcprefix\))$/, '\\1puts\\2')
-            f.rewind
-            f.write content
-            f.truncate(f.tell)
           end
-        end
-      end
-
-      # genearte fake.rb for different ruby versions
-      file "#{tmp_path}/fake.rb" do |t|
-        File.open(t.name, 'w') do |f|
-          f.write fake_rb(for_platform, ruby_ver)
+          f.write content
         end
       end
 
@@ -495,8 +486,10 @@ Java extension should be preferred.
         # "cannot load such file -- win32/resolv" when it is required later on.
         # See also: https://github.com/tjschuck/rake-compiler-dev-box/issues/5
         require 'resolv'
+        require 'rbconfig'
 
         class Object
+          remove_const :RbConfig
           remove_const :RUBY_PLATFORM
           remove_const :RUBY_VERSION
           remove_const :RUBY_DESCRIPTION if defined?(RUBY_DESCRIPTION)
