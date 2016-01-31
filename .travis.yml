@@ -12,15 +12,6 @@ rvm:
   - 2.3.0
   - ruby-head
 env:
-  - RUBYGEMS_VERSION=1.8.29
   - RUBYGEMS_VERSION=2.0.14
   - RUBYGEMS_VERSION=2.2.2
   - RUBYGEMS_VERSION=2.4.1
-matrix:
-  exclude:
-    - rvm: 2.0.0
-      env: RUBYGEMS_VERSION=1.8.29
-    - rvm: 2.1.2
-      env: RUBYGEMS_VERSION=1.8.29
-    - rvm: ruby-head
-      env: RUBYGEMS_VERSION=1.8.29
