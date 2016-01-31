@@ -15,3 +15,6 @@ env:
   - RUBYGEMS_VERSION=2.0.14
   - RUBYGEMS_VERSION=2.2.2
   - RUBYGEMS_VERSION=2.4.1
+matrix:
+  allow_failures:
+    - rvm: ruby-head
