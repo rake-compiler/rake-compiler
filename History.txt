@@ -1,3 +1,29 @@
+=== 0.9.6 / 2016-03-04
+
+* Enhancements
+  * Add more descriptions into README.
+    Closes #105 [Patch by Aaron Stone]
+  * Remove needless executable bits.
+    Closes #107 [Patch by Thibault Jouan]
+  * Update .gitignore.
+    Closes #108 [Patch by Thibault Jouan]
+  * Improve "make" detection on some platforms such as FreeBSD.
+    Closes #109 [Patch by Thibault Jouan]
+  * Enable cucumber steps for POSIX on *BSD.
+    Closes #110 [Patch by Thibault Jouan]
+  * Stop to build bundled extensions.
+  * Add description about CLI option into README.
+    Closes #115 [Patch by Richard Michael]
+  * Update description about using rake-compiler on virtual machine in
+    README.
+    Closes #116, #117 [Patch by Lars Kanis]
+  * Update fake mechanism to be compatible with Bundler.
+    Closes #121 [Patch by Lars Kanis]
+
+* Bugfixes:
+  * Fix typos in README.
+    Closes #102, #103 [Patch by Robert Fletcher]
+
 === 0.9.5 / 2015-01-03
 
 * Enhancements
