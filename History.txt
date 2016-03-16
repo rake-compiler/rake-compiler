@@ -1,3 +1,9 @@
+=== 0.9.7 / 2016-03-16
+
+* Bugfixes:
+  * May fix "make" detection on Windows.
+    #123 [Reported by Aaron Stone]
+
 === 0.9.6 / 2016-03-04
 
 * Enhancements
