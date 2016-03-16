@@ -1,3 +1,5 @@
+require "rbconfig"
+
 require 'rake/baseextensiontask'
 require "rubygems/package_task"
 
@@ -458,9 +460,10 @@ Java extension should be preferred.
       candidates = ["gmake", "make"]
       paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
 
+      exeext = RbConfig::CONFIG["EXEEXT"]
       candidates.each do |candidate|
         paths.each do |path|
-          make = File.join(path, candidate)
+          make = File.join(path, "#{candidate}#{exeext}")
           return make if File.executable?(make)
         end
       end
