@@ -279,6 +279,36 @@ describe Rake::ExtensionTask do
         @ruby_ver = RUBY_VERSION
       end
 
+      context 'compile' do
+        it 'should define as task' do
+          Rake::Task.task_defined?('compile').should be_true
+        end
+
+        it "should depend on 'compile:{platform}'" do
+          Rake::Task['compile'].prerequisites.should include("compile:#{@platform}")
+        end
+      end
+
+      context 'compile:prefix1/prefix2/extension_one' do
+        it 'should define as task' do
+          Rake::Task.task_defined?('compile:prefix1/prefix2/extension_one').should be_true
+        end
+
+        it "should depend on 'compile:prefix1/prefix2/extension_one:{platform}'" do
+          Rake::Task['compile:prefix1/prefix2/extension_one'].prerequisites.should include("compile:prefix1/prefix2/extension_one:#{@platform}")
+        end
+      end
+
+      context 'lib/prefix1/prefix2/extension_one.{so,bundle}' do
+        it 'should define as task' do
+          Rake::Task.task_defined?("lib/prefix1/prefix2/#{@ext_bin}").should be_true
+        end
+
+        it "should depend on 'copy:prefix1/prefix2/extension_one:{platform}:{ruby_ver}'" do
+          Rake::Task["lib/prefix1/prefix2/#{@ext_bin}"].prerequisites.should include("copy:prefix1/prefix2/extension_one:#{@platform}:#{@ruby_ver}")
+        end
+      end
+
       context 'tmp/{platform}/prefix1/prefix2/extension_one/{ruby_ver}/extension_one.{so,bundle}' do
         it 'should define as task' do
           Rake::Task.task_defined?("tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/#{@ext_bin}").should be_true
