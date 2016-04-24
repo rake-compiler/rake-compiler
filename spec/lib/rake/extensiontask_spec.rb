@@ -270,6 +270,34 @@ describe Rake::ExtensionTask do
       end
     end
 
+    context '(one extension whose name with directory prefixes)' do
+      before :each do
+        Rake::FileList.stub!(:[]).and_return(["ext/prefix1/prefix2/extension_one/source.c"], [])
+        @ext = Rake::ExtensionTask.new('prefix1/prefix2/extension_one')
+        @ext_bin = ext_bin('extension_one')
+        @platform = RUBY_PLATFORM
+        @ruby_ver = RUBY_VERSION
+      end
+
+      context 'tmp/{platform}/prefix1/prefix2/extension_one/{ruby_ver}/extension_one.{so,bundle}' do
+        it 'should define as task' do
+          Rake::Task.task_defined?("tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/#{@ext_bin}").should be_true
+        end
+
+        it "should depend on 'tmp/{platform}/prefix1/prefix2/extension_one/{ruby_ver}/Makefile'" do
+          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should include("tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/Makefile")
+        end
+
+        it "should depend on 'ext/extension_one/source.c'" do
+          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should include("ext/prefix1/prefix2/extension_one/source.c")
+        end
+
+        it "should not depend on 'ext/extension_one/source.h'" do
+          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should_not include("ext/prefix1/prefix2/extension_one/source.h")
+        end
+      end
+    end
+
     context '(cross platform tasks)' do
       before :each do
         File.stub!(:exist?).and_return(true)
