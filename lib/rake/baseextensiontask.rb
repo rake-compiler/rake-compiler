@@ -67,7 +67,7 @@ module Rake
         else
           RbConfig::CONFIG['DLEXT']
       end
-      "#{@name}.#{ext}"
+      "#{File.basename(@name)}.#{ext}"
     end
 
     def source_files
