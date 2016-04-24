@@ -110,8 +110,16 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       # platform usage
       platf = for_platform || platform
 
+      # target_prefix
+      if @name.include? '/'
+        target_prefix = File.dirname(name)
+        target_prefix[0,0] = '/'
+      else
+        target_prefix = ''
+      end
+
       # lib_path
-      lib_path = lib_dir
+      lib_path = "#{lib_dir}#{target_prefix}"
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
