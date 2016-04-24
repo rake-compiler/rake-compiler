@@ -111,7 +111,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       platf = for_platform || platform
 
       # target_prefix
-      if @name.include? '/'
+      if @name.include?('/')
         target_prefix = File.dirname(@name)
         target_prefix[0,0] = '/'
       else
