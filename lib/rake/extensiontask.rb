@@ -112,6 +112,9 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
 
       # lib_path
       lib_path = lib_dir
+      if @name.include?('/')
+        lib_path += "/#{File.dirname(@name)}"
+      end
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
