@@ -1,3 +1,9 @@
+=== 0.9.8 / 2016-04-29
+
+* Enhancements:
+  * Support extension in sub directory.
+    #128, #129 [Patch by Kenta Murata]
+
 === 0.9.7 / 2016-03-16
 
 * Bugfixes:
@@ -6,7 +12,7 @@
 
 === 0.9.6 / 2016-03-04
 
-* Enhancements
+* Enhancements:
   * Add more descriptions into README.
     Closes #105 [Patch by Aaron Stone]
   * Remove needless executable bits.
@@ -32,7 +38,7 @@
 
 === 0.9.5 / 2015-01-03
 
-* Enhancements
+* Enhancements:
   * Support adding bundled files in cross_compiling block.
     Closes #100 [Patch by Aaron Stone]
 
