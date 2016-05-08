@@ -46,6 +46,7 @@ module Rake
 
     def define
       fail "Extension name must be provided." if @name.nil?
+      @name = @name.to_s
 
       define_compile_tasks
     end
