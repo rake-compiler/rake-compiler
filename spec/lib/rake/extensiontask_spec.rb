@@ -17,6 +17,11 @@ describe Rake::ExtensionTask do
         ext.name.should == 'extension_one'
       end
 
+      it 'should allow symbol as extension name assignation' do
+        ext = Rake::ExtensionTask.new(:extension_one)
+        ext.name.should == 'extension_one'
+      end
+
       it 'should allow string as extension name using block assignation' do
         ext = Rake::ExtensionTask.new do |ext|
           ext.name = 'extension_two'
