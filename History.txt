@@ -1,3 +1,9 @@
+=== 0.9.9 / 2016-05-10
+
+* Bugfixes:
+  * Support Symbol as extension name again.
+    #134 [Patch by Takashi Kokubun]
+
 === 0.9.8 / 2016-04-29
 
 * Enhancements:
