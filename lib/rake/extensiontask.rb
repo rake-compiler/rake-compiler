@@ -135,17 +135,18 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
 
       # directories we need
       directory tmp_path
+      directory tmp_binary_dir_path
       directory lib_binary_dir_path
       directory stage_binary_dir_path
 
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_binary_dir_path, "#{tmp_path}/#{binary_path}"] do
-        install "#{tmp_path}/#{binary_path}", "#{lib_path}/#{binary_path}"
+      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_binary_dir_path, tmp_binary_path] do
+        install tmp_binary_path, "#{lib_path}/#{binary_path}"
       end
       # copy binary from temporary location to staging directory
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_binary_dir_path, "#{tmp_path}/#{binary_path}"] do
-        cp "#{tmp_path}/#{binary_path}", stage_binary_path
+      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_binary_dir_path, tmp_binary_path] do
+        cp tmp_binary_path, stage_binary_path
       end
 
       # copy other gem files to staging directory
@@ -153,7 +154,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
 
       # binary in temporary folder depends on makefile and source files
       # tmp/extension_name/extension_name.{so,bundle}
-      file "#{tmp_path}/#{binary_path}" => [tmp_binary_dir_path, "#{tmp_path}/Makefile"] + source_files do
+      file tmp_binary_path => [tmp_binary_dir_path, "#{tmp_path}/Makefile"] + source_files do
         jruby_compile_msg = <<-EOF
 Compiling a native C extension on JRuby. This is discouraged and a
 Java extension should be preferred.
