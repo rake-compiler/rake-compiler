@@ -110,15 +110,22 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       # platform usage
       platf = for_platform || platform
 
+      binary_path = binary(platf)
+
       # lib_path
       lib_path = lib_dir
-      if @name.include?('/')
-        lib_path += "/#{File.dirname(@name)}"
-      end
+
+      lib_binary_path = "#{lib_path}/#{binary_path}"
+      lib_binary_dir_path = File.dirname(lib_binary_path)
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
       stage_path = "#{@tmp_dir}/#{platf}/stage"
+
+      tmp_binary_path = "#{tmp_path}/#{binary_path}"
+      tmp_binary_dir_path = File.dirname(tmp_binary_path)
+      stage_binary_path = "#{stage_path}/#{lib_path}/#{binary_path}"
+      stage_binary_dir_path = File.dirname(stage_binary_path)
 
       # cleanup and clobbering
       CLEAN.include(tmp_path)
@@ -128,17 +135,17 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
 
       # directories we need
       directory tmp_path
-      directory "#{stage_path}/#{lib_path}"
-      directory lib_path
+      directory lib_binary_dir_path
+      directory stage_binary_dir_path
 
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_path, "#{tmp_path}/#{binary(platf)}"] do
-        install "#{tmp_path}/#{binary(platf)}", "#{lib_path}/#{binary(platf)}"
+      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_binary_dir_path, "#{tmp_path}/#{binary_path}"] do
+        install "#{tmp_path}/#{binary_path}", "#{lib_path}/#{binary_path}"
       end
       # copy binary from temporary location to staging directory
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => ["#{stage_path}/#{lib_path}", "#{tmp_path}/#{binary(platf)}"] do
-        cp "#{tmp_path}/#{binary(platf)}", "#{stage_path}/#{lib_path}/#{binary(platf)}"
+      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_binary_dir_path, "#{tmp_path}/#{binary_path}"] do
+        cp "#{tmp_path}/#{binary_path}", stage_binary_path
       end
 
       # copy other gem files to staging directory
@@ -146,7 +153,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
 
       # binary in temporary folder depends on makefile and source files
       # tmp/extension_name/extension_name.{so,bundle}
-      file "#{tmp_path}/#{binary(platf)}" => ["#{tmp_path}/Makefile"] + source_files do
+      file "#{tmp_path}/#{binary_path}" => [tmp_binary_dir_path, "#{tmp_path}/Makefile"] + source_files do
         jruby_compile_msg = <<-EOF
 Compiling a native C extension on JRuby. This is discouraged and a
 Java extension should be preferred.
@@ -155,6 +162,9 @@ Java extension should be preferred.
 
         chdir tmp_path do
           sh make
+          if binary_path != File.basename(binary_path)
+            cp File.basename(binary_path), binary_path
+          end
         end
       end
 
@@ -214,7 +224,7 @@ Java extension should be preferred.
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
         # ensure file is always copied
-        file "#{lib_path}/#{binary(platf)}" => ["copy:#{name}:#{platf}:#{ruby_ver}"]
+        file "#{lib_path}/#{binary_path}" => ["copy:#{name}:#{platf}:#{ruby_ver}"]
 
         task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
         task "compile" => ["compile:#{platf}"]
@@ -297,7 +307,7 @@ Java extension should be preferred.
       end
 
       # add binaries to the dependency chain
-      task "native:#{@gem_spec.name}:#{platf}" => ["#{stage_path}/#{lib_dir}/#{binary(platf)}"]
+      task "native:#{@gem_spec.name}:#{platf}" => ["#{stage_path}/#{lib_path}/#{binary(platf)}"]
 
       # ensure the extension get copied
       unless Rake::Task.task_defined?("#{lib_path}/#{binary(platf)}") then
