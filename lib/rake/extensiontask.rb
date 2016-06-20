@@ -129,7 +129,7 @@ Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
       # directories we need
       directory tmp_path
       directory "#{stage_path}/#{lib_path}"
-      directory lib_dir
+      directory lib_path
 
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
