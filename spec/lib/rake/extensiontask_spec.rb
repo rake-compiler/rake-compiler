@@ -314,21 +314,21 @@ describe Rake::ExtensionTask do
         end
       end
 
-      context 'tmp/{platform}/prefix1/prefix2/extension_one/{ruby_ver}/extension_one.{so,bundle}' do
+      context 'tmp/{platform}/prefix1/prefix2/extension_one/{ruby_ver}/prefix1/prefix2/extension_one.{so,bundle}' do
         it 'should define as task' do
-          Rake::Task.task_defined?("tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/#{@ext_bin}").should be_true
+          Rake::Task.task_defined?("tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/prefix1/prefix2/#{@ext_bin}").should be_true
         end
 
         it "should depend on 'tmp/{platform}/prefix1/prefix2/extension_one/{ruby_ver}/Makefile'" do
-          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should include("tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/Makefile")
+          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/prefix1/prefix2/#{@ext_bin}"].prerequisites.should include("tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/Makefile")
         end
 
         it "should depend on 'ext/extension_one/source.c'" do
-          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should include("ext/prefix1/prefix2/extension_one/source.c")
+          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/prefix1/prefix2/#{@ext_bin}"].prerequisites.should include("ext/prefix1/prefix2/extension_one/source.c")
         end
 
         it "should not depend on 'ext/extension_one/source.h'" do
-          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should_not include("ext/prefix1/prefix2/extension_one/source.h")
+          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/prefix1/prefix2/#{@ext_bin}"].prerequisites.should_not include("ext/prefix1/prefix2/extension_one/source.h")
         end
       end
     end
