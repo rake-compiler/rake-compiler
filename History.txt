@@ -1,3 +1,8 @@
+=== 1.0.0 / 2016-06-21
+
+* Enhancements:
+  * Really support extension in sub directory.
+
 === 0.9.9 / 2016-05-10
 
 * Bugfixes:
