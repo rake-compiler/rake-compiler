@@ -393,7 +393,7 @@ cross compiling from a Linux or OSX host. Patches are welcome if building
 Now it's up to you to make your gem load the proper binary at runtime:
 
   begin
-    RUBY_VERSION =~ /(\d+.\d+)/
+    RUBY_VERSION =~ /(\d+\.\d+)/
     require "#{$1}/my_extension"
   rescue LoadError
     require "my_extension"
