@@ -342,7 +342,7 @@ Java extension should be preferred.
 
         # tweak lib directory only when targeting multiple versions
         if multi then
-          version =~ /(\d+.\d+)/
+          version =~ /(\d+\.\d+)/
           @lib_dir = "#{@lib_dir}/#{$1}"
         end
 
