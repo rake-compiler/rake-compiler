@@ -454,6 +454,46 @@ describe Rake::ExtensionTask do
         end
       end
 
+      it "should set required_ruby_version from RUBY_CC_VERSION" do
+        platforms = ["x86-mingw32", "x64-mingw32"]
+        ruby_cc_versions = ["1.8.6", "2.1.10", "2.2.6", "2.3.3", "2.10.1"]
+        ENV["RUBY_CC_VERSION"] = ruby_cc_versions.join(":")
+        config = mock(Hash)
+        ruby_cc_versions.each do |ruby_cc_version|
+          platforms.each do |platform|
+            config.stub!(:[]).
+              with("rbconfig-#{platform}-#{ruby_cc_version}").
+              and_return("/rubies/#{ruby_cc_version}/rbconfig.rb")
+          end
+        end
+        YAML.stub!(:load_file).and_return(config)
+
+        Gem.stub_chain(:configuration, :verbose=).and_return(true)
+
+        spec = Gem::Specification.new do |s|
+          s.name = 'my_gem'
+          s.platform = Gem::Platform::RUBY
+        end
+
+        cross_specs = []
+        Rake::ExtensionTask.new("extension_one", spec) do |ext|
+          ext.cross_platform = platforms
+          ext.cross_compile = true
+          ext.cross_compiling do |cross_spec|
+            cross_specs << cross_spec
+          end
+        end
+        platforms.each do |platform|
+          Rake::Task["native:my_gem:#{platform}"].execute
+        end
+
+        expected_required_ruby_versions = [
+          Gem::Requirement.new([">= 1.8", "< 2.11"]),
+          Gem::Requirement.new([">= 1.8", "< 2.11"]),
+        ]
+        cross_specs.collect(&:required_ruby_version).should == expected_required_ruby_versions
+      end
+
       after :each do
         ENV.delete('RUBY_CC_VERSION')
       end

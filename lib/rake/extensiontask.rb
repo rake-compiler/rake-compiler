@@ -255,10 +255,13 @@ Java extension should be preferred.
           spec.platform = Gem::Platform.new(platf)
 
           # set ruby version constraints
-          cross_rubies = @ruby_versions_per_platform[platf] || []
+          ruby_versions = @ruby_versions_per_platform[platf] || []
+          sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
+            ruby_version.split(".").collect(&:to_i)
+          end
           spec.required_ruby_version = [
-            ">= #{version_ary2str( cross_rubies.min[0,2] )}",
-            "< #{version_ary2str( cross_rubies.max[0,2].succ )}"
+            ">= #{ruby_api_version(sorted_ruby_versions.first)}",
+            "< #{ruby_api_version(sorted_ruby_versions.last).succ}"
           ]
 
           # clear the extensions defined in the specs
@@ -356,7 +359,7 @@ Java extension should be preferred.
 
         # Update cross compiled platform/version combinations
         ruby_versions = (@ruby_versions_per_platform[for_platform] ||= [])
-        ruby_versions << version_str2ary(version)
+        ruby_versions << version
 
         define_cross_platform_tasks_with_version(for_platform, version)
 
@@ -509,12 +512,8 @@ Java extension should be preferred.
       [*@cross_platform].map { |p| "native:#{p}" }
     end
 
-    def version_str2ary(version_string)
-      version_string[/\A[^-]+/].split(".").map(&:to_i).pack("C*")
-    end
-
-    def version_ary2str(version_ary)
-      version_ary.unpack("C*").join(".")
+    def ruby_api_version(ruby_version)
+      ruby_version.split(".")[0, 2].join(".")
     end
 
     def fake_rb(platform, version)
