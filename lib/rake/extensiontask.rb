@@ -25,6 +25,7 @@ module Rake
       @cross_compiling = nil
       @no_native = false
       @config_includes = []
+      @ruby_versions_per_platform = Hash.new([])
     end
 
     def cross_platform
@@ -253,6 +254,13 @@ Java extension should be preferred.
           # adjust to specified platform
           spec.platform = Gem::Platform.new(platf)
 
+          # set ruby version constraints
+          cross_rubies = @ruby_versions_per_platform[platf]
+          spec.required_ruby_version = [
+            ">= #{version_ary2str( cross_rubies.min[0,2] )}",
+            "< #{version_ary2str( cross_rubies.max[0,2].succ )}"
+          ]
+
           # clear the extensions defined in the specs
           spec.extensions.clear
 
@@ -345,6 +353,9 @@ Java extension should be preferred.
           version =~ /(\d+\.\d+)/
           @lib_dir = "#{@lib_dir}/#{$1}"
         end
+
+        # Update cross compiled platform/version combinations
+        @ruby_versions_per_platform[for_platform] << version_str2ary(version)
 
         define_cross_platform_tasks_with_version(for_platform, version)
 
@@ -495,6 +506,14 @@ Java extension should be preferred.
 
     def natives_cross_platform
       [*@cross_platform].map { |p| "native:#{p}" }
+    end
+
+    def version_str2ary(version_string)
+      version_string[/\A[^-]+/].split(".").map(&:to_i).pack("C*")
+    end
+
+    def version_ary2str(version_ary)
+      version_ary.unpack("C*").join(".")
     end
 
     def fake_rb(platform, version)
