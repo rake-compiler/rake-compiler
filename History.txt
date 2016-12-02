@@ -1,3 +1,9 @@
+=== 1.0.3 / 2016-12-02
+
+* Enhancements:
+  * Support specifying required Ruby versions.
+    #137 [Patch by Lars Kanis]
+
 === 1.0.2 / 2016-11-13
 
 * Bugfixes:
