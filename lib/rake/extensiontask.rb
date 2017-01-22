@@ -476,6 +476,7 @@ Java extension should be preferred.
           else
             ENV['MAKE'] || find_make
           end
+        raise 'make executable not found in path?' unless @make
       end
 
       unless @make
