@@ -533,7 +533,7 @@ Java extension should be preferred.
           RUBY_VERSION = "#{version}"
           RUBY_DESCRIPTION = "ruby \#{RUBY_VERSION} (\#{RUBY_RELEASE_DATE}) [\#{RUBY_PLATFORM}]"
         end
-        if RUBY_PLATFORM =~ /mswin|bccwin|mingw/
+        if '#{RUBY_PLATFORM}' =~ /mswin|bccwin|mingw/
           class File
             remove_const :ALT_SEPARATOR
             ALT_SEPARATOR = "\\\\"
