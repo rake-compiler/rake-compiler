@@ -89,7 +89,7 @@ describe Rake::JavaExtensionTask do
 
     context '(one extension)' do
       before :each do
-        Rake::FileList.stub!(:[]).and_return(["ext/extension_one/source.java"])
+        allow(Rake::FileList).to receive(:[]).and_return(["ext/extension_one/source.java"])
         @ext = Rake::JavaExtensionTask.new('extension_one')
         @ext_bin = ext_bin('extension_one')
         @platform = 'java'
@@ -97,7 +97,7 @@ describe Rake::JavaExtensionTask do
 
       context 'compile' do
         it 'should define as task' do
-          Rake::Task.task_defined?('compile').should be_true
+          Rake::Task.task_defined?('compile').should == true
         end
 
         it "should depend on 'compile:{platform}'" do
@@ -108,7 +108,7 @@ describe Rake::JavaExtensionTask do
 
       context 'compile:extension_one' do
         it 'should define as task' do
-          Rake::Task.task_defined?('compile:extension_one').should be_true
+          Rake::Task.task_defined?('compile:extension_one').should == true
         end
 
         it "should depend on 'compile:extension_one:{platform}'" do
@@ -131,7 +131,7 @@ describe Rake::JavaExtensionTask do
 
       context 'tmp/{platform}/extension_one/extension_one.jar' do
         it 'should define as task' do
-          Rake::Task.task_defined?("tmp/#{@platform}/extension_one/#{@ext_bin}").should be_true
+          Rake::Task.task_defined?("tmp/#{@platform}/extension_one/#{@ext_bin}").should == true
         end
 
         it "should depend on checkpoint file" do
@@ -141,7 +141,7 @@ describe Rake::JavaExtensionTask do
 
       context 'tmp/{platform}/extension_one/.build' do
         it 'should define as task' do
-          Rake::Task.task_defined?("tmp/#{@platform}/extension_one/.build").should be_true
+          Rake::Task.task_defined?("tmp/#{@platform}/extension_one/.build").should == true
         end
 
         it 'should depend on source files' do
@@ -174,7 +174,7 @@ describe Rake::JavaExtensionTask do
   end
 
   def mock_gem_spec(stubs = {})
-    mock(Gem::Specification,
+    double(Gem::Specification,
       { :name => 'my_gem', :platform => 'ruby' }.merge(stubs)
     )
   end
