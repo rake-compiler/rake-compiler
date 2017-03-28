@@ -44,6 +44,7 @@ MAKE = ENV['MAKE'] || %w[gmake make].find { |c| system("#{c} -v > /dev/null 2>&1
 USER_HOME = File.expand_path("~/.rake-compiler")
 RUBY_CC_VERSION = "ruby-" << ENV.fetch("VERSION", "1.8.7-p371")
 RUBY_SOURCE = ENV['SOURCE']
+RUBY_SVN = ENV['SVN']
 RUBY_BUILD = RbConfig::CONFIG["host"]
 
 # grab the major "1.8" or "1.9" part of the version number
@@ -86,11 +87,22 @@ file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.bz2" => ["#{USER_HOME}/sources
 end
 
 # Extract the sources
-source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.bz2"
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => ["#{USER_HOME}/sources/#{source_file}"] do |t|
-  chdir File.dirname(t.name) do
-    t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
+if RUBY_SVN
+
+  file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" do |t|
+    sh "svn export -q http://svn.ruby-lang.org/repos/ruby/#{RUBY_SVN} #{t.name}"
+    chdir(t.name) { sh 'autoreconf' }
   end
+
+else
+
+  source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.bz2"
+  file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => ["#{USER_HOME}/sources/#{source_file}"] do |t|
+    chdir File.dirname(t.name) do
+      t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
+    end
+  end
+
 end
 
 # backup makefile.in
