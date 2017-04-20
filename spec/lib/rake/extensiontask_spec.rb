@@ -454,7 +454,7 @@ describe Rake::ExtensionTask do
         end
       end
 
-      it "should set required_ruby_version from RUBY_CC_VERSION" do
+      it "should set required_ruby_version from RUBY_CC_VERSION, set platform, clear extensions but keep metadata" do
         platforms = ["x86-mingw32", "x64-mingw32"]
         ruby_cc_versions = ["1.8.6", "2.1.10", "2.2.6", "2.3.3", "2.10.1"]
         ENV["RUBY_CC_VERSION"] = ruby_cc_versions.join(":")
@@ -473,6 +473,8 @@ describe Rake::ExtensionTask do
         spec = Gem::Specification.new do |s|
           s.name = 'my_gem'
           s.platform = Gem::Platform::RUBY
+          s.extensions = ['ext/somegem/extconf.rb']
+          s.metadata['allowed_push_host'] = 'http://test'
         end
 
         cross_specs = []
@@ -492,6 +494,15 @@ describe Rake::ExtensionTask do
           Gem::Requirement.new([">= 1.8", "< 2.11"]),
         ]
         cross_specs.collect(&:required_ruby_version).should == expected_required_ruby_versions
+        cross_specs.collect(&:extensions).should == [[], []]
+        cross_specs.collect(&:platform).collect(&:to_s).should == platforms
+        cross_specs.collect{|s| s.metadata['allowed_push_host']}.should == ['http://test', 'http://test']
+
+        # original gemspec should keep unchanged
+        spec.required_ruby_version.should == Gem::Requirement.new([">= 0"])
+        spec.platform.should == Gem::Platform::RUBY
+        spec.extensions.should == ['ext/somegem/extconf.rb']
+        spec.metadata['allowed_push_host'].should == 'http://test'
       end
 
       after :each do
