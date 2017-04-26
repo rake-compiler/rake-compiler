@@ -18,7 +18,7 @@ module Rake
     def init(name = nil, gem_spec = nil)
       super
       @config_script = 'extconf.rb'
-      @source_pattern = "*.c"
+      @source_pattern = "*.{c,cc,cpp}"
       @compiled_pattern = "*.{o,obj,so,bundle,dSYM}"
       @cross_compile = false
       @cross_config_options = []
