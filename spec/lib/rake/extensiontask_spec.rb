@@ -77,8 +77,8 @@ describe Rake::ExtensionTask do
       @ext.lib_dir.should == 'lib'
     end
 
-    it 'should look for C files pattern (.c)' do
-      @ext.source_pattern.should == "*.c"
+    it 'should look for C/C++ files pattern (.c,.cc,.cpp)' do
+      @ext.source_pattern.should == "*.{c,cc,cpp}"
     end
 
     it 'should have no configuration options preset to delegate' do
