@@ -237,7 +237,6 @@ Java extension should be preferred.
       platf = for_platform || platform
 
       # tmp_path
-      tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
       stage_path = "#{@tmp_dir}/#{platf}/stage"
 
       # lib_path
