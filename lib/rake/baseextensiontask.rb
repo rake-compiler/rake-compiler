@@ -19,10 +19,10 @@ module Rake
     attr_accessor :tmp_dir
     attr_accessor :ext_dir
     attr_accessor :lib_dir
-    attr_accessor :platform
     attr_accessor :config_options
     attr_accessor :source_pattern
     attr_accessor :extra_options
+    attr_writer :platform
 
     def platform
       @platform ||= RUBY_PLATFORM
