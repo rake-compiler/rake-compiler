@@ -10,7 +10,7 @@ module Rake
   class ExtensionTask < BaseExtensionTask
     attr_accessor :config_script
     attr_accessor :cross_compile
-    attr_accessor :cross_platform
+    attr_writer :cross_platform
     attr_writer :cross_config_options
     attr_accessor :no_native
     attr_accessor :config_includes
