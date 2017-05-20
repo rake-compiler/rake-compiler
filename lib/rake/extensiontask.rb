@@ -10,7 +10,7 @@ module Rake
   class ExtensionTask < BaseExtensionTask
     attr_accessor :config_script
     attr_accessor :cross_compile
-    attr_accessor :cross_platform
+    attr_writer :cross_platform
     attr_writer :cross_config_options
     attr_accessor :no_native
     attr_accessor :config_includes
@@ -237,7 +237,6 @@ Java extension should be preferred.
       platf = for_platform || platform
 
       # tmp_path
-      tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
       stage_path = "#{@tmp_dir}/#{platf}/stage"
 
       # lib_path
@@ -283,12 +282,12 @@ Java extension should be preferred.
           callback.call(spec) if callback
 
           # Generate a package for this gem
-          pkg = Gem::PackageTask.new(spec) do |pkg|
-            pkg.need_zip = false
-            pkg.need_tar = false
+          pkg = Gem::PackageTask.new(spec) do |p|
+            p.need_zip = false
+            p.need_tar = false
             # Do not copy any files per PackageTask, because
             # we need the files from the staging directory
-            pkg.package_files.clear
+            p.package_files.clear
           end
 
           # copy other gem files to staging directory if added by the callback
