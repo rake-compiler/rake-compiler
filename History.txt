@@ -1,3 +1,14 @@
+=== 1.0.4 / 2017-05-27
+
+* Enhancements:
+  * Migrate to RSpec 3 from RSpec 2.
+  * Add more tests.
+    #140 [Patch by Lars Kanis]
+  * Support C++ source files by default.
+    #141 [Patch by Takashi Kokubun]
+  * Suppress warnings.
+    #142 [Patch by Akira Matsuda]
+
 === 1.0.3 / 2016-12-02
 
 * Enhancements:
