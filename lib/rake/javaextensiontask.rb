@@ -29,8 +29,8 @@ module Rake
       @classpath      = nil
       @java_compiling = nil
       @debug          = false
-      @source_version = '1.5'
-      @target_version = '1.5'
+      @source_version = '1.6'
+      @target_version = '1.6'
     end
 
     def define
