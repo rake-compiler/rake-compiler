@@ -211,11 +211,14 @@ execute the Rake compilation task using the JRuby interpreter.
         end
       end
       unless jruby_cpath
-        jruby_cpath = ENV['JRUBY_PARENT_CLASSPATH'] || ENV['JRUBY_HOME'] &&
-          Dir.glob("#{File.expand_path(ENV['JRUBY_HOME'])}/lib/*.jar").
-            join(File::PATH_SEPARATOR)
+        require 'rbconfig'
+        libdir = RbConfig::CONFIG['libdir']
+        if libdir.start_with? "classpath:"
+          raise 'Cannot build with jruby-complete'
+        end
+        jruby_cpath = libdir && File.join(libdir, "jruby.jar")
       end
-      raise "JRUBY_HOME or JRUBY_PARENT_CLASSPATH are not set" unless jruby_cpath
+      raise "'libdir' not set" unless jruby_cpath
       jruby_cpath += File::PATH_SEPARATOR + args.join(File::PATH_SEPARATOR) unless args.empty?
       jruby_cpath ? "-cp \"#{jruby_cpath}\"" : ""
     end
