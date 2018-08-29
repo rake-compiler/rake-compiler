@@ -1,3 +1,5 @@
+require "rbconfig"
+
 require 'rake/baseextensiontask'
 
 # Define a series of tasks to aid in the compilation of Java extensions for
@@ -211,7 +213,6 @@ execute the Rake compilation task using the JRuby interpreter.
         end
       end
       unless jruby_cpath
-        require 'rbconfig'
         libdir = RbConfig::CONFIG['libdir']
         if libdir.start_with? "classpath:"
           raise 'Cannot build with jruby-complete'
