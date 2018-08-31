@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency  'rake'
 
   # development dependencies
+  s.add_development_dependency 'bundler'
   s.add_development_dependency 'rspec', '~> 2.8.0'
   s.add_development_dependency 'cucumber', '~> 1.1.4'
 
