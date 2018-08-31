@@ -58,22 +58,26 @@ MINGW_TARGET = MINGW_HOST.gsub('msvc', '')
   ENV.delete(var)
 end
 
-# define a location where sources will be stored
-directory "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
-directory "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
+# define locations where sources, builds, and shims will be stored
+RUBY_CC_SOURCE = "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
+RUBY_CC_BUILD = "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
+RUBY_CC_SHIM = "#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
+
+directory RUBY_CC_SOURCE
+directory RUBY_CC_BUILD
 
 # clean intermediate files and folders
-CLEAN.include("#{USER_HOME}/sources/#{RUBY_CC_VERSION}")
-CLEAN.include("#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
+CLEAN.include(RUBY_CC_SOURCE)
+CLEAN.include(RUBY_CC_BUILD)
 
 # remove the final products and sources
 CLOBBER.include("#{USER_HOME}/sources")
 CLOBBER.include("#{USER_HOME}/builds")
-CLOBBER.include("#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
+CLOBBER.include(RUBY_CC_SHIM)
 CLOBBER.include("#{USER_HOME}/config.yml")
 
 # ruby source file should be stored there
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.bz2" => ["#{USER_HOME}/sources"] do |t|
+file "#{RUBY_CC_SOURCE}.tar.bz2" => ["#{USER_HOME}/sources"] do |t|
   # download the source file using wget or curl
   chdir File.dirname(t.name) do
     if RUBY_SOURCE
@@ -87,19 +91,19 @@ end
 
 # Extract the sources
 source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.bz2"
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => ["#{USER_HOME}/sources/#{source_file}"] do |t|
+file RUBY_CC_SOURCE => ["#{USER_HOME}/sources/#{source_file}"] do |t|
   chdir File.dirname(t.name) do
     t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
   end
 end
 
 # backup makefile.in
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in.bak" => ["#{USER_HOME}/sources/#{RUBY_CC_VERSION}"] do |t|
-  cp "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in", t.name
+file "#{RUBY_CC_SOURCE}/Makefile.in.bak" => [RUBY_CC_SOURCE] do |t|
+  cp "#{RUBY_CC_SOURCE}/Makefile.in", t.name
 end
 
 # correct the makefiles
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in" => ["#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in.bak"] do |t|
+file "#{RUBY_CC_SOURCE}/Makefile.in" => ["#{RUBY_CC_SOURCE}/Makefile.in.bak"] do |t|
   content = File.open(t.name, 'rb') { |f| f.read }
 
   out = ""
@@ -126,8 +130,7 @@ task :mingw32 do
 end
 
 # generate the makefile in a clean build location
-file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}",
-                                  "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in"] do |t|
+file "#{RUBY_CC_BUILD}/Makefile" => [RUBY_CC_BUILD, "#{RUBY_CC_SOURCE}/Makefile.in"] do |t|
 
   options = [
     "--host=#{MINGW_HOST}",
@@ -149,19 +152,19 @@ file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile" => ["#{USER
 end
 
 # make
-file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/ruby.exe" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile"] do |t|
+file "#{RUBY_CC_BUILD}/ruby.exe" => ["#{RUBY_CC_BUILD}/Makefile"] do |t|
   chdir File.dirname(t.prerequisites.first) do
     sh MAKE
   end
 end
 
 # make install
-file "#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/ruby.exe"] do |t|
+file "#{RUBY_CC_SHIM}/bin/ruby.exe" => ["#{RUBY_CC_BUILD}/ruby.exe"] do |t|
   chdir File.dirname(t.prerequisites.first) do
     sh "#{MAKE} install"
   end
 end
-task :install => ["#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe"]
+task :install => ["#{RUBY_CC_SHIM}/bin/ruby.exe"]
 
 desc "Update rake-compiler list of installed Ruby versions"
 task 'update-config' do
