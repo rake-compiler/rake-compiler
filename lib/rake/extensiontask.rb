@@ -260,7 +260,7 @@ Java extension should be preferred.
           end
           spec.required_ruby_version = [
             ">= #{ruby_api_version(sorted_ruby_versions.first)}",
-            "< #{ruby_api_version(sorted_ruby_versions.last).succ}"
+            "< #{ruby_api_version(sorted_ruby_versions.last).succ}.dev"
           ]
 
           # clear the extensions defined in the specs

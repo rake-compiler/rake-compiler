@@ -490,8 +490,8 @@ describe Rake::ExtensionTask do
         end
 
         expected_required_ruby_versions = [
-          Gem::Requirement.new([">= 1.8", "< 2.11"]),
-          Gem::Requirement.new([">= 1.8", "< 2.11"]),
+          Gem::Requirement.new([">= 1.8", "< 2.11.dev"]),
+          Gem::Requirement.new([">= 1.8", "< 2.11.dev"]),
         ]
         cross_specs.collect(&:required_ruby_version).should == expected_required_ruby_versions
         cross_specs.collect(&:extensions).should == [[], []]
