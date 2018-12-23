@@ -1,3 +1,9 @@
+=== 1.0.6 / 2018-12-23
+
+* Enhancements:
+  * Stop to make unreleased Ruby installable.
+    #150 [Reported by MSP-Greg]
+
 === 1.0.5 / 2018-08-31
 
 * Enhancements:
