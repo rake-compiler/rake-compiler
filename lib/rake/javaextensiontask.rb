@@ -212,13 +212,26 @@ execute the Rake compilation task using the JRuby interpreter.
         rescue => e
         end
       end
+
       unless jruby_cpath
         libdir = RbConfig::CONFIG['libdir']
         if libdir.start_with? "classpath:"
           raise 'Cannot build with jruby-complete'
         end
-        jruby_cpath = File.join(libdir, "jruby.jar")
+        candidate = File.join(libdir, "jruby.jar")
+        jruby_cpath = candidate if File.exist? candidate
       end
+
+      unless jruby_cpath
+        jruby_home = ENV['JRUBY_HOME']
+        if jruby_home
+          candidate = File.join(jruby_home, 'lib', 'jruby.jar')
+          jruby_cpath = candidate if File.exist? candidate
+        end
+      end
+
+      raise "jruby.jar path not found" unless jruby_cpath
+
       jruby_cpath += File::PATH_SEPARATOR + args.join(File::PATH_SEPARATOR) unless args.empty?
       jruby_cpath ? "-cp \"#{jruby_cpath}\"" : ""
     end
