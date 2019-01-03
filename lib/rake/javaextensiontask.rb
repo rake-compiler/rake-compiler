@@ -220,7 +220,7 @@ execute the Rake compilation task using the JRuby interpreter.
         jruby_home = ENV['JRUBY_HOME']
         if jruby_home
           candidate = File.join(jruby_home, 'lib', 'jruby.jar')
-          jruby_cpath = candidate if File.exist? candidate
+          jruby_cpath = candidate if File.exist?(candidate)
         end
       end
 
@@ -229,11 +229,11 @@ execute the Rake compilation task using the JRuby interpreter.
       # found lib path
       unless jruby_cpath
         libdir = RbConfig::CONFIG['libdir']
-        if libdir.start_with? "uri:classloader:"
+        if libdir.start_with?("uri:classloader:")
           raise 'Cannot build with jruby-complete from Java 9 onwards'
         end
         candidate = File.join(libdir, "jruby.jar")
-        jruby_cpath = candidate if File.exist? candidate
+        jruby_cpath = candidate if File.exist?(candidate)
       end
 
       unless jruby_cpath
