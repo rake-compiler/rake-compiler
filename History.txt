@@ -1,3 +1,10 @@
+=== 1.0.7 / 2019-01-04
+
+* Bugfixes:
+  * Fix a bug that JRuby class path detection is failed on
+    cross-compilation.
+    #149 #151 [Reported by Chalupa Petr][Patch by Prashant Vithani]
+
 === 1.0.6 / 2018-12-23
 
 * Enhancements:
