@@ -237,7 +237,7 @@ execute the Rake compilation task using the JRuby interpreter.
       end
 
       unless jruby_cpath
-        raise "Could not find jruby.jar. Please set JRUBY_HOME or Use jruby in rvm"
+        raise "Could not find jruby.jar. Please set JRUBY_HOME or use jruby in rvm"
       end
 
       jruby_cpath += File::PATH_SEPARATOR + args.join(File::PATH_SEPARATOR) unless args.empty?
