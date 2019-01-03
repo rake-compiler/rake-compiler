@@ -213,15 +213,9 @@ execute the Rake compilation task using the JRuby interpreter.
         end
       end
 
-      unless jruby_cpath
-        libdir = RbConfig::CONFIG['libdir']
-        if libdir.start_with? "classpath:"
-          raise 'Cannot build with jruby-complete'
-        end
-        candidate = File.join(libdir, "jruby.jar")
-        jruby_cpath = candidate if File.exist? candidate
-      end
-
+      # jruby_cpath might not be present from Java-9 onwards as it removes
+      # sun.boot.class.path. Check if JRUBY_HOME is set as env variable and try
+      # to find jruby.jar under JRUBY_HOME
       unless jruby_cpath
         jruby_home = ENV['JRUBY_HOME']
         if jruby_home
@@ -230,7 +224,21 @@ execute the Rake compilation task using the JRuby interpreter.
         end
       end
 
-      raise "jruby.jar path not found" unless jruby_cpath
+      # JRUBY_HOME is not necessarily set in JRuby-9.x
+      # Find the libdir from RbConfig::CONFIG and find jruby.jar under the
+      # found lib path
+      unless jruby_cpath
+        libdir = RbConfig::CONFIG['libdir']
+        if libdir.start_with? "uri:classloader:"
+          raise 'Cannot build with jruby-complete from Java 9 onwards'
+        end
+        candidate = File.join(libdir, "jruby.jar")
+        jruby_cpath = candidate if File.exist? candidate
+      end
+
+      unless jruby_cpath
+        raise "Could not find jruby.jar. Please set JRUBY_HOME or Use jruby in rvm"
+      end
 
       jruby_cpath += File::PATH_SEPARATOR + args.join(File::PATH_SEPARATOR) unless args.empty?
       jruby_cpath ? "-cp \"#{jruby_cpath}\"" : ""
