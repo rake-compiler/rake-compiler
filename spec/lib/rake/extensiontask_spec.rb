@@ -505,6 +505,39 @@ describe Rake::ExtensionTask do
         spec.metadata['allowed_push_host'].should == 'http://test'
       end
 
+      it "does not override required_ruby_version if uses_libruby == false" do
+        config = {}
+        ruby_cc_version = RUBY_VERSION
+        platform = "x64-mingw32"
+        allow(config).to receive(:[]).
+            with("rbconfig-#{platform}-#{ruby_cc_version}").
+            and_return("/rubies/#{ruby_cc_version}/rbconfig.rb")
+        allow(YAML).to receive(:load_file).and_return(config)
+
+        allow(Gem).to receive_message_chain(:configuration, :verbose=).and_return(true)
+
+        spec = Gem::Specification.new do |s|
+          s.name = 'my_gem'
+          s.platform = Gem::Platform::RUBY
+          s.extensions = ['ext/somegem/extconf.rb']
+          s.metadata['allowed_push_host'] = 'http://test'
+          s.required_ruby_version = '>= 1.0'
+        end
+
+        cross_spec = nil
+        Rake::ExtensionTask.new("extension_one", spec) do |ext|
+          ext.uses_libruby = false
+          ext.cross_platform = [platform]
+          ext.cross_compile = true
+          ext.cross_compiling do |modified_spec|
+            cross_spec = modified_spec
+          end
+        end
+        Rake::Task["native:my_gem:#{platform}"].execute
+
+        expect(cross_spec.required_ruby_version).to eq(Gem::Requirement.new([">= 1.0"]))
+      end
+
       after :each do
         ENV.delete('RUBY_CC_VERSION')
       end

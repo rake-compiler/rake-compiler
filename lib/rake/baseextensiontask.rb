@@ -22,6 +22,11 @@ module Rake
     attr_accessor :config_options
     attr_accessor :source_pattern
     attr_accessor :extra_options
+
+    # @return [Boolean] Whether the binary component uses libruby.
+    # If false, the pre-compiled gems will not override `required_ruby_version`.
+    attr_accessor :uses_libruby
+
     attr_writer :platform
 
     def platform
@@ -42,6 +47,7 @@ module Rake
       @lib_dir = 'lib'
       @config_options = []
       @extra_options = ARGV.select { |i| i =~ /\A--?/ }
+      @uses_libruby = true
     end
 
     def define
