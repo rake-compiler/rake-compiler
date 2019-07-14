@@ -44,7 +44,6 @@ Gem::Specification.new do |s|
 
   # project information
   s.homepage          = 'https://github.com/rake-compiler/rake-compiler'
-  s.rubyforge_project = 'rake-compiler'
   s.licenses          = ['MIT']
 
   # author and contributors
