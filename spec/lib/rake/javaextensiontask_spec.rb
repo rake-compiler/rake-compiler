@@ -79,6 +79,7 @@ describe Rake::JavaExtensionTask do
     it 'should default to Java platform' do
       @ext.platform.should == 'java'
     end
+  end
 
   context '(tasks)' do
     before :each do
@@ -164,7 +165,6 @@ describe Rake::JavaExtensionTask do
           CLOBBER.should include('tmp')
         end
       end
-    end
     end
   end
   private
