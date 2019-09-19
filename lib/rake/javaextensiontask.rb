@@ -31,11 +31,11 @@ module Rake
       super
       @source_pattern = '**/*.java'
       @classpath      = nil
-      @encoding       = nil
-      @java_compiling = nil
       @debug          = false
       @source_version = '1.6'
       @target_version = '1.6'
+      @encoding       = nil
+      @java_compiling = nil
     end
 
     def define
