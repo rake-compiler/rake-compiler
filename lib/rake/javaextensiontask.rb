@@ -17,6 +17,8 @@ module Rake
     # Generate class files for specific VM version
     attr_accessor :target_version
 
+    attr_accessor :encoding
+
     def platform
       @platform ||= 'java'
     end
@@ -29,6 +31,7 @@ module Rake
       super
       @source_pattern = '**/*.java'
       @classpath      = nil
+      @encoding       = nil
       @java_compiling = nil
       @debug          = false
       @source_version = '1.6'
@@ -95,7 +98,7 @@ execute the Rake compilation task using the JRuby interpreter.
         classpath_arg = java_classpath_arg(@classpath)
         debug_arg     = @debug ? '-g' : ''
 
-        sh "javac #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} -Xlint:unchecked #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
+        sh "javac #{java_encoding_arg} #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} -Xlint:unchecked #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
 
         # Checkpoint file
         touch "#{tmp_path}/.build"
@@ -191,6 +194,13 @@ execute the Rake compilation task using the JRuby interpreter.
       extdirs = Java::java.lang.System.getProperty('java.ext.dirs') rescue nil
       extdirs = ENV['JAVA_EXT_DIR'] unless extdirs
       java_extdir = extdirs.nil? ? "" : "-extdirs \"#{extdirs}\""
+    end
+
+    #
+    # Build an encoding argument
+    #
+    def java_encoding_arg
+      @encoding.nil? ? "" : "-encoding \"#{@encoding}\""
     end
 
     #
