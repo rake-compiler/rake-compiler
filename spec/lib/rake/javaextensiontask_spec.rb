@@ -76,6 +76,10 @@ describe Rake::JavaExtensionTask do
       @ext.config_options.should be_empty
     end
 
+    it 'lint option should be "unchecked"' do
+      @ext.lint_option.should == 'unchecked'
+    end
+
     it 'should default to Java platform' do
       @ext.platform.should == 'java'
     end
@@ -164,6 +168,19 @@ describe Rake::JavaExtensionTask do
         it "should include 'tmp'" do
           CLOBBER.should include('tmp')
         end
+      end
+    end
+
+    context 'A custom extension' do
+      let(:extension) do
+        Rake::JavaExtensionTask.new('extension_two') do |ext|
+          ext.lint_option = lint_option
+        end
+      end
+      let(:lint_option) { 'deprecated'.freeze }
+
+      it 'should honor the lint option' do
+        (extension.lint_option).should eq lint_option
       end
     end
   end
