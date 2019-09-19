@@ -1,7 +1,7 @@
 language: ruby
 notifications:
-  recipients:
-    - rake-compiler@ml.commit-email.info
+  webhooks:
+    - https://webhook.commit-email.info/
 before_script:
   - gem update bundler
 rvm:
