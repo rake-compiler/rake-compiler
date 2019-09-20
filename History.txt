@@ -1,3 +1,14 @@
+=== 1.0.8 / 2019-09-21
+
+* Enhancements:
+  * Added Rake::JavaExtensionTask#encoding= to pass the -encoding option to
+    javac.
+    #157 [Patch by Tiago Dias]
+
+* Bugfixes:
+  * Drop EOL'd rubyforge_project directive from .gemspec.
+    #155 [Patch by Olle Jonsson]
+
 === 1.0.7 / 2019-01-04
 
 * Bugfixes:
