@@ -1,7 +1,9 @@
 === develop
 
 * Enhancements:
-  *
+  * Make customizable compiler Xlint option for JRuby native extension.
+    #118 [Patch by Hiroshi Hatake]
+    #158 [Patch by Stephen George]
 
 * Bugfixes:
   *
