@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
   s.files += Dir.glob("spec/**/*.rb")
   s.files += Dir.glob("tasks/**/*.rake")
   s.files += ["Rakefile", "Gemfile"]
-  s.files += Dir.glob("*.{rdoc,txt,yml}")
+  s.files += Dir.glob("*.{md,rdoc,txt,yml}")
 
   s.bindir      = 'bin'
   s.executables = ['rake-compiler']
@@ -38,9 +38,9 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
 
   # documentation
-  s.rdoc_options << '--main'  << 'README.rdoc' << '--title' << 'rake-compiler -- Documentation'
+  s.rdoc_options << '--main'  << 'README.md' << '--title' << 'rake-compiler -- Documentation'
 
-  s.extra_rdoc_files = %w(README.rdoc LICENSE.txt History.txt)
+  s.extra_rdoc_files = %w(README.md LICENSE.txt History.txt)
 
   # project information
   s.homepage          = 'https://github.com/rake-compiler/rake-compiler'
