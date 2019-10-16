@@ -221,6 +221,32 @@ several settings for `Rake::ExtensionTask`:
                                               # will be used.
     end
 
+
+### Show me all of the supported configuration options
+
+| Option               | Supported By          | Description                              |
+| -------------------- | --------------------- | ---------------------------------------- |
+| name                 | Both                  | Required. Give the target binary a name. |
+| gem_spec             | Both                  | [Optional] Indicate which gem specification will be used. |
+| tmp_dir              | Both                  | [Optional] Temporary folder used during compilation. |
+| ext_dir              | Both                  | [Optional] Where to search for `name`. Default: `ext/#{@name}`. |
+| lib_dir              | Both                  | [Optional] Put binaries into this folder. Default: `lib`. |
+| config_options       | Both                  | [Optional] Supply additional options to configure script. |
+| source_pattern       | Both                  | [Optional] Monitor file changes to allow simple rebuild. Default for CRuby: `*.{c,cc,cpp}`. Default for Java: `**/*.java`. |
+| _extra_options_      | ExtensionTask (CRuby) | [Optional] _Any options you add to ARGV on the command line are passed on as complilation flags if they begin with a dash (-)._ |
+| config_script        | ExtensionTask (CRuby) | [Optional] Specify alternate configuration file name when [Adding the code to enable rake-compiler](#adding-the-code-to-enable-rake-compiler). Default: `extconf.rb`.  |
+| cross_compile        | ExtensionTask (CRuby) | [Optional] See [Cross compilation - the future is now.](#cross-compilation---the-future-is-now) Default: `false`. |
+| cross_platform       | ExtensionTask (CRuby) | [Optional] See [Cross compilation - the future is now.](#cross-compilation---the-future-is-now) Default: `i386-mingw32`. |
+| cross_config_options | ExtensionTask (CRuby) | [Optional] See [Cross compilation - the future is now.](#cross-compilation---the-future-is-now) Default: `[]`. |
+| no_native            | ExtensionTask (CRuby) | [Optional] Set to true to prevent non-CRuby platforms from defining native tasks. Default: `false`. |
+| config_includes      | ExtensionTask (CRuby) | [Optional] Specify an Array of paths to include as `-I...:...` includes during compilation. Default: `['.']`. |
+| classpath            | JavaExtensionTask     | [Optional] Specify additional classpath paths as an Array. Default: _Uses the current CLASSPATH._  |
+| debug                | JavaExtensionTask     | [Optional] Whether to set the debug flag during complication. Default: `false`. |
+| source_version       | JavaExtensionTask     | [Optional] The JRE version that your source code requires to compile. Default: `1.6`. |
+| target_version       | JavaExtensionTask     | [Optional] The oldest JRE version you want to support. Default: `1.6`. |
+| encoding             | JavaExtensionTask     | [Optional] Specify an -encoding option to provide to the compiler. Default: `nil`. |
+
+
 ## Cross compilation - the future is now.
 
 Rake-compiler also provides a standardized way to generate, from either Linux
