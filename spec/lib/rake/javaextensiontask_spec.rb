@@ -76,8 +76,8 @@ describe Rake::JavaExtensionTask do
       @ext.config_options.should be_empty
     end
 
-    it 'lint option should be "unchecked"' do
-      @ext.lint_option.should == 'unchecked'
+    it 'should have no lint option preset to delegate' do
+      @ext.lint_option.should be_falsey
     end
 
     it 'should default to Java platform' do
@@ -174,13 +174,26 @@ describe Rake::JavaExtensionTask do
     context 'A custom extension' do
       let(:extension) do
         Rake::JavaExtensionTask.new('extension_two') do |ext|
-          ext.lint_option = lint_option
+          ext.lint_option = lint_option if lint_option
         end
       end
-      let(:lint_option) { 'deprecated'.freeze }
 
-      it 'should honor the lint option' do
-        (extension.lint_option).should eq lint_option
+      context 'without a specified lint option' do
+        let(:lint_option) { nil }
+
+        it 'should honor the lint option' do
+          (extension.lint_option).should be_falsey
+          (extension.send :java_lint_arg, extension.lint_option).should eq '-Xlint'
+        end
+      end
+
+      context "with a specified lint option of 'deprecated'" do
+        let(:lint_option) { 'deprecated'.freeze }
+
+        it 'should honor the lint option' do
+          (extension.lint_option).should eq lint_option
+          (extension.send :java_lint_arg, extension.lint_option).should eq '-Xlint:deprecated'
+        end
       end
     end
   end

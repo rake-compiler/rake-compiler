@@ -39,7 +39,7 @@ module Rake
       @target_version = '1.6'
       @encoding       = nil
       @java_compiling = nil
-      @lint_option    = 'unchecked'
+      @lint_option    = nil
     end
 
     def define
@@ -102,7 +102,7 @@ execute the Rake compilation task using the JRuby interpreter.
         classpath_arg = java_classpath_arg(@classpath)
         debug_arg     = @debug ? '-g' : ''
 
-        sh "javac #{java_encoding_arg} #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} -Xlint:#{@lint_option} #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
+        sh "javac #{java_encoding_arg} #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} #{java_lint_arg @lint_option} #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
 
         # Checkpoint file
         touch "#{tmp_path}/.build"
@@ -258,5 +258,16 @@ execute the Rake compilation task using the JRuby interpreter.
       jruby_cpath ? "-cp \"#{jruby_cpath}\"" : ""
     end
 
+    #
+    # Convert a `-Xlint:___` linting option such as `deprecation` into a full javac argument, such as `-Xlint:deprecation`.
+    #
+    # @param [String]  lint_option  A `-Xlint:___` linting option such as `deprecation`, `all`, `none`, etc.
+    # @return [String]              Default: _Simply `-Xlint` is run, which enables recommended warnings.
+    #
+    def java_lint_arg(lint_option)
+      return '-Xlint' unless lint_option
+
+      "-Xlint:#{lint_option}"
+    end
   end
 end
