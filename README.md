@@ -245,6 +245,7 @@ several settings for `Rake::ExtensionTask`:
 | source_version       | JavaExtensionTask     | [Optional] The JRE version that your source code requires to compile. Default: `1.6`. |
 | target_version       | JavaExtensionTask     | [Optional] The oldest JRE version you want to support. Default: `1.6`. |
 | encoding             | JavaExtensionTask     | [Optional] Specify an -encoding option to provide to the compiler. Default: `nil`. |
+| lint_option          | JavaExtensionTask     | [Optional] Specify a `-Xlint:___` linting option such as `deprecation`, `all`, `none`, etc. (Run `javac -help -X` to see all available options.) <br> Default: _Simply `-Xlint` is run, which enables recommended warnings._ |
 
 
 ## Cross compilation - the future is now.
