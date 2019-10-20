@@ -99,10 +99,19 @@ execute the Rake compilation task using the JRuby interpreter.
         EOF
         warn_once(not_jruby_compile_msg) unless defined?(JRUBY_VERSION)
 
-        classpath_arg = java_classpath_arg(@classpath)
-        debug_arg     = @debug ? '-g' : ''
-
-        sh "javac #{java_encoding_arg} #{java_extdirs_arg} -target #{@target_version} -source #{@source_version} #{java_lint_arg @lint_option} #{debug_arg} #{classpath_arg} -d #{tmp_path} #{source_files.join(' ')}"
+        javac_command_line = [
+          "javac",
+          "-target", @target_version,
+          "-source", @source_version,
+          java_lint_arg,
+          "-d", tmp_path,
+        ]
+        javac_command_line.concat(java_encoding_arg)
+        javac_command_line.concat(java_extdirs_arg)
+        javac_command_line.concat(java_classpath_args)
+        javac_command_line << "-g" if @debug
+        javac_command_line.concat(source_files)
+        sh(*javac_command_line)
 
         # Checkpoint file
         touch "#{tmp_path}/.build"
@@ -192,31 +201,36 @@ execute the Rake compilation task using the JRuby interpreter.
     end
 
     #
-    # Discover Java Extension Directories and build an extdirs argument
+    # Discover Java Extension Directories and build an extdirs arguments
     #
-    def java_extdirs_arg
+    def java_extdirs_args
       extdirs = Java::java.lang.System.getProperty('java.ext.dirs') rescue nil
-      extdirs = ENV['JAVA_EXT_DIR'] unless extdirs
-      java_extdir = extdirs.nil? ? "" : "-extdirs \"#{extdirs}\""
+      extdirs ||= ENV['JAVA_EXT_DIR']
+      if extdirs.nil?
+        []
+      else
+        ["-extdirs", extdirs]
+      end
     end
 
     #
-    # Build an encoding argument
+    # Build an encoding arguments
     #
-    def java_encoding_arg
-      @encoding.nil? ? "" : "-encoding \"#{@encoding}\""
+    def java_encoding_args
+      if @encoding.nil?
+        []
+      else
+        ["-encoding", @encoding]
+      end
     end
 
     #
-    # Discover the Java/JRuby classpath and build a classpath argument
-    #
-    # @params
-    #   *args:: Additional classpath arguments to append
+    # Discover the Java/JRuby classpath and build a classpath arguments
     #
     # Copied verbatim from the ActiveRecord-JDBC project. There are a small myriad
     # of ways to discover the Java classpath correctly.
     #
-    def java_classpath_arg(*args)
+    def java_classpath_args
       jruby_cpath = nil
       if RUBY_PLATFORM =~ /java/
         begin
@@ -254,20 +268,21 @@ execute the Rake compilation task using the JRuby interpreter.
         raise "Could not find jruby.jar. Please set JRUBY_HOME or use jruby in rvm"
       end
 
-      jruby_cpath += File::PATH_SEPARATOR + args.join(File::PATH_SEPARATOR) unless args.empty?
-      jruby_cpath ? "-cp \"#{jruby_cpath}\"" : ""
+      if @classpath and @classpath.size > 0
+        jruby_cpath = [jruby_cpath, *@classpath].join(File::PATH_SEPARATOR)
+      end
+      ["-cp", jruby_cpath]
     end
 
     #
     # Convert a `-Xlint:___` linting option such as `deprecation` into a full javac argument, such as `-Xlint:deprecation`.
     #
-    # @param [String]  lint_option  A `-Xlint:___` linting option such as `deprecation`, `all`, `none`, etc.
     # @return [String]              Default: _Simply `-Xlint` is run, which enables recommended warnings.
     #
-    def java_lint_arg(lint_option)
-      return '-Xlint' unless lint_option
+    def java_lint_arg
+      return '-Xlint' unless @lint_option
 
-      "-Xlint:#{lint_option}"
+      "-Xlint:#{@lint_option}"
     end
   end
 end

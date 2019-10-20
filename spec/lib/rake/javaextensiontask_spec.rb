@@ -183,7 +183,7 @@ describe Rake::JavaExtensionTask do
 
         it 'should honor the lint option' do
           (extension.lint_option).should be_falsey
-          (extension.send :java_lint_arg, extension.lint_option).should eq '-Xlint'
+          (extension.send :java_lint_arg).should eq '-Xlint'
         end
       end
 
@@ -192,7 +192,7 @@ describe Rake::JavaExtensionTask do
 
         it 'should honor the lint option' do
           (extension.lint_option).should eq lint_option
-          (extension.send :java_lint_arg, extension.lint_option).should eq '-Xlint:deprecated'
+          (extension.send :java_lint_arg).should eq '-Xlint:deprecated'
         end
       end
     end
