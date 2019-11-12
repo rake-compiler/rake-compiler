@@ -254,7 +254,7 @@ Java extension should be preferred.
           spec.platform = Gem::Platform.new(platf)
 
           # set ruby version constraints
-          ruby_versions = @ruby_versions_per_platform[platf] || []
+          ruby_versions = @ruby_versions_per_platform[platf] || [ruby_ver]
           sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
             ruby_version.split(".").collect(&:to_i)
           end
