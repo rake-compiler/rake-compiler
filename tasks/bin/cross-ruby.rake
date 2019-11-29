@@ -95,12 +95,16 @@ end
 
 # backup makefile.in
 file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in.bak" => ["#{USER_HOME}/sources/#{RUBY_CC_VERSION}"] do |t|
-  cp "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in", t.name
+  if File.exist?("#{USER_HOME}/sources/#{RUBY_CC_VERSION}/template/Makefile.in")
+    cp "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/template/Makefile.in", t.name
+  else
+    cp "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in", t.name
+  end
 end
 
 # correct the makefiles
 file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in" => ["#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in.bak"] do |t|
-  content = File.open(t.name, 'rb') { |f| f.read }
+  content = File.open(t.prerequisites[0], 'rb') { |f| f.read }
 
   out = ""
 
@@ -114,6 +118,9 @@ file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in" => ["#{USER_HOME}/sou
 
   when_writing("Patching Makefile.in") {
     File.open(t.name, 'wb') { |f| f.write(out) }
+    if File.exist?("#{USER_HOME}/sources/#{RUBY_CC_VERSION}/template")
+      File.open("#{USER_HOME}/sources/#{RUBY_CC_VERSION}/template/Makefile.in", 'wb') { |f| f.write(out) }
+    end
   }
 end
 
