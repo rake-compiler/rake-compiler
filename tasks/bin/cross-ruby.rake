@@ -58,13 +58,16 @@ MINGW_TARGET = MINGW_HOST.gsub('msvc', '')
   ENV.delete(var)
 end
 
+source_dir = "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
+build_dir = "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
+
 # define a location where sources will be stored
-directory "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
-directory "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
+directory source_dir
+directory build_dir
 
 # clean intermediate files and folders
-CLEAN.include("#{USER_HOME}/sources/#{RUBY_CC_VERSION}")
-CLEAN.include("#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
+CLEAN.include(source_dir)
+CLEAN.include(build_dir)
 
 # remove the final products and sources
 CLOBBER.include("#{USER_HOME}/sources")
@@ -87,20 +90,26 @@ end
 
 # Extract the sources
 source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.bz2"
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}" => ["#{USER_HOME}/sources/#{source_file}"] do |t|
+file source_dir => ["#{USER_HOME}/sources/#{source_file}"] do |t|
   chdir File.dirname(t.name) do
     t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
   end
 end
 
 # backup makefile.in
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in.bak" => ["#{USER_HOME}/sources/#{RUBY_CC_VERSION}"] do |t|
-  cp "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in", t.name
+if RUBY_CC_VERSION >= "ruby-2.7.0"
+  makefile_in = "#{source_dir}/template/Makefile.in"
+else
+  makefile_in = "#{source_dir}/Makefile.in"
+end
+makefile_in_bak = "#{makefile_in}.bak"
+file makefile_in_bak => [source_dir] do |t|
+  cp makefile_in, makefile_in_bak
 end
 
 # correct the makefiles
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in" => ["#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in.bak"] do |t|
-  content = File.open(t.name, 'rb') { |f| f.read }
+file makefile_in => [makefile_in_bak] do |t|
+  content = File.open(makefile_in_bak, 'rb') { |f| f.read }
 
   out = ""
 
@@ -113,7 +122,7 @@ file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in" => ["#{USER_HOME}/sou
   end
 
   when_writing("Patching Makefile.in") {
-    File.open(t.name, 'wb') { |f| f.write(out) }
+    File.open(makefile_in, 'wb') { |f| f.write(out) }
   }
 end
 
@@ -126,8 +135,7 @@ task :mingw32 do
 end
 
 # generate the makefile in a clean build location
-file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}",
-                                  "#{USER_HOME}/sources/#{RUBY_CC_VERSION}/Makefile.in"] do |t|
+file "#{build_dir}/Makefile" => [build_dir, makefile_in] do |t|
 
   options = [
     "--host=#{MINGW_HOST}",
@@ -149,14 +157,14 @@ file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile" => ["#{USER
 end
 
 # make
-file "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/ruby.exe" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/Makefile"] do |t|
+file "#{build_dir}/ruby.exe" => ["#{build_dir}/Makefile"] do |t|
   chdir File.dirname(t.prerequisites.first) do
     sh MAKE
   end
 end
 
 # make install
-file "#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe" => ["#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}/ruby.exe"] do |t|
+file "#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe" => ["#{build_dir}/ruby.exe"] do |t|
   chdir File.dirname(t.prerequisites.first) do
     sh "#{MAKE} install"
   end
@@ -210,4 +218,3 @@ end
 
 desc "Build #{RUBY_CC_VERSION} suitable for cross-platform development."
 task 'cross-ruby' => [:mingw32, :install, 'update-config']
-
