@@ -377,7 +377,10 @@ Java extension should be preferred.
         return
       end
 
-      config_file = YAML.load_file(config_path)
+      config_file = File.open(config_path) do |fd|
+        fd.flock(File::LOCK_SH)
+        YAML.load(fd.read)
+      end
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{for_platform}/#{@name}/#{ruby_ver}"

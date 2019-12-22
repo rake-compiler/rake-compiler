@@ -145,40 +145,42 @@ task :install => ["#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.e
 desc "Update rake-compiler list of installed Ruby versions"
 task 'update-config' do
   config_file = "#{USER_HOME}/config.yml"
-  if File.exist?(config_file) then
-    puts "Updating #{config_file}"
-    config = YAML.load_file(config_file)
-  else
-    puts "Generating #{config_file}"
-    config = {}
-  end
-
-  files = Dir.glob("#{USER_HOME}/ruby/*/*/**/rbconfig.rb").sort
-
-  files.each do |rbconfig|
-    version, platform = rbconfig.match(/.*-(\d.\d.\d).*\/([-\w]+)\/rbconfig/)[1,2]
-    platforms = [platform]
-
-    # fake alternate (binary compatible) i386-mswin32-60 platform
-    platform == "i386-mingw32" and
-      platforms.push "i386-mswin32-60"
-
-    platforms.each do |plat|
-      config["rbconfig-#{plat}-#{version}"] = rbconfig
-
-      # also store RubyGems-compatible version
-      gem_platform = Gem::Platform.new(plat)
-      config["rbconfig-#{gem_platform}-#{version}"] = rbconfig
+  File.open(config_file, File::RDWR|File::CREAT) do |config_fd|
+    config_fd.flock(File::LOCK_EX)
+    config = YAML.load(config_fd.read)
+    if config
+      puts "Updating #{config_file}"
+    else
+      puts "Generating #{config_file}"
+      config = {}
     end
 
-    puts "Found Ruby version #{version} for platform #{platform} (#{rbconfig})"
-  end
+    files = Dir.glob("#{USER_HOME}/ruby/*/*/**/rbconfig.rb").sort
 
-  when_writing("Saving changes into #{config_file}") {
-    File.open(config_file, 'w') do |f|
-      f.puts config.to_yaml
+    files.each do |rbconfig|
+      version, platform = rbconfig.match(/.*-(\d.\d.\d).*\/([-\w]+)\/rbconfig/)[1,2]
+      platforms = [platform]
+
+      # fake alternate (binary compatible) i386-mswin32-60 platform
+      platform == "i386-mingw32" and
+        platforms.push "i386-mswin32-60"
+
+      platforms.each do |plat|
+        config["rbconfig-#{plat}-#{version}"] = rbconfig
+
+        # also store RubyGems-compatible version
+        gem_platform = Gem::Platform.new(plat)
+        config["rbconfig-#{gem_platform}-#{version}"] = rbconfig
+      end
+
+      puts "Found Ruby version #{version} for platform #{platform} (#{rbconfig})"
     end
-  }
+
+    when_writing("Saving changes into #{config_file}") {
+      config_fd.rewind
+      config_fd.puts config.to_yaml
+    }
+  end
 end
 
 task :default do
