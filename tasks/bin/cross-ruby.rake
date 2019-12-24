@@ -96,36 +96,6 @@ file source_dir => ["#{USER_HOME}/sources/#{source_file}"] do |t|
   end
 end
 
-# backup makefile.in
-if RUBY_CC_VERSION >= "ruby-2.7.0"
-  makefile_in = "#{source_dir}/template/Makefile.in"
-else
-  makefile_in = "#{source_dir}/Makefile.in"
-end
-makefile_in_bak = "#{makefile_in}.bak"
-file makefile_in_bak => [source_dir] do |t|
-  cp makefile_in, makefile_in_bak
-end
-
-# correct the makefiles
-file makefile_in => [makefile_in_bak] do |t|
-  content = File.open(makefile_in_bak, 'rb') { |f| f.read }
-
-  out = ""
-
-  content.each_line do |line|
-    if line =~ /^\s*ALT_SEPARATOR =/
-      out << "\t\t    ALT_SEPARATOR = \"\\\\\\\\\"; \\\n"
-    else
-      out << line
-    end
-  end
-
-  when_writing("Patching Makefile.in") {
-    File.open(makefile_in, 'wb') { |f| f.write(out) }
-  }
-end
-
 task :mingw32 do
   unless MINGW_HOST then
     warn "You need to install mingw32 cross compile functionality to be able to continue."
@@ -135,7 +105,7 @@ task :mingw32 do
 end
 
 # generate the makefile in a clean build location
-file "#{build_dir}/Makefile" => [build_dir, makefile_in] do |t|
+file "#{build_dir}/Makefile" => [build_dir, source_dir] do |t|
 
   options = [
     "--host=#{MINGW_HOST}",
