@@ -106,8 +106,8 @@ execute the Rake compilation task using the JRuby interpreter.
           java_lint_arg,
           "-d", tmp_path,
         ]
-        javac_command_line.concat(java_encoding_arg)
-        javac_command_line.concat(java_extdirs_arg)
+        javac_command_line.concat(java_encoding_args)
+        javac_command_line.concat(java_extdirs_args)
         javac_command_line.concat(java_classpath_args)
         javac_command_line << "-g" if @debug
         javac_command_line.concat(source_files)
