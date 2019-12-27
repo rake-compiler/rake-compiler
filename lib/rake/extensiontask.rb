@@ -234,6 +234,10 @@ Java extension should be preferred.
       # lib_path
       lib_path = lib_dir
 
+      # Update compiled platform/version combinations
+      ruby_versions = (@ruby_versions_per_platform[platf] ||= [])
+      ruby_versions << ruby_ver
+
       # create 'native:gem_name' and chain it to 'native' task
       unless Rake::Task.task_defined?("native:#{@gem_spec.name}:#{platf}")
         task "native:#{@gem_spec.name}:#{platf}" do |t|
