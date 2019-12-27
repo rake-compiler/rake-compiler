@@ -37,7 +37,7 @@ module Rake
       paths = ENV['PATH'].split(File::PATH_SEPARATOR)
 
       # the pattern to look into (captures *nix and windows executables)
-      pattern = "{mingw32-,i?86*mingw*}gcc{,.*}"
+      pattern = "{mingw32-,i?86*mingw*,x86*mingw*}gcc{,.*}"
 
       @mingw_gcc_executable = paths.find do |path|
         # cleanup paths before globbing
