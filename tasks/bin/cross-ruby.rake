@@ -113,7 +113,8 @@ file "#{build_dir}/Makefile" => [build_dir, source_dir] do |t|
     "--build=#{RUBY_BUILD}",
     '--enable-shared',
     '--disable-install-doc',
-    '--with-ext='
+    '--with-ext=',
+    'LDFLAGS=-pipe -s',
   ]
 
   # Force Winsock2 for Ruby 1.8, 1.9 defaults to it
