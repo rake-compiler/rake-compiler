@@ -364,9 +364,8 @@ describe Rake::ExtensionTask do
 
         it 'should create a dummy nested cross-compile target that raises an error' do
           Rake::Task.should have_defined("cross")
-          Rake::Task["cross"].invoke
           lambda {
-            Rake::Task["compile"].invoke
+            Rake::Task["cross"].invoke
           }.should raise_error(RuntimeError,
                                /rake-compiler must be configured first to enable cross-compilation/)
         end

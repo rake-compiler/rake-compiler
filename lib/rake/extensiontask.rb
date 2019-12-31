@@ -428,38 +428,12 @@ Java extension should be preferred.
       end
 
       # create cross task
-      task 'cross' do
-        # clear compile dependencies
-        Rake::Task['compile'].prerequisites.reject! { |t| !compiles_cross_platform.include?(t) }
-
-        # chain the cross platform ones
-        task 'compile' => ["compile:#{for_platform}"]
-
-        # clear lib/binary dependencies and trigger cross platform ones
-        # check if lib/binary is defined (damn bundle versus so versus dll)
-        if Rake::Task.task_defined?("#{lib_path}/#{binary(for_platform)}") then
-          Rake::Task["#{lib_path}/#{binary(for_platform)}"].prerequisites.clear
-        end
-
-        # FIXME: targeting multiple platforms copies the file twice
-        file "#{lib_path}/#{binary(for_platform)}" => ["copy:#{@name}:#{for_platform}:#{ruby_ver}"]
-
-        # if everything for native task is in place
-        if @gem_spec && @gem_spec.platform == 'ruby' then
-          # double check: only cross platform native tasks should be here
-          # FIXME: Sooo brittle
-          Rake::Task['native'].prerequisites.reject! { |t| !natives_cross_platform.include?(t) }
-          task 'native' => ["native:#{for_platform}"]
-        end
-      end
+      task 'cross' => "native:#{for_platform}"
     end
 
     def define_dummy_cross_platform_tasks
       task 'cross' do
-        Rake::Task['compile'].clear
-        task 'compile' do
-          raise "rake-compiler must be configured first to enable cross-compilation"
-        end
+        raise "rake-compiler-dock must be used or rake-compiler must be configured first to enable cross-compilation"
       end
     end
 
