@@ -26,6 +26,7 @@ module Rake
       @no_native = false
       @config_includes = []
       @ruby_versions_per_platform = {}
+      @make = nil
     end
 
     def cross_platform
