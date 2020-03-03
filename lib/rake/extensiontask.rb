@@ -234,7 +234,7 @@ Java extension should be preferred.
       end
     end
 
-    def define_native_tasks(for_platform = nil, ruby_ver = RUBY_VERSION, callback = nil)
+    def define_native_tasks(for_platform = nil, ruby_ver = RUBY_VERSION)
       platf = for_platform || platform
 
       # tmp_path
@@ -280,7 +280,7 @@ Java extension should be preferred.
           spec.files += ext_files
 
           # expose gem specification for customization
-          callback.call(spec) if callback
+          @cross_compiling.call(spec) if @cross_compiling
 
           # Generate a package for this gem
           pkg = Gem::PackageTask.new(spec) do |p|
@@ -425,7 +425,7 @@ Java extension should be preferred.
 
       # now define native tasks for cross compiled files
       if @gem_spec && @gem_spec.platform == 'ruby' then
-        define_native_tasks(for_platform, ruby_ver, @cross_compiling)
+        define_native_tasks(for_platform, ruby_ver)
       end
 
       # create cross task
