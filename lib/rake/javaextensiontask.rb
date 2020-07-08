@@ -35,8 +35,8 @@ module Rake
       @source_pattern = '**/*.java'
       @classpath      = nil
       @debug          = false
-      @source_version = '1.6'
-      @target_version = '1.6'
+      @source_version = '1.7'
+      @target_version = '1.7'
       @encoding       = nil
       @java_compiling = nil
       @lint_option    = nil
