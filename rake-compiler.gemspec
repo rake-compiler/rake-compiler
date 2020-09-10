@@ -40,7 +40,7 @@ Gem::Specification.new do |s|
   # documentation
   s.rdoc_options << '--main'  << 'README.md' << '--title' << 'rake-compiler -- Documentation'
 
-  s.extra_rdoc_files = %w(README.md LICENSE.txt History.txt)
+  s.extra_rdoc_files = %w(README.md LICENSE.txt History.md)
 
   # project information
   s.homepage          = 'https://github.com/rake-compiler/rake-compiler'
