@@ -130,6 +130,9 @@ end
 # make
 file "#{build_dir}/ruby.exe" => ["#{build_dir}/Makefile"] do |t|
   chdir File.dirname(t.prerequisites.first) do
+    # From https://github.com/grpc/grpc/issues/12161. Old rubies have race conditions around verconf.h.
+    sh "test -s verconf.h || rm -f verconf.h"  # if verconf.h has size 0, make sure it gets re-built by make
+
     sh MAKE
   end
 end
