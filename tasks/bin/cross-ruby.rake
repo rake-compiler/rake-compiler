@@ -76,7 +76,7 @@ CLOBBER.include("#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
 CLOBBER.include("#{USER_HOME}/config.yml")
 
 # ruby source file should be stored there
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.bz2" => ["#{USER_HOME}/sources"] do |t|
+file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.gz" => ["#{USER_HOME}/sources"] do |t|
   # download the source file using wget or curl
   chdir File.dirname(t.name) do
     if RUBY_SOURCE
@@ -89,7 +89,7 @@ file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.bz2" => ["#{USER_HOME}/sources
 end
 
 # Extract the sources
-source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.bz2"
+source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.gz"
 file source_dir => ["#{USER_HOME}/sources/#{source_file}"] do |t|
   chdir File.dirname(t.name) do
     t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
