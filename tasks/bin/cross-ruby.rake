@@ -120,6 +120,23 @@ file "#{build_dir}/Makefile" => [build_dir, source_dir] do |t|
   # Force Winsock2 for Ruby 1.8, 1.9 defaults to it
   options << "--with-winsock2" if MAJOR == "1.8"
 
+  # We need a different set of options for darwin.
+  # - The "-s" option breaks /usr/bin/ld, so don't use it.
+  # - We want to statically link some libraries for portability.
+  if MINGW_TARGET =~ /darwin/
+    options = [
+      "--host=#{MINGW_HOST}",
+      "--target=#{MINGW_TARGET}",
+      "--build=#{RUBY_BUILD}",
+      '--enable-static',
+      '--disable-shared',
+      '--disable-install-doc',
+      '--without-gmp',
+      '--with-ext=',
+      'LDFLAGS=-pipe',
+    ]
+  end
+
   chdir File.dirname(t.name) do
     prefix = File.expand_path("../../../ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
     options << "--prefix=#{prefix}"
