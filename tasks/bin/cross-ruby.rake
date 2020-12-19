@@ -41,106 +41,105 @@ end
 require 'rake/extensioncompiler'
 
 MAKE = ENV['MAKE'] || %w[gmake make].find { |c| system("#{c} -v > /dev/null 2>&1") }
-USER_HOME = File.expand_path("~/.rake-compiler")
-RUBY_CC_VERSION = "ruby-" << ENV.fetch("VERSION", "1.8.7-p371")
+USER_HOME = File.realpath(File.expand_path("~/.rake-compiler"))
 RUBY_SOURCE = ENV['SOURCE']
 RUBY_BUILD = RbConfig::CONFIG["host"]
-
-# grab the major "1.8" or "1.9" part of the version number
-MAJOR = RUBY_CC_VERSION.match(/.*-(\d.\d).\d/)[1]
-
-# Use Rake::ExtensionCompiler helpers to find the proper host
-MINGW_HOST = ENV['HOST'] || Rake::ExtensionCompiler.mingw_host
-MINGW_TARGET = MINGW_HOST.gsub('msvc', '')
 
 # Unset any possible variable that might affect compilation
 ["CC", "CXX", "CPPFLAGS", "LDFLAGS", "RUBYOPT"].each do |var|
   ENV.delete(var)
 end
 
-source_dir = "#{USER_HOME}/sources/#{RUBY_CC_VERSION}"
-build_dir = "#{USER_HOME}/builds/#{MINGW_HOST}/#{RUBY_CC_VERSION}"
+RUBY_CC_VERSIONS = ENV.fetch("VERSION", "1.8.7-p371")
+RUBY_CC_VERSIONS.split(":").each do |ruby_cc_version|
+  ruby_cc_version = "ruby-" + ruby_cc_version
+  # grab the major "1.8" or "1.9" part of the version number
+  major = ruby_cc_version.match(/.*-(\d.\d).\d/)[1]
 
-# define a location where sources will be stored
-directory source_dir
-directory build_dir
+  # define a location where sources will be stored
+  source_dir = "#{USER_HOME}/sources/#{ruby_cc_version}"
+  directory source_dir
+  # clean intermediate files and folders
+  CLEAN.include(source_dir)
 
-# clean intermediate files and folders
-CLEAN.include(source_dir)
-CLEAN.include(build_dir)
+  # remove the final products and sources
+  CLOBBER.include("#{USER_HOME}/sources")
+  CLOBBER.include("#{USER_HOME}/builds")
+  CLOBBER.include("#{USER_HOME}/config.yml")
 
-# remove the final products and sources
-CLOBBER.include("#{USER_HOME}/sources")
-CLOBBER.include("#{USER_HOME}/builds")
-CLOBBER.include("#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
-CLOBBER.include("#{USER_HOME}/config.yml")
+  # Extract the sources
+  source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{ruby_cc_version}.tar.gz"
+  file source_dir => ["#{USER_HOME}/sources/#{source_file}"] do |t|
+    t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}", chdir: File.dirname(t.name) }
+  end
 
-# ruby source file should be stored there
-file "#{USER_HOME}/sources/#{RUBY_CC_VERSION}.tar.gz" => ["#{USER_HOME}/sources"] do |t|
-  # download the source file using wget or curl
-  chdir File.dirname(t.name) do
+  # ruby source file should be stored there
+  file "#{USER_HOME}/sources/#{ruby_cc_version}.tar.gz" => ["#{USER_HOME}/sources"] do |t|
+    # download the source file using wget or curl
     if RUBY_SOURCE
       url = RUBY_SOURCE
     else
-      url = "http://cache.ruby-lang.org/pub/ruby/#{MAJOR}/#{File.basename(t.name)}"
+      url = "http://cache.ruby-lang.org/pub/ruby/#{major}/#{File.basename(t.name)}"
     end
-    sh "wget #{url} || curl -O #{url}"
+    sh "wget #{url} || curl -O #{url}", chdir: File.dirname(t.name)
+  end
+
+  # Create tasks for each host out of the ":" separated hosts list in the HOST variable.
+  # These tasks are processed in parallel as dependencies to the "install" task.
+  mingw_hosts = ENV['HOST'] || Rake::ExtensionCompiler.mingw_host
+  mingw_hosts.split(":").each do |mingw_host|
+
+    # Use Rake::ExtensionCompiler helpers to find the proper host
+    mingw_target = mingw_host.gsub('msvc', '')
+
+    # define a location where built files for each host will be stored
+    build_dir = "#{USER_HOME}/builds/#{mingw_host}/#{ruby_cc_version}"
+    directory build_dir
+    install_dir = "#{USER_HOME}/ruby/#{mingw_host}/#{ruby_cc_version}"
+
+    # clean intermediate files and folders
+    CLEAN.include(build_dir)
+    CLOBBER.include(install_dir)
+
+    task :mingw32 do
+      unless mingw_host then
+        warn "You need to install mingw32 cross compile functionality to be able to continue."
+        warn "Please refer to your distribution/package manager documentation about installation."
+        fail
+      end
+    end
+
+    # generate the makefile in a clean build location
+    file "#{build_dir}/Makefile" => [build_dir, source_dir] do |t|
+
+      options = [
+        "--host=#{mingw_host}",
+        "--target=#{mingw_target}",
+        "--build=#{RUBY_BUILD}",
+        '--enable-shared',
+        '--disable-install-doc',
+        '--with-ext=',
+        'LDFLAGS=-pipe -s',
+      ]
+
+      # Force Winsock2 for Ruby 1.8, 1.9 defaults to it
+      options << "--with-winsock2" if major == "1.8"
+      options << "--prefix=#{install_dir}"
+      sh File.expand_path("#{USER_HOME}/sources/#{ruby_cc_version}/configure"), *options, chdir: File.dirname(t.name)
+    end
+
+    # make
+    file "#{build_dir}/ruby.exe" => ["#{build_dir}/Makefile"] do |t|
+      sh MAKE, chdir: File.dirname(t.prerequisites.first)
+    end
+
+    # make install
+    file "#{USER_HOME}/ruby/#{mingw_host}/#{ruby_cc_version}/bin/ruby.exe" => ["#{build_dir}/ruby.exe"] do |t|
+      sh "#{MAKE} install", chdir: File.dirname(t.prerequisites.first)
+    end
+    multitask :install => ["#{USER_HOME}/ruby/#{mingw_host}/#{ruby_cc_version}/bin/ruby.exe"]
   end
 end
-
-# Extract the sources
-source_file = RUBY_SOURCE ? RUBY_SOURCE.split('/').last : "#{RUBY_CC_VERSION}.tar.gz"
-file source_dir => ["#{USER_HOME}/sources/#{source_file}"] do |t|
-  chdir File.dirname(t.name) do
-    t.prerequisites.each { |f| sh "tar xf #{File.basename(f)}" }
-  end
-end
-
-task :mingw32 do
-  unless MINGW_HOST then
-    warn "You need to install mingw32 cross compile functionality to be able to continue."
-    warn "Please refer to your distribution/package manager documentation about installation."
-    fail
-  end
-end
-
-# generate the makefile in a clean build location
-file "#{build_dir}/Makefile" => [build_dir, source_dir] do |t|
-
-  options = [
-    "--host=#{MINGW_HOST}",
-    "--target=#{MINGW_TARGET}",
-    "--build=#{RUBY_BUILD}",
-    '--enable-shared',
-    '--disable-install-doc',
-    '--with-ext=',
-    'LDFLAGS=-pipe -s',
-  ]
-
-  # Force Winsock2 for Ruby 1.8, 1.9 defaults to it
-  options << "--with-winsock2" if MAJOR == "1.8"
-
-  chdir File.dirname(t.name) do
-    prefix = File.expand_path("../../../ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}")
-    options << "--prefix=#{prefix}"
-    sh File.expand_path("../../../sources/#{RUBY_CC_VERSION}/configure"), *options
-  end
-end
-
-# make
-file "#{build_dir}/ruby.exe" => ["#{build_dir}/Makefile"] do |t|
-  chdir File.dirname(t.prerequisites.first) do
-    sh MAKE
-  end
-end
-
-# make install
-file "#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe" => ["#{build_dir}/ruby.exe"] do |t|
-  chdir File.dirname(t.prerequisites.first) do
-    sh "#{MAKE} install"
-  end
-end
-task :install => ["#{USER_HOME}/ruby/#{MINGW_HOST}/#{RUBY_CC_VERSION}/bin/ruby.exe"]
 
 desc "Update rake-compiler list of installed Ruby versions"
 task 'update-config' do
@@ -187,5 +186,5 @@ task :default do
   Rake.application.display_tasks_and_comments
 end
 
-desc "Build #{RUBY_CC_VERSION} suitable for cross-platform development."
+desc "Build rubies suitable for cross-platform development."
 task 'cross-ruby' => [:mingw32, :install, 'update-config']
