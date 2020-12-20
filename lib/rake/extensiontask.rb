@@ -23,7 +23,7 @@ module Rake
       @cross_compile = false
       @cross_config_options = []
       @cross_compiling = nil
-      @no_native = false
+      @no_native = (ENV["RAKE_EXTENSION_TASK_NO_NATIVE"] == "true")
       @config_includes = []
       @ruby_versions_per_platform = {}
       @make = nil
