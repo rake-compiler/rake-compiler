@@ -46,7 +46,7 @@ RUBY_SOURCE = ENV['SOURCE']
 RUBY_BUILD = RbConfig::CONFIG["host"]
 
 # Unset any possible variable that might affect compilation
-["CC", "CXX", "CPPFLAGS", "LDFLAGS", "RUBYOPT"].each do |var|
+["RUBYOPT"].each do |var|
   ENV.delete(var)
 end
 
@@ -119,7 +119,6 @@ RUBY_CC_VERSIONS.split(":").each do |ruby_cc_version|
         '--enable-shared',
         '--disable-install-doc',
         '--with-ext=',
-        'LDFLAGS=-pipe -s',
       ]
 
       # Force Winsock2 for Ruby 1.8, 1.9 defaults to it
