@@ -5,3 +5,4 @@
 /doc/api/
 /pkg/
 /tmp/
+.bundle/

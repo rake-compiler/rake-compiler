@@ -255,14 +255,16 @@ Java extension should be preferred.
           spec.platform = Gem::Platform.new(platf)
 
           # set ruby version constraints
-          ruby_versions = @ruby_versions_per_platform[platf] || []
-          sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
-            ruby_version.split(".").collect(&:to_i)
+          if uses_libruby
+            ruby_versions = @ruby_versions_per_platform[platf] || []
+            sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
+              ruby_version.split(".").collect(&:to_i)
+            end
+            spec.required_ruby_version = [
+              ">= #{ruby_api_version(sorted_ruby_versions.first)}",
+              "< #{ruby_api_version(sorted_ruby_versions.last).succ}.dev"
+            ]
           end
-          spec.required_ruby_version = [
-            ">= #{ruby_api_version(sorted_ruby_versions.first)}",
-            "< #{ruby_api_version(sorted_ruby_versions.last).succ}.dev"
-          ]
 
           # clear the extensions defined in the specs
           spec.extensions.clear
@@ -346,6 +348,10 @@ Java extension should be preferred.
       end
 
       multi = (ruby_vers.size > 1) ? true : false
+
+      if multi && !uses_libruby
+        raise ArgumentError, 'Only a single RUBY_CC_VERSION may be specified with uses_libruby=false'
+      end
 
       ruby_vers.each do |version|
         # save original lib_dir
