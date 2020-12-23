@@ -26,4 +26,4 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
       - run: bundle install
-      - run: bundle exec rake test
+      - run: bundle exec rake
