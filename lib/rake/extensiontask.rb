@@ -46,15 +46,6 @@ module Rake
     end
 
     def define
-      if (defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ironruby')
-        warn_once <<-EOF
-WARNING: You're attempting to (cross-)compile C extensions from a platform
-(#{RUBY_ENGINE}) that does not support native extensions or mkmf.rb.
-Rerun `rake` under MRI Ruby 1.8.x/1.9.x to cross/native compile.
-        EOF
-        return
-      end
-
       super
 
       unless compiled_files.empty?
