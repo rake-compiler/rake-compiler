@@ -15,9 +15,10 @@ jobs:
           - macos-latest
           - ubuntu-latest
         ruby:
-          - 2.5
-          - 2.6
-          - 2.7
+          - "2.5"
+          - "2.6"
+          - "2.7"
+          - "3.0"
           - head
     steps:
       - uses: actions/checkout@v2
