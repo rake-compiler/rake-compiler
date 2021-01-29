@@ -237,7 +237,7 @@ execute the Rake compilation task using the JRuby interpreter.
           cpath  = Java::java.lang.System.getProperty('java.class.path').split(File::PATH_SEPARATOR)
           cpath += Java::java.lang.System.getProperty('sun.boot.class.path').split(File::PATH_SEPARATOR)
           jruby_cpath = cpath.compact.join(File::PATH_SEPARATOR)
-        rescue => e
+        rescue
         end
       end
 
