@@ -132,14 +132,26 @@ module Rake
       directory lib_binary_dir_path
       directory stage_binary_dir_path
 
+      dsymutil = RbConfig::CONFIG['dsymutil']
+      if dsymutil.to_s.empty?
+        dsymutil = nil
+      else
+        tmp_dsym_path = "#{tmp_binary_path}.dSYM"
+        lib_dsym_path = "#{lib_binary_path}.dSYM"
+        stage_dsym_path = "#{stage_binary_path}.dSYM"
+      end
+
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_binary_dir_path, tmp_binary_path] do
-        install tmp_binary_path, "#{lib_path}/#{binary_path}"
+      copy_task_name = "copy:#{@name}:#{platf}:#{ruby_ver}"
+      task copy_task_name => [lib_binary_dir_path, tmp_binary_path, tmp_dsym_path].compact do
+        install tmp_binary_path, lib_binary_path
+        copy_entry tmp_dsym_path, lib_dsym_path if tmp_dsym_path
       end
       # copy binary from temporary location to staging directory
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_binary_dir_path, tmp_binary_path] do
+      task copy_task_name => [stage_binary_dir_path, tmp_binary_path, tmp_dsym_path].compact do
         cp tmp_binary_path, stage_binary_path
+        copy_entry tmp_dsym_path, stage_dsym_path if tmp_dsym_path
       end
 
       # copy other gem files to staging directory
@@ -161,6 +173,9 @@ Java extension should be preferred.
           end
         end
       end
+      directory tmp_dsym_path => [tmp_binary_path] do
+        sh dsymutil, tmp_binary_path
+      end if dsymutil
 
       # makefile depends of tmp_dir and config_script
       # tmp/extension_name/Makefile
@@ -211,14 +226,15 @@ Java extension should be preferred.
       end
 
       # Allow segmented compilation by platform (open door for 'cross compile')
-      task "compile:#{@name}:#{platf}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
+      task "compile:#{@name}:#{platf}" => [copy_task_name]
       task "compile:#{platf}" => ["compile:#{@name}:#{platf}"]
 
       # Only add this extension to the compile chain if current
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
         # ensure file is always copied
-        file "#{lib_path}/#{binary_path}" => ["copy:#{name}:#{platf}:#{ruby_ver}"]
+        file lib_binary_path => [copy_task_name]
+        directory lib_dsym_path => [copy_task_name] if dsymutil
 
         task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
         task "compile" => ["compile:#{platf}"]

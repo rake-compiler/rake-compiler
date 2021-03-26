@@ -4,6 +4,8 @@ require 'rake/extensiontask'
 require 'rbconfig'
 
 describe Rake::ExtensionTask do
+  have_dsymutil = !RbConfig::CONFIG['dsymutil'].to_s.empty?
+
   context '#new' do
     context '(basic)' do
       it 'should raise an error if no name is provided' do
@@ -170,6 +172,18 @@ describe Rake::ExtensionTask do
         end
       end
 
+      context 'tmp/{platform}/extension_one/{ruby_ver}/extension_one.bundle.dSYM' do
+        it 'should define the task only on appropriate platforms' do
+          Rake::Task.task_defined?("tmp/#{@platform}/extension_one/#{@ruby_ver}/#{@ext_bin}.dSYM").should == have_dsymutil
+        end
+
+        if have_dsymutil
+          it "should depend on 'tmp/{platform}/extension_one/{ruby_ver}/extension_one.bundle'" do
+            Rake::Task["tmp/#{@platform}/extension_one/#{@ruby_ver}/#{@ext_bin}.dSYM"].prerequisites.should include("tmp/#{@platform}/extension_one/#{@ruby_ver}/#{@ext_bin}")
+          end
+        end
+      end
+
       context 'tmp/{platform}/extension_one/{ruby_ver}/Makefile' do
         it 'should define as task' do
           Rake::Task.task_defined?("tmp/#{@platform}/extension_one/#{@ruby_ver}/Makefile").should == true
@@ -311,6 +325,18 @@ describe Rake::ExtensionTask do
 
         it "should depend on 'copy:prefix1/prefix2/extension_one:{platform}:{ruby_ver}'" do
           Rake::Task["lib/prefix1/prefix2/#{@ext_bin}"].prerequisites.should include("copy:prefix1/prefix2/extension_one:#{@platform}:#{@ruby_ver}")
+        end
+      end
+
+      context 'lib/prefix1/prefix2/extension_one.bundle.dSYM' do
+        it 'should define as task' do
+          Rake::Task.task_defined?("lib/prefix1/prefix2/#{@ext_bin}.dSYM").should == have_dsymutil
+        end
+
+        if have_dsymutil
+          it "should depend on 'copy:prefix1/prefix2/extension_one:{platform}:{ruby_ver}'" do
+            Rake::Task["lib/prefix1/prefix2/#{@ext_bin}.dSYM"].prerequisites.should include("copy:prefix1/prefix2/extension_one:#{@platform}:#{@ruby_ver}")
+          end
         end
       end
 
