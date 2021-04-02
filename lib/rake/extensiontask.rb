@@ -115,6 +115,7 @@ module Rake
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
       stage_path = "#{@tmp_dir}/#{platf}/stage"
 
+      siteconf_path = "#{tmp_path}/.rake-compiler-siteconf.rb"
       tmp_binary_path = "#{tmp_path}/#{binary_path}"
       tmp_binary_dir_path = File.dirname(tmp_binary_path)
       stage_binary_path = "#{stage_path}/#{lib_path}/#{binary_path}"
@@ -132,10 +133,27 @@ module Rake
       directory lib_binary_dir_path
       directory stage_binary_dir_path
 
+      directory File.dirname(siteconf_path)
+      # Set paths for "make install" destinations
+      file siteconf_path => File.dirname(siteconf_path) do
+        File.open(siteconf_path, "w") do |siteconf|
+          siteconf.puts "require 'rbconfig'"
+          siteconf.puts "require 'mkmf'"
+          siteconf.puts "dest_path = mkintpath(#{File.expand_path(lib_path).dump})"
+          %w[sitearchdir sitelibdir].each do |dir|
+            siteconf.puts "RbConfig::MAKEFILE_CONFIG['#{dir}'] = dest_path"
+            siteconf.puts "RbConfig::CONFIG['#{dir}'] = dest_path"
+          end
+        end
+      end
+
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_binary_dir_path, tmp_binary_path] do
-        install tmp_binary_path, "#{lib_path}/#{binary_path}"
+      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_binary_dir_path, tmp_binary_path, "#{tmp_path}/Makefile"] do
+        # install in lib for native platform only
+        unless for_platform
+          sh "#{make} install", chdir: tmp_path
+        end
       end
       # copy binary from temporary location to staging directory
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_binary_dir_path, tmp_binary_path] do
@@ -164,12 +182,12 @@ Java extension should be preferred.
 
       # makefile depends of tmp_dir and config_script
       # tmp/extension_name/Makefile
-      file "#{tmp_path}/Makefile" => [tmp_path, extconf] do |t|
+      file "#{tmp_path}/Makefile" => [tmp_path, extconf, siteconf_path] do |t|
         options = @config_options.dup
 
         # include current directory
         include_dirs = ['.'].concat(@config_includes).uniq.join(File::PATH_SEPARATOR)
-        cmd = [Gem.ruby, "-I#{include_dirs}"]
+        cmd = [Gem.ruby, "-I#{include_dirs}", "-r#{File.basename(siteconf_path)}"]
 
         # build a relative path to extconf script
         abs_tmp_path = (Pathname.new(Dir.pwd) + tmp_path).realpath
