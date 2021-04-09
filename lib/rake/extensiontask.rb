@@ -25,7 +25,8 @@ module Rake
       @cross_compiling = nil
       @no_native = (ENV["RAKE_EXTENSION_TASK_NO_NATIVE"] == "true")
       @config_includes = []
-      @ruby_versions_per_platform = {}
+      # Default to an empty list of ruby versions for each platform
+      @ruby_versions_per_platform = Hash.new { |h, k| h[k] = [] }
       @make = nil
     end
 
@@ -252,6 +253,9 @@ Java extension should be preferred.
       # lib_path
       lib_path = lib_dir
 
+      # Update compiled platform/version combinations
+      @ruby_versions_per_platform[platf] << ruby_ver
+
       # create 'native:gem_name' and chain it to 'native' task
       unless Rake::Task.task_defined?("native:#{@gem_spec.name}:#{platf}")
         task "native:#{@gem_spec.name}:#{platf}" do |t|
@@ -264,7 +268,7 @@ Java extension should be preferred.
           spec.platform = Gem::Platform.new(platf)
 
           # set ruby version constraints
-          ruby_versions = @ruby_versions_per_platform[platf] || []
+          ruby_versions = @ruby_versions_per_platform[platf]
           sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
             ruby_version.split(".").collect(&:to_i)
           end
@@ -367,8 +371,7 @@ Java extension should be preferred.
         end
 
         # Update cross compiled platform/version combinations
-        ruby_versions = (@ruby_versions_per_platform[for_platform] ||= [])
-        ruby_versions << version
+        @ruby_versions_per_platform[for_platform] << version
 
         define_cross_platform_tasks_with_version(for_platform, version)
 
