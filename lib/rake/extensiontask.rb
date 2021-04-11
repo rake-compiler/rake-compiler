@@ -153,7 +153,7 @@ module Rake
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_binary_dir_path, tmp_binary_path, "#{tmp_path}/Makefile"] do
         # install in lib for native platform only
         unless for_platform
-          sh "#{make} install", chdir: tmp_path
+          sh "#{make} #{make_opt} install", chdir: tmp_path
         end
       end
       # copy binary from temporary location to staging directory
@@ -174,7 +174,7 @@ Java extension should be preferred.
         warn_once(jruby_compile_msg) if defined?(JRUBY_VERSION)
 
         chdir tmp_path do
-          sh make
+          sh "#{make} #{make_opt}"
           if binary_path != File.basename(binary_path)
             cp File.basename(binary_path), binary_path
           end
@@ -510,6 +510,14 @@ Java extension should be preferred.
       end
 
       nil
+    end
+
+    def make_opt
+      unless @make_opt
+        @make_opt = ENV['MAKEOPT'] || ''
+      end
+
+      @make_opt
     end
 
     def compiled_files
