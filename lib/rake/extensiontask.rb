@@ -153,7 +153,7 @@ module Rake
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_binary_dir_path, tmp_binary_path, "#{tmp_path}/Makefile"] do
         # install in lib for native platform only
         unless for_platform
-          sh "#{make} install", chdir: tmp_path
+          sh "#{make} install target_prefix=", chdir: tmp_path
         end
       end
       # copy binary from temporary location to staging directory
