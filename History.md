@@ -1,3 +1,26 @@
+### 1.1.2 / 2021-12-07
+
+* Changes:
+  * Use .tar.gz instead of .tar.bz2 for Ruby archive.
+    [#179](https://github.com/rake-compiler/rake-compiler/pull/179) [Patch by Masaki Hara]
+  * Stop removing `CC`, `CXX`, `CPPFLAGS` and `LDFLAGS` environment variables for cross-build.
+    [#182](https://github.com/rake-compiler/rake-compiler/pull/182) [Patch by Lars Kanis]
+  * Remove IronRuby related message.
+    [#184](https://github.com/rake-compiler/rake-compiler/pull/184) [Patch by Thomas E Enebo]
+  * Suppress a warning.
+    [#185](https://github.com/rake-compiler/rake-compiler/pull/185) [Patch by Olle Jonsson]
+  * Rename `History.txt` to `History.md`.
+    [#174](https://github.com/rake-compiler/rake-compiler/pull/174) [Patch by MSP-Greg]
+  * Use `make install` instead of copying artifacts manually.
+    [#191](https://github.com/rake-compiler/rake-compiler/pull/191) [Patch by Lars Kanis]
+
+* Enhancements:
+  * Add support for building cross rubies in parallel.
+    [#169](https://github.com/rake-compiler/rake-compiler/pull/169) [Patch by Lars Kanis]
+  * Use `RAKE_EXTENSION_TASK_NO_NATIVE` environment variable as the default `no_native` value.
+  * Add support for `rake native gem` without `cross`.
+    [#166](https://github.com/rake-compiler/rake-compiler/pull/166) [Patch by Lars Kanis]
+
 ### 1.1.1 / 2020-07-10
 
 * Changes:
