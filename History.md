@@ -1,3 +1,9 @@
+### 1.1.3/ 2021-12-08
+
+* Fixes:
+  * Fix a bug that wrong install location is used.
+    [#194](https://github.com/rake-compiler/rake-compiler/issues/194) [Reported by Andrew Kane]
+
 ### 1.1.2 / 2021-12-07
 
 * Changes:
