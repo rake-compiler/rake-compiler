@@ -1,3 +1,9 @@
+### 1.1.5 / 2021-12-12
+
+* Fixes:
+  * Fix a regression bug that wrong install location is used when name that includes `/` is specified to `Rake::ExtensionTask.new`.
+    [#196](https://github.com/rake-compiler/rake-compiler/issues/196) [Reported by konsolebox]
+
 ### 1.1.4 / 2021-12-11
 
 * Fixes:
