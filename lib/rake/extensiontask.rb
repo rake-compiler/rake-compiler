@@ -109,9 +109,6 @@ module Rake
       # lib_path
       lib_path = lib_dir
 
-      lib_binary_path = "#{lib_path}/#{binary_path}"
-      lib_binary_dir_path = File.dirname(lib_binary_path)
-
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
       stage_path = "#{@tmp_dir}/#{platf}/stage"
@@ -131,7 +128,7 @@ module Rake
       # directories we need
       directory tmp_path
       directory tmp_binary_dir_path
-      directory lib_binary_dir_path
+      directory lib_path
       directory stage_binary_dir_path
 
       directory File.dirname(siteconf_path)
@@ -150,7 +147,7 @@ module Rake
 
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_binary_dir_path, tmp_binary_path, "#{tmp_path}/Makefile"] do
+      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_path, tmp_binary_path, "#{tmp_path}/Makefile"] do
         # install in lib for native platform only
         unless for_platform
           sh "#{make} install target_prefix=", chdir: tmp_path
