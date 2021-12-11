@@ -40,6 +40,9 @@ module Rake
       @tmp_dir = 'tmp'
       @ext_dir = "ext/#{@name}"
       @lib_dir = 'lib'
+      if @name and File.dirname(@name) != "."
+        @lib_dir += "/#{File.dirname(@name)}"
+      end
       @config_options = []
       @extra_options = ARGV.select { |i| i =~ /\A--?/ }
     end
