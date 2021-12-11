@@ -1,7 +1,13 @@
-### 1.1.3/ 2021-12-08
+### 1.1.4 / 2021-12-11
 
 * Fixes:
-  * Fix a bug that wrong install location is used.
+  * Fix a regression bug that installed gem can't be found on cross compile.
+    [#195](https://github.com/rake-compiler/rake-compiler/issues/195) [Reported by Mike Dalessio]
+
+### 1.1.3 / 2021-12-08
+
+* Fixes:
+  * Fix a regression bug that wrong install location is used.
     [#194](https://github.com/rake-compiler/rake-compiler/issues/194) [Reported by Andrew Kane]
 
 ### 1.1.2 / 2021-12-07
