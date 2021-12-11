@@ -416,8 +416,21 @@ Java extension should be preferred.
       # genearte fake.rb for different ruby versions
       file "#{tmp_path}/fake.rb" => [rbconfig_file] do |t|
         File.open(t.name, 'w') do |f|
-          f.write fake_rb(for_platform, ruby_ver)
-          f.write File.read(t.prerequisites.first)
+          # Keep the original RbConfig::CONFIG["ENABLE_SHARED"] to use
+          # the same RubyGems extension directory. See also
+          # Gem::BasicSpecificaion#extenions_dir and
+          # Gem.extension_api_version.
+          #
+          # if RbConfig::CONFIG["ENABLE_SHARED"] == "no"
+          #   "extensions/x86_64-linux/2.5.0-static"
+          # else
+          #   "extensions/x86_64-linux/2.5.0"
+          # end
+          f.puts("require 'rbconfig'")
+          f.puts("original_enable_shared = RbConfig::CONFIG['ENABLE_SHARED']")
+          f.puts(fake_rb(for_platform, ruby_ver))
+          f.puts(File.read(t.prerequisites.first))
+          f.puts("RbConfig::CONFIG['ENABLE_SHARED'] = original_enable_shared")
         end
       end
 
