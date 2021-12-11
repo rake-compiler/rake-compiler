@@ -234,7 +234,7 @@ Java extension should be preferred.
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
         # ensure file is always copied
-        file "#{lib_path}/#{binary_path}" => ["copy:#{name}:#{platf}:#{ruby_ver}"]
+        file "#{lib_path}/#{File.basename(binary_path)}" => ["copy:#{name}:#{platf}:#{ruby_ver}"]
 
         task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
         task "compile" => ["compile:#{platf}"]
@@ -465,7 +465,7 @@ Java extension should be preferred.
         end
 
         # FIXME: targeting multiple platforms copies the file twice
-        file "#{lib_path}/#{binary(for_platform)}" => ["copy:#{@name}:#{for_platform}:#{ruby_ver}"]
+        file "#{lib_path}/#{File.basename(binary(for_platform))}" => ["copy:#{@name}:#{for_platform}:#{ruby_ver}"]
 
         # if everything for native task is in place
         if @gem_spec && @gem_spec.platform == 'ruby' then
