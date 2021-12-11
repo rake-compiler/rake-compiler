@@ -1,3 +1,8 @@
+### 1.1.6 / 2021-12-12
+
+* Fixes:
+  * Fix a regression bug that `Symbol` can't be used for `name` of `Rake::ExtensionTask.new`.
+
 ### 1.1.5 / 2021-12-12
 
 * Fixes:
