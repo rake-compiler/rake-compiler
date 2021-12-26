@@ -56,12 +56,15 @@ module Rake
       # lib_path
       lib_path = lib_dir
 
+      # lib_binary_path
+      lib_binary_path = "#{lib_path}/#{File.basename(binary(platf))}"
+
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}"
 
       # cleanup and clobbering
       CLEAN.include(tmp_path)
-      CLOBBER.include("#{lib_path}/#{binary(platf)}")
+      CLOBBER.include(lib_binary_path)
       CLOBBER.include("#{@tmp_dir}")
 
       # directories we need
@@ -71,7 +74,7 @@ module Rake
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
       task "copy:#{@name}:#{platf}" => [lib_path, "#{tmp_path}/#{binary(platf)}"] do
-        install "#{tmp_path}/#{binary(platf)}", "#{lib_path}/#{binary(platf)}"
+        install "#{tmp_path}/#{binary(platf)}", lib_binary_path
       end
 
       file "#{tmp_path}/#{binary(platf)}" => "#{tmp_path}/.build" do
@@ -137,7 +140,7 @@ execute the Rake compilation task using the JRuby interpreter.
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
         # ensure file is always copied
-        file "#{lib_path}/#{binary(platf)}" => ["copy:#{name}:#{platf}"]
+        file lib_binary_path => ["copy:#{name}:#{platf}"]
 
         task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
         task "compile" => ["compile:#{platf}"]
@@ -184,12 +187,15 @@ execute the Rake compilation task using the JRuby interpreter.
           end
         end
 
+        # lib_binary_path
+        lib_binary_path = "#{lib_path}/#{File.basename(binary(platform))}"
+
         # add binaries to the dependency chain
-        task "java:#{@gem_spec.name}" => ["#{lib_path}/#{binary(platform)}"]
+        task "java:#{@gem_spec.name}" => [lib_binary_path]
 
         # ensure the extension get copied
-        unless Rake::Task.task_defined?("#{lib_path}/#{binary(platform)}") then
-          file "#{lib_path}/#{binary(platform)}" => ["copy:#{name}:#{platform}"]
+        unless Rake::Task.task_defined?(lib_binary_path) then
+          file lib_binary_path => ["copy:#{name}:#{platform}"]
         end
 
         task 'java' => ["java:#{@gem_spec.name}"]

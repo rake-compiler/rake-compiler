@@ -82,9 +82,12 @@ module Rake
     private
     # copy other gem files to staging directory
     def define_staging_file_tasks(files, lib_path, stage_path, platf, ruby_ver)
+      # lib_binary_path
+      lib_binary_path = "#{lib_path}/#{File.basename(binary(platf))}"
+
       files.each do |gem_file|
         # ignore directories and the binary extension
-        next if File.directory?(gem_file) || gem_file == "#{lib_path}/#{binary(platf)}"
+        next if File.directory?(gem_file) || gem_file == lib_binary_path
         stage_file = "#{stage_path}/#{gem_file}"
 
         # copy each file from base to stage directory
@@ -109,6 +112,9 @@ module Rake
       # lib_path
       lib_path = lib_dir
 
+      # lib_binary_path
+      lib_binary_path = "#{lib_path}/#{File.basename(binary_path)}"
+
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
       stage_path = "#{@tmp_dir}/#{platf}/stage"
@@ -116,13 +122,13 @@ module Rake
       siteconf_path = "#{tmp_path}/.rake-compiler-siteconf.rb"
       tmp_binary_path = "#{tmp_path}/#{binary_path}"
       tmp_binary_dir_path = File.dirname(tmp_binary_path)
-      stage_binary_path = "#{stage_path}/#{lib_path}/#{binary_path}"
+      stage_binary_path = "#{stage_path}/#{lib_binary_path}"
       stage_binary_dir_path = File.dirname(stage_binary_path)
 
       # cleanup and clobbering
       CLEAN.include(tmp_path)
       CLEAN.include(stage_path)
-      CLOBBER.include("#{lib_path}/#{binary(platf)}")
+      CLOBBER.include(lib_binary_path)
       CLOBBER.include("#{@tmp_dir}")
 
       # directories we need
@@ -234,7 +240,7 @@ Java extension should be preferred.
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
         # ensure file is always copied
-        file "#{lib_path}/#{File.basename(binary_path)}" => ["copy:#{name}:#{platf}:#{ruby_ver}"]
+        file lib_binary_path => ["copy:#{name}:#{platf}:#{ruby_ver}"]
 
         task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
         task "compile" => ["compile:#{platf}"]
@@ -249,6 +255,9 @@ Java extension should be preferred.
 
       # lib_path
       lib_path = lib_dir
+
+      # lib_path
+      lib_binary_path = "#{lib_path}/#{File.basename(binary(platf))}"
 
       # Update compiled platform/version combinations
       @ruby_versions_per_platform[platf] << ruby_ver
@@ -329,13 +338,13 @@ Java extension should be preferred.
       end
 
       # add binaries to the dependency chain
-      task "native:#{@gem_spec.name}:#{platf}" => ["#{stage_path}/#{lib_path}/#{binary(platf)}"]
+      task "native:#{@gem_spec.name}:#{platf}" => ["#{stage_path}/#{lib_binary_path}"]
 
       # ensure the extension get copied
-      unless Rake::Task.task_defined?("#{lib_path}/#{binary(platf)}") then
-        file "#{lib_path}/#{binary(platf)}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
+      unless Rake::Task.task_defined?(lib_binary_path) then
+        file lib_binary_path => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
       end
-      file "#{stage_path}/#{lib_dir}/#{binary(platf)}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
+      file "#{stage_path}/#{lib_binary_path}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
 
       # Allow segmented packaging by platform (open door for 'cross compile')
       task "native:#{platf}" => ["native:#{@gem_spec.name}:#{platf}"]
@@ -393,6 +402,9 @@ Java extension should be preferred.
 
       # lib_path
       lib_path = lib_dir
+
+      # lib_binary_path
+      lib_binary_path = "#{lib_path}/#{File.basename(binary(for_platform))}"
 
       unless rbconfig_file = config_file["rbconfig-#{for_platform}-#{ruby_ver}"] then
         warn "no configuration section for specified version of Ruby (rbconfig-#{for_platform}-#{ruby_ver})"
@@ -460,12 +472,12 @@ Java extension should be preferred.
 
         # clear lib/binary dependencies and trigger cross platform ones
         # check if lib/binary is defined (damn bundle versus so versus dll)
-        if Rake::Task.task_defined?("#{lib_path}/#{binary(for_platform)}") then
-          Rake::Task["#{lib_path}/#{binary(for_platform)}"].prerequisites.clear
+        if Rake::Task.task_defined?(lib_binary_path) then
+          Rake::Task[lib_binary_path].prerequisites.clear
         end
 
         # FIXME: targeting multiple platforms copies the file twice
-        file "#{lib_path}/#{File.basename(binary(for_platform))}" => ["copy:#{@name}:#{for_platform}:#{ruby_ver}"]
+        file lib_binary_path => ["copy:#{@name}:#{for_platform}:#{ruby_ver}"]
 
         # if everything for native task is in place
         if @gem_spec && @gem_spec.platform == 'ruby' then
