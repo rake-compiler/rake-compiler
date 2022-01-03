@@ -1,3 +1,9 @@
+### 1.1.7 / 2022-01-04
+
+* Fixes:
+  * Fix binary paths for staging and clobber.
+    [#197](https://github.com/rake-compiler/rake-compiler/issues/197) [Patch by konsolebox]
+
 ### 1.1.6 / 2021-12-12
 
 * Fixes:
