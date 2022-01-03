@@ -53,11 +53,13 @@ module Rake
       # platform usage
       platf = for_platform || platform
 
+      binary_path = binary(platf)
+
       # lib_path
       lib_path = lib_dir
 
       # lib_binary_path
-      lib_binary_path = "#{lib_path}/#{File.basename(binary(platf))}"
+      lib_binary_path = "#{lib_path}/#{File.basename(binary_path)}"
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}"
@@ -73,11 +75,11 @@ module Rake
 
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
-      task "copy:#{@name}:#{platf}" => [lib_path, "#{tmp_path}/#{binary(platf)}"] do
-        install "#{tmp_path}/#{binary(platf)}", lib_binary_path
+      task "copy:#{@name}:#{platf}" => [lib_path, "#{tmp_path}/#{binary_path}"] do
+        install "#{tmp_path}/#{binary_path}", lib_binary_path
       end
 
-      file "#{tmp_path}/#{binary(platf)}" => "#{tmp_path}/.build" do
+      file "#{tmp_path}/#{binary_path}" => "#{tmp_path}/.build" do
 
         class_files = FileList["#{tmp_path}/**/*.class"].
           gsub("#{tmp_path}/", '')
@@ -89,7 +91,7 @@ module Rake
           ["-C #{tmp_path}", path]
         }.flatten
 
-        sh "jar cf #{tmp_path}/#{binary(platf)} #{args.join(' ')}"
+        sh "jar cf #{tmp_path}/#{binary_path} #{args.join(' ')}"
       end
 
       file "#{tmp_path}/.build" => [tmp_path] + source_files do
