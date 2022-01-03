@@ -108,12 +108,13 @@ module Rake
       platf = for_platform || platform
 
       binary_path = binary(platf)
+      binary_base_name = File.basename(binary_path)
 
       # lib_path
       lib_path = lib_dir
 
       # lib_binary_path
-      lib_binary_path = "#{lib_path}/#{File.basename(binary_path)}"
+      lib_binary_path = "#{lib_path}/#{binary_base_name}"
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
@@ -178,8 +179,8 @@ Java extension should be preferred.
 
         chdir tmp_path do
           sh make
-          if binary_path != File.basename(binary_path)
-            cp File.basename(binary_path), binary_path
+          if binary_path != binary_base_name
+            cp binary_base_name, binary_path
           end
         end
       end
