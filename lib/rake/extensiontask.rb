@@ -256,7 +256,7 @@ Java extension should be preferred.
       # lib_path
       lib_path = lib_dir
 
-      # lib_path
+      # lib_binary_path
       lib_binary_path = "#{lib_path}/#{File.basename(binary(platf))}"
 
       # Update compiled platform/version combinations
