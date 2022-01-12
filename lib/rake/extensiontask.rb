@@ -377,9 +377,6 @@ Java extension should be preferred.
           @lib_dir = "#{@lib_dir}/#{$1}"
         end
 
-        # Update cross compiled platform/version combinations
-        @ruby_versions_per_platform[for_platform] << version
-
         define_cross_platform_tasks_with_version(for_platform, version)
 
         # restore lib_dir
