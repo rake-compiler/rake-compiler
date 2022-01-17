@@ -456,14 +456,17 @@ describe Rake::ExtensionTask do
 
       it "should set required_ruby_version from RUBY_CC_VERSION, set platform, clear extensions but keep metadata" do
         platforms = ["x86-mingw32", "x64-mingw32"]
-        ruby_cc_versions = ["1.8.6", "2.1.10", "2.2.6", "2.3.3", "2.10.1"]
+        ruby_cc_versions = ["1.8.6", "2.1.10", "2.2.6", "2.3.3", "2.10.1", "2.11.0"]
         ENV["RUBY_CC_VERSION"] = ruby_cc_versions.join(":")
         config = Hash.new
         ruby_cc_versions.each do |ruby_cc_version|
           platforms.each do |platform|
+            unless platform == "x64-mingw32" && ruby_cc_version == "2.11.0"
+              rbconf = "/rubies/#{ruby_cc_version}/rbconfig.rb"
+            end
             allow(config).to receive(:[]).
               with("rbconfig-#{platform}-#{ruby_cc_version}").
-              and_return("/rubies/#{ruby_cc_version}/rbconfig.rb")
+              and_return(rbconf)
           end
         end
         allow(YAML).to receive(:load_file).and_return(config)
@@ -490,7 +493,7 @@ describe Rake::ExtensionTask do
         end
 
         expected_required_ruby_versions = [
-          Gem::Requirement.new([">= 1.8", "< 2.11.dev"]),
+          Gem::Requirement.new([">= 1.8", "< 2.12.dev"]),
           Gem::Requirement.new([">= 1.8", "< 2.11.dev"]),
         ]
         cross_specs.collect(&:required_ruby_version).should == expected_required_ruby_versions
