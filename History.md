@@ -1,3 +1,9 @@
+### 1.1.8 / 2022-01-18
+
+* Fixes:
+  * Fix wrong `required_ruby_version` when some `RUBY_CC_VERSION`s are missing.
+    [#198](https://github.com/rake-compiler/rake-compiler/issues/198) [Patch by Lars Kanis]
+
 ### 1.1.7 / 2022-01-04
 
 * Fixes:
