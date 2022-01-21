@@ -17,6 +17,9 @@ module Rake
     # Generate class files for specific VM version
     attr_accessor :target_version
 
+    # Compile for oldeer platform version
+    attr_accessor :release
+
     attr_accessor :encoding
 
     # Specify lint option
@@ -37,6 +40,7 @@ module Rake
       @debug          = false
       @source_version = '1.7'
       @target_version = '1.7'
+      @release        = nil
       @encoding       = nil
       @java_compiling = nil
       @lint_option    = nil
@@ -114,6 +118,7 @@ execute the Rake compilation task using the JRuby interpreter.
         javac_command_line.concat(java_encoding_args)
         javac_command_line.concat(java_extdirs_args)
         javac_command_line.concat(java_classpath_args)
+        javac_command_line << "--release=#{@release}" if @release
         javac_command_line << "-g" if @debug
         javac_command_line.concat(source_files)
         sh(*javac_command_line)
