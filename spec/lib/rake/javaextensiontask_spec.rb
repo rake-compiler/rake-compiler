@@ -206,7 +206,7 @@ describe Rake::JavaExtensionTask do
         it 'should generate -target and -source build options' do
           extension.target_version = "1.8"
           extension.source_version = "1.8"
-          (extension.send :java_target_arg).should eq "-target 1.8 -source 1.8"
+          (extension.send :java_target_args).should eq ["-target", "1.8", "-source", "1.8"]
         end
       end
 
@@ -217,7 +217,7 @@ describe Rake::JavaExtensionTask do
         it 'should generate --release option even with target_version/source_version' do
           extension.target_version = "1.8"
           extension.source_version = "1.8"
-          (extension.send :java_target_arg).should eq "--release=8"
+          (extension.send :java_target_args).should eq ["--release=8"]
         end
       end
     end

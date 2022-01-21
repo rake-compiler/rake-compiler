@@ -110,7 +110,7 @@ execute the Rake compilation task using the JRuby interpreter.
 
         javac_command_line = [
           "javac",
-          java_target_arg,
+          *java_target_args,
           java_lint_arg,
           "-d", tmp_path,
         ]
@@ -211,11 +211,11 @@ execute the Rake compilation task using the JRuby interpreter.
       end
     end
 
-    def java_target_arg
+    def java_target_args
       if @release
-        "--release=#{@release}"
+        ["--release=#{@release}"]
       else
-        "-target #{@target_version} -source #{@source_version}"
+        ["-target", @target_version, "-source", @source_version]
       end
     end
 
