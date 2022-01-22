@@ -175,11 +175,13 @@ describe Rake::JavaExtensionTask do
       let(:extension) do
         Rake::JavaExtensionTask.new('extension_two') do |ext|
           ext.lint_option = lint_option if lint_option
+          ext.release = release if release
         end
       end
 
       context 'without a specified lint option' do
         let(:lint_option) { nil }
+        let(:release) { nil }
 
         it 'should honor the lint option' do
           (extension.lint_option).should be_falsey
@@ -189,10 +191,33 @@ describe Rake::JavaExtensionTask do
 
       context "with a specified lint option of 'deprecated'" do
         let(:lint_option) { 'deprecated'.freeze }
+        let(:release) { nil }
 
         it 'should honor the lint option' do
           (extension.lint_option).should eq lint_option
           (extension.send :java_lint_arg).should eq '-Xlint:deprecated'
+        end
+      end
+
+      context "without release option" do
+        let(:lint_option) { nil }
+        let(:release) { nil }
+
+        it 'should generate -target and -source build options' do
+          extension.target_version = "1.8"
+          extension.source_version = "1.8"
+          (extension.send :java_target_args).should eq ["-target", "1.8", "-source", "1.8"]
+        end
+      end
+
+      context "with release option" do
+        let(:lint_option) { nil }
+        let(:release) { '8' }
+
+        it 'should generate --release option even with target_version/source_version' do
+          extension.target_version = "1.8"
+          extension.source_version = "1.8"
+          (extension.send :java_target_args).should eq ["--release=8"]
         end
       end
     end
