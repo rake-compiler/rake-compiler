@@ -1,3 +1,10 @@
+### 1.1.9 / 2022-01-22
+
+* Enhancements:
+  * Add support for `--release` option to build JRuby extension.
+    [#200](https://github.com/rake-compiler/rake-compiler/issues/200) [Reported by Pavel Rosický]
+    [#201](https://github.com/rake-compiler/rake-compiler/issues/201) [Patch by Satoshi Tagomori]
+
 ### 1.1.8 / 2022-01-18
 
 * Fixes:
