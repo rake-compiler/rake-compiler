@@ -393,6 +393,7 @@ Java extension should be preferred.
         return
       end
 
+      require "yaml"
       config_file = YAML.load_file(config_path)
 
       # tmp_path
