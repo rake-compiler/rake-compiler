@@ -1,3 +1,9 @@
+### 1.2.0 / 2022-04-15
+
+* Enhancements:
+  * Defer requiring `yaml`.
+    [ruby/stringio#21](https://github.com/ruby/stringio/issues/21)
+
 ### 1.1.9 / 2022-01-22
 
 * Enhancements:
