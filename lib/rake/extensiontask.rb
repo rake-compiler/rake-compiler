@@ -32,8 +32,8 @@ module Rake
       @cross_platform ||= 'i386-mingw32'
     end
 
-    def cross_compiling(&block)
-      @cross_compiling = block if block_given?
+    def cross_compiling(&allow)
+      @cross_compiling = allow if block_given?
     end
 
     def binary(platform = nil)
