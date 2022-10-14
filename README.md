@@ -241,7 +241,7 @@ several settings for `Rake::ExtensionTask`:
 | no_native            | ExtensionTask (CRuby) | [Optional] Set to true to prevent non-CRuby platforms from defining native tasks. Default: `false`. |
 | config_includes      | ExtensionTask (CRuby) | [Optional] Specify an Array of paths to include as `-I...:...` includes during compilation. Default: `['.']`. |
 | classpath            | JavaExtensionTask     | [Optional] Specify additional classpath paths as an Array. Default: _Uses the current CLASSPATH._  |
-| debug                | JavaExtensionTask     | [Optional] Whether to set the debug flag during complication. Default: `false`. |
+| debug                | JavaExtensionTask     | [Optional] Whether to set the debug flag during compilation. Default: `false`. |
 | source_version       | JavaExtensionTask     | [Optional] The JRE version that your source code requires to compile. Default: `1.6`. |
 | target_version       | JavaExtensionTask     | [Optional] The oldest JRE version you want to support. Default: `1.6`. |
 | encoding             | JavaExtensionTask     | [Optional] Specify an -encoding option to provide to the compiler. Default: `nil`. |
