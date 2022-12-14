@@ -27,4 +27,28 @@ describe Rake::CompilerConfig do
     expect(cc.find("2.7.0", "x86_64-linux")).to be_nil
     expect(cc.find("3.1.0", "arm64-linux")).to be_nil
   end
+
+  it "returns the matching config for inexact platform match" do
+    cc = Rake::CompilerConfig.new(config_file(<<~CONFIG))
+      ---
+      rbconfig-x86_64-linux-gnu-3.0.0: "/path/to/aaa/rbconfig.rb"
+      rbconfig-x86_64-linux-musl-3.1.0: "/path/to/bbb/rbconfig.rb"
+    CONFIG
+
+    expect(cc.find("3.0.0", "x86_64-linux")).to eq("/path/to/aaa/rbconfig.rb")
+    expect(cc.find("3.1.0", "x86_64-linux")).to eq("/path/to/bbb/rbconfig.rb")
+  end
+
+  it "does not match the other way around" do
+    if Gem::Version.new(Gem::VERSION) < Gem::Version.new("3.3.21")
+      skip "rubygems 3.3.21+ only"
+    end
+
+    cc = Rake::CompilerConfig.new(config_file(<<~CONFIG))
+      ---
+      rbconfig-x86_64-linux-3.1.0: "/path/to/bbb/rbconfig.rb"
+    CONFIG
+
+    expect(cc.find("3.1.0", "x86_64-linux-musl")).to be_nil
+  end
 end
