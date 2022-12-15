@@ -5,6 +5,8 @@ require 'rbconfig'
 
 require 'pathname'
 
+require_relative "compiler_config"
+
 module Rake
   class BaseExtensionTask < TaskLib
 

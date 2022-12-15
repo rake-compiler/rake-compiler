@@ -393,8 +393,11 @@ Java extension should be preferred.
         return
       end
 
-      require "yaml"
-      config_file = YAML.load_file(config_path)
+      rbconfig_file = Rake::CompilerConfig.new(config_path).find(ruby_ver, for_platform)
+      unless rbconfig_file
+        warn "no configuration section for specified version of Ruby (rbconfig-#{for_platform}-#{ruby_ver})"
+        return
+      end
 
       # tmp_path
       tmp_path = "#{@tmp_dir}/#{for_platform}/#{@name}/#{ruby_ver}"
@@ -404,11 +407,6 @@ Java extension should be preferred.
 
       # lib_binary_path
       lib_binary_path = "#{lib_path}/#{File.basename(binary(for_platform))}"
-
-      unless rbconfig_file = config_file["rbconfig-#{for_platform}-#{ruby_ver}"] then
-        warn "no configuration section for specified version of Ruby (rbconfig-#{for_platform}-#{ruby_ver})"
-        return
-      end
 
       # mkmf
       mkmf_file = File.expand_path(File.join(File.dirname(rbconfig_file), '..', 'mkmf.rb'))

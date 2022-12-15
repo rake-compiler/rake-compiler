@@ -381,9 +381,10 @@ describe Rake::ExtensionTask do
       end
 
       it 'should warn if no section of config file defines running version of ruby' do
-        config = Hash.new
-        expect(config).to receive(:[]).with("rbconfig-#{@platform}-#{@ruby_ver}").and_return(nil)
-        allow(YAML).to receive(:load_file).and_return(config)
+        allow_any_instance_of(Rake::CompilerConfig).to(
+          receive(:find).with(@ruby_ver, @platform).and_return(nil)
+        )
+
         out, err = capture_output do
           Rake::ExtensionTask.new('extension_one') do |ext|
             ext.cross_compile = true
@@ -403,9 +404,9 @@ describe Rake::ExtensionTask do
       end
 
       it 'should generate additional rake tasks if files are added when cross compiling' do
-        config = Hash.new
-        allow(config).to receive(:[]).and_return('/rubies/1.9.1/rbconfig.rb')
-        allow(YAML).to receive(:load_file).and_return(config)
+        allow_any_instance_of(Rake::CompilerConfig).to(
+          receive(:find).and_return("/rubies/1.9.1/rbconfig.rb")
+        )
 
         # Use a real spec instead of a mock because define_native_tasks dups and
         # calls methods on Gem::Specification, which is more than mock can do.
@@ -433,9 +434,11 @@ describe Rake::ExtensionTask do
       end
 
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
-        config = Hash.new
-        expect(config).to receive(:[]).with("rbconfig-i386-mingw32-1.9.1").and_return('/rubies/1.9.1/rbconfig.rb')
-        allow(YAML).to receive(:load_file).and_return(config)
+        allow_any_instance_of(Rake::CompilerConfig).to(
+          receive(:find)
+            .with("1.9.1", "i386-mingw32")
+            .and_return("/rubies/1.9.1/rbconfig.rb")
+        )
 
         ENV['RUBY_CC_VERSION'] = '1.9.1'
         Rake::ExtensionTask.new('extension_one') do |ext|
@@ -444,10 +447,16 @@ describe Rake::ExtensionTask do
       end
 
       it 'should allow multiple versions be supplied to RUBY_CC_VERSION' do
-        config = Hash.new
-        expect(config).to receive(:[]).once.with("rbconfig-i386-mingw32-1.8.6").and_return('/rubies/1.8.6/rbconfig.rb')
-        expect(config).to receive(:[]).once.with("rbconfig-i386-mingw32-1.9.1").and_return('/rubies/1.9.1/rbconfig.rb')
-        allow(YAML).to receive(:load_file).and_return(config)
+        allow_any_instance_of(Rake::CompilerConfig).to(
+          receive(:find)
+            .with("1.8.6", "i386-mingw32")
+            .and_return("/rubies/1.8.6/rbconfig.rb")
+        )
+        allow_any_instance_of(Rake::CompilerConfig).to(
+          receive(:find)
+            .with("1.9.1", "i386-mingw32")
+            .and_return("/rubies/1.9.1/rbconfig.rb")
+        )
 
         ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
         Rake::ExtensionTask.new('extension_one') do |ext|
@@ -459,18 +468,19 @@ describe Rake::ExtensionTask do
         platforms = ["x86-mingw32", "x64-mingw32"]
         ruby_cc_versions = ["1.8.6", "2.1.10", "2.2.6", "2.3.3", "2.10.1", "2.11.0"]
         ENV["RUBY_CC_VERSION"] = ruby_cc_versions.join(":")
-        config = Hash.new
+
         ruby_cc_versions.each do |ruby_cc_version|
           platforms.each do |platform|
             unless platform == "x64-mingw32" && ruby_cc_version == "2.11.0"
               rbconf = "/rubies/#{ruby_cc_version}/rbconfig.rb"
             end
-            allow(config).to receive(:[]).
-              with("rbconfig-#{platform}-#{ruby_cc_version}").
-              and_return(rbconf)
+            allow_any_instance_of(Rake::CompilerConfig).to(
+              receive(:find)
+                .with(ruby_cc_version, platform)
+                .and_return(rbconf)
+            )
           end
         end
-        allow(YAML).to receive(:load_file).and_return(config)
 
         allow(Gem).to receive_message_chain(:configuration, :verbose=).and_return(true)
 
@@ -515,9 +525,16 @@ describe Rake::ExtensionTask do
 
       context "(cross compile for multiple versions)" do
         before :each do
-          config = Hash.new
-          allow(config).to receive(:[]).and_return('/rubies/1.8.6/rbconfig.rb', '/rubies/1.9.1/rbconfig.rb')
-          allow(YAML).to receive(:load_file).and_return(config)
+          allow_any_instance_of(Rake::CompilerConfig).to(
+            receive(:find)
+              .with("1.8.6", "universal-unknown")
+              .and_return("/rubies/1.8.6/rbconfig.rb")
+          )
+          allow_any_instance_of(Rake::CompilerConfig).to(
+            receive(:find)
+              .with("1.9.1", "universal-unknown")
+              .and_return("/rubies/1.9.1/rbconfig.rb")
+          )
 
           ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
           @ext = Rake::ExtensionTask.new('extension_one') do |ext|
