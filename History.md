@@ -1,3 +1,17 @@
+### 1.2.1 / 2022-12-16
+
+* Enhancements:
+  * GH-209: Added support for RubyGems 3.3.21 or later.
+    [Patch by Mike Dalessio]
+
+* Fixes:
+  * GH-208: Fixed a typo in documentation.
+    [Patch by Garen Torikian]
+
+* Thanks:
+  * Garen Torikian
+  * Mike Dalessio
+
 ### 1.2.0 / 2022-04-15
 
 * Enhancements:
