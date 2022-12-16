@@ -21,3 +21,5 @@ jobs:
           gh release create \
             --discussion-category Announcements \
             --notes-file release-node.md
+        env:
+          GH_TOKEN: ${{ github.token }}
