@@ -1,0 +1,23 @@
+name: Release
+on:
+  push:
+    tags:
+      - "*"
+jobs:
+  github:
+    name: GitHub
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - name: Extract release note
+        run: |
+          ruby \
+            -e 'print("## rake-compiler "); \
+                puts(ARGF.read.split(/^### /)[1].gsub(/ {.+?}/, ""))' \
+            History.md > release-note.md
+      - name: Upload to release
+        run: |
+          gh release create \
+            --discussion-category Announcements \
+            --notes-file release-node.md
