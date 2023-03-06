@@ -18,6 +18,7 @@ module Rake
     attr_accessor :config_options
     attr_accessor :source_pattern
     attr_accessor :extra_options
+    attr_accessor :extra_sources
     attr_writer :platform
 
     def platform
@@ -41,6 +42,7 @@ module Rake
       end
       @config_options = []
       @extra_options = ARGV.select { |i| i =~ /\A--?/ }
+      @extra_sources = FileList[]
     end
 
     def define
@@ -71,7 +73,7 @@ module Rake
     end
 
     def source_files
-      FileList["#{@ext_dir}/#{@source_pattern}"]
+      FileList["#{@ext_dir}/#{@source_pattern}"] + @extra_sources
     end
 
     def warn_once(message)
