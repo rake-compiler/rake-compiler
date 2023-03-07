@@ -58,6 +58,15 @@ describe Rake::ExtensionTask do
         end
         ext.platform.should == 'universal-foo-bar-10.5'
       end
+
+      it 'should allow extra sources to be added' do
+        ext = Rake::ExtensionTask.new('extension_one') do |ext|
+          ext.extra_sources << 'extra.c'
+        end
+        ext.extra_sources.should include('extra.c')
+        # Private API between the base task and the extension task
+        ext.send(:source_files).should include('extra.c')
+      end
     end
   end
 
