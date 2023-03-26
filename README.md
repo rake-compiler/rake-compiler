@@ -349,7 +349,7 @@ Now, you only need specify a few additional options in your extension definition
       # platform build, with platform-specific options in a hash.
       ext.cross_config_options << '--with-common-option'
       ext.cross_config_options << {
-        'x86-mswin32-60 => '--with-some-option',
+        'x86-mswin32-60' => '--with-some-option',
         'x64-mingw32'   => '--enable-64bits',
       }
       ext.cross_config_options << '--with-final-option'
