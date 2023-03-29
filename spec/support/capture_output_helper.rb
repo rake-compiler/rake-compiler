@@ -1,5 +1,5 @@
 module CaptureOutputHelper
-  def capture_output(&block)
+  def capture_output
     old_stdout = $stdout
     old_stderr = $stderr
 

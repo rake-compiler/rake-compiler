@@ -18,7 +18,7 @@ end
 Rake.application.init('rake-compiler')
 
 # Load the already cooked tasks ;-)
-load File.join(File.dirname(__FILE__), %w{.. tasks bin cross-ruby.rake})
+load File.join(File.dirname(__FILE__), %w[.. tasks bin cross-ruby.rake])
 
 # delegate control to Rake
 Rake.application.top_level

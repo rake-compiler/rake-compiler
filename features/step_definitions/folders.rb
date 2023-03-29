@@ -1,4 +1,4 @@
-Given /^a safe project directory$/ do
+Given(/^a safe project directory$/) do
   # step back to ROOT
   Dir.chdir ROOT_PATH
   tmp_name = "project.#{Process.pid}"
@@ -10,23 +10,23 @@ Given /^a safe project directory$/ do
   generate_scaffold_structure
 end
 
-Given /^'(.*)' folder (exist|is deleted)$/ do |folder, condition|
+Given(/^'(.*)' folder (exist|is deleted)$/) do |folder, condition|
   case condition
-    when 'exist'
-      raise "Folder #{folder} do not exist" unless File.exist?(folder) && File.directory?(folder)
-    when 'is deleted'
-      FileUtils.rm_rf folder
+  when 'exist'
+    raise "Folder #{folder} do not exist" unless File.exist?(folder) && File.directory?(folder)
+  when 'is deleted'
+    FileUtils.rm_rf folder
   end
 end
 
-Then /^'(.*)' folder is created$/ do |folder|
+Then(/^'(.*)' folder is created$/) do |folder|
   File.directory?(folder).should be_true
 end
 
-Then /^'(.*)' folder do not exist$/ do |folder|
+Then(/^'(.*)' folder do not exist$/) do |folder|
   File.directory?(folder).should_not be_true
 end
 
-Then /^no left over from '(.*)' remains in '(.*)'$/ do |name, folder|
+Then(/^no left over from '(.*)' remains in '(.*)'$/) do |name, folder|
   Dir.glob("#{folder}/**/#{name}/#{RUBY_VERSION}").should be_empty
 end

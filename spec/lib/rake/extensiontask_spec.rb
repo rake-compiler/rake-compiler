@@ -88,14 +88,14 @@ describe Rake::ExtensionTask do
     end
 
     it 'should look for C/C++ files pattern (.c,.cc,.cpp)' do
-      @ext.source_pattern.should == "*.{c,cc,cpp}"
+      @ext.source_pattern.should == '*.{c,cc,cpp}'
     end
 
     it 'should have no configuration options preset to delegate' do
       @ext.config_options.should be_empty
     end
 
-    it "should have no includes preset to delegate" do
+    it 'should have no includes preset to delegate' do
       @ext.config_includes.should be_empty
     end
 
@@ -125,7 +125,7 @@ describe Rake::ExtensionTask do
 
     context '(one extension)' do
       before :each do
-        allow(Rake::FileList).to receive(:[]).and_return(["ext/extension_one/source.c"], [])
+        allow(Rake::FileList).to receive(:[]).and_return(['ext/extension_one/source.c'], [])
         @ext = Rake::ExtensionTask.new('extension_one')
         @ext_bin = ext_bin('extension_one')
         @platform = RUBY_PLATFORM
@@ -172,11 +172,11 @@ describe Rake::ExtensionTask do
         end
 
         it "should depend on 'ext/extension_one/source.c'" do
-          Rake::Task["tmp/#{@platform}/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should include("ext/extension_one/source.c")
+          Rake::Task["tmp/#{@platform}/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should include('ext/extension_one/source.c')
         end
 
         it "should not depend on 'ext/extension_one/source.h'" do
-          Rake::Task["tmp/#{@platform}/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should_not include("ext/extension_one/source.h")
+          Rake::Task["tmp/#{@platform}/extension_one/#{@ruby_ver}/#{@ext_bin}"].prerequisites.should_not include('ext/extension_one/source.h')
         end
       end
 
@@ -190,7 +190,7 @@ describe Rake::ExtensionTask do
         end
 
         it "should depend on 'ext/extension_one/extconf.rb'" do
-          Rake::Task["tmp/#{@platform}/extension_one/#{@ruby_ver}/Makefile"].prerequisites.should include("ext/extension_one/extconf.rb")
+          Rake::Task["tmp/#{@platform}/extension_one/#{@ruby_ver}/Makefile"].prerequisites.should include('ext/extension_one/extconf.rb')
         end
       end
 
@@ -210,21 +210,21 @@ describe Rake::ExtensionTask do
         end
       end
 
-      it "should warn when pre-compiled files exist in extension directory" do
-        allow(Rake::FileList).to receive(:[]).
-          and_return(["ext/extension_one/source.c"],
-                      ["ext/extension_one/source.o"])
+      it 'should warn when pre-compiled files exist in extension directory' do
+        allow(Rake::FileList).to receive(:[])
+          .and_return(['ext/extension_one/source.c'],
+                      ['ext/extension_one/source.o'])
 
         _, err = capture_output do
           Rake::ExtensionTask.new('extension_one')
         end
-        err.should match(/rake-compiler found compiled files in 'ext\/extension_one' directory. Please remove them./)
+        err.should match(%r{rake-compiler found compiled files in 'ext/extension_one' directory. Please remove them.})
       end
     end
 
     context '(extension in custom location)' do
       before :each do
-        allow(Rake::FileList).to receive(:[]).and_return(["ext/extension_one/source.c"], [])
+        allow(Rake::FileList).to receive(:[]).and_return(['ext/extension_one/source.c'], [])
         @ext = Rake::ExtensionTask.new('extension_one') do |ext|
           ext.ext_dir = 'custom/ext/foo'
         end
@@ -235,14 +235,14 @@ describe Rake::ExtensionTask do
 
       context 'tmp/{platform}/extension_one/{ruby_ver}/Makefile' do
         it "should depend on 'custom/ext/foo/extconf.rb'" do
-          Rake::Task["tmp/#{@platform}/extension_one/#{@ruby_ver}/Makefile"].prerequisites.should include("custom/ext/foo/extconf.rb")
+          Rake::Task["tmp/#{@platform}/extension_one/#{@ruby_ver}/Makefile"].prerequisites.should include('custom/ext/foo/extconf.rb')
         end
       end
     end
 
     context '(native tasks)' do
       before :each do
-        allow(Rake::FileList).to receive(:[]).and_return(["ext/extension_one/source.c"], [])
+        allow(Rake::FileList).to receive(:[]).and_return(['ext/extension_one/source.c'], [])
         @spec = mock_gem_spec
         @ext_bin = ext_bin('extension_one')
         @platform = RUBY_PLATFORM
@@ -273,7 +273,7 @@ describe Rake::ExtensionTask do
 
         it 'should depend on platform specific native tasks' do
           Rake::ExtensionTask.new('extension_one', @spec)
-          Rake::Task["native"].prerequisites.should include("native:#{@platform}")
+          Rake::Task['native'].prerequisites.should include("native:#{@platform}")
         end
 
         context 'native:my_gem:{platform}' do
@@ -287,7 +287,7 @@ describe Rake::ExtensionTask do
 
     context '(one extension whose name with directory prefixes)' do
       before :each do
-        allow(Rake::FileList).to receive(:[]).and_return(["ext/prefix1/prefix2/extension_one/source.c"], [])
+        allow(Rake::FileList).to receive(:[]).and_return(['ext/prefix1/prefix2/extension_one/source.c'], [])
         @ext = Rake::ExtensionTask.new('prefix1/prefix2/extension_one')
         @ext_bin = ext_bin('extension_one')
         @platform = RUBY_PLATFORM
@@ -334,11 +334,11 @@ describe Rake::ExtensionTask do
         end
 
         it "should depend on 'ext/extension_one/source.c'" do
-          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/prefix1/prefix2/#{@ext_bin}"].prerequisites.should include("ext/prefix1/prefix2/extension_one/source.c")
+          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/prefix1/prefix2/#{@ext_bin}"].prerequisites.should include('ext/prefix1/prefix2/extension_one/source.c')
         end
 
         it "should not depend on 'ext/extension_one/source.h'" do
-          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/prefix1/prefix2/#{@ext_bin}"].prerequisites.should_not include("ext/prefix1/prefix2/extension_one/source.h")
+          Rake::Task["tmp/#{@platform}/prefix1/prefix2/extension_one/#{@ruby_ver}/prefix1/prefix2/#{@ext_bin}"].prerequisites.should_not include('ext/prefix1/prefix2/extension_one/source.h')
         end
       end
     end
@@ -347,9 +347,9 @@ describe Rake::ExtensionTask do
       before :each do
         allow(File).to receive(:exist?).and_return(true)
         allow(YAML).to receive(:load_file).and_return(mock_config_yml)
-        allow(Rake::FileList).to receive(:[]).and_return(["ext/extension_one/source.c"], [])
+        allow(Rake::FileList).to receive(:[]).and_return(['ext/extension_one/source.c'], [])
         @spec = mock_gem_spec
-        @config_file = File.expand_path("~/.rake-compiler/config.yml")
+        @config_file = File.expand_path('~/.rake-compiler/config.yml')
         @ruby_ver = RUBY_VERSION
         @platform = 'i386-mingw32'
         @config_path = mock_config_yml["rbconfig-#{@platform}-#{@ruby_ver}"]
@@ -369,14 +369,14 @@ describe Rake::ExtensionTask do
         end
 
         it 'should not generate a warning' do
-          @err.should eq("")
+          @err.should eq('')
         end
 
         it 'should create a dummy nested cross-compile target that raises an error' do
-          Rake::Task.should have_defined("cross")
-          Rake::Task["cross"].invoke
+          Rake::Task.should have_defined('cross')
+          Rake::Task['cross'].invoke
           lambda {
-            Rake::Task["compile"].invoke
+            Rake::Task['compile'].invoke
           }.should raise_error(RuntimeError,
                                /rake-compiler must be configured first to enable cross-compilation/)
         end
@@ -406,7 +406,7 @@ describe Rake::ExtensionTask do
         lambda {
           Rake::ExtensionTask.new('extension_one') do |ext|
             ext.cross_compiling do |gem_spec|
-              gem_spec.post_install_message = "Cross compiled gem"
+              gem_spec.post_install_message = 'Cross compiled gem'
             end
           end
         }.should_not raise_error
@@ -414,7 +414,7 @@ describe Rake::ExtensionTask do
 
       it 'should generate additional rake tasks if files are added when cross compiling' do
         allow_any_instance_of(Rake::CompilerConfig).to(
-          receive(:find).and_return("/rubies/1.9.1/rbconfig.rb")
+          receive(:find).and_return('/rubies/1.9.1/rbconfig.rb')
         )
 
         # Use a real spec instead of a mock because define_native_tasks dups and
@@ -438,15 +438,15 @@ describe Rake::ExtensionTask do
           end
         end
         Rake::Task['native:my_gem:universal-unknown'].execute
-        Rake::Task.should have_defined("tmp/universal-unknown/stage/somedir")
-        Rake::Task.should have_defined("tmp/universal-unknown/stage/somedir/somefile")
+        Rake::Task.should have_defined('tmp/universal-unknown/stage/somedir')
+        Rake::Task.should have_defined('tmp/universal-unknown/stage/somedir/somefile')
       end
 
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
         allow_any_instance_of(Rake::CompilerConfig).to(
           receive(:find)
-            .with("1.9.1", "i386-mingw32")
-            .and_return("/rubies/1.9.1/rbconfig.rb")
+            .with('1.9.1', 'i386-mingw32')
+            .and_return('/rubies/1.9.1/rbconfig.rb')
         )
 
         ENV['RUBY_CC_VERSION'] = '1.9.1'
@@ -458,13 +458,13 @@ describe Rake::ExtensionTask do
       it 'should allow multiple versions be supplied to RUBY_CC_VERSION' do
         allow_any_instance_of(Rake::CompilerConfig).to(
           receive(:find)
-            .with("1.8.6", "i386-mingw32")
-            .and_return("/rubies/1.8.6/rbconfig.rb")
+            .with('1.8.6', 'i386-mingw32')
+            .and_return('/rubies/1.8.6/rbconfig.rb')
         )
         allow_any_instance_of(Rake::CompilerConfig).to(
           receive(:find)
-            .with("1.9.1", "i386-mingw32")
-            .and_return("/rubies/1.9.1/rbconfig.rb")
+            .with('1.9.1', 'i386-mingw32')
+            .and_return('/rubies/1.9.1/rbconfig.rb')
         )
 
         ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
@@ -473,14 +473,14 @@ describe Rake::ExtensionTask do
         end
       end
 
-      it "should set required_ruby_version from RUBY_CC_VERSION, set platform, clear extensions but keep metadata" do
-        platforms = ["x86-mingw32", "x64-mingw32"]
-        ruby_cc_versions = ["1.8.6", "2.1.10", "2.2.6", "2.3.3", "2.10.1", "2.11.0"]
-        ENV["RUBY_CC_VERSION"] = ruby_cc_versions.join(":")
+      it 'should set required_ruby_version from RUBY_CC_VERSION, set platform, clear extensions but keep metadata' do
+        platforms = %w[x86-mingw32 x64-mingw32]
+        ruby_cc_versions = ['1.8.6', '2.1.10', '2.2.6', '2.3.3', '2.10.1', '2.11.0']
+        ENV['RUBY_CC_VERSION'] = ruby_cc_versions.join(':')
 
         ruby_cc_versions.each do |ruby_cc_version|
           platforms.each do |platform|
-            unless platform == "x64-mingw32" && ruby_cc_version == "2.11.0"
+            unless platform == 'x64-mingw32' && ruby_cc_version == '2.11.0'
               rbconf = "/rubies/#{ruby_cc_version}/rbconfig.rb"
             end
             allow_any_instance_of(Rake::CompilerConfig).to(
@@ -501,7 +501,7 @@ describe Rake::ExtensionTask do
         end
 
         cross_specs = []
-        Rake::ExtensionTask.new("extension_one", spec) do |ext|
+        Rake::ExtensionTask.new('extension_one', spec) do |ext|
           ext.cross_platform = platforms
           ext.cross_compile = true
           ext.cross_compiling do |cross_spec|
@@ -513,16 +513,16 @@ describe Rake::ExtensionTask do
         end
 
         expected_required_ruby_versions = [
-          Gem::Requirement.new([">= 1.8", "< 2.12.dev"]),
-          Gem::Requirement.new([">= 1.8", "< 2.11.dev"]),
+          Gem::Requirement.new(['>= 1.8', '< 2.12.dev']),
+          Gem::Requirement.new(['>= 1.8', '< 2.11.dev'])
         ]
         cross_specs.collect(&:required_ruby_version).should == expected_required_ruby_versions
         cross_specs.collect(&:extensions).should == [[], []]
         cross_specs.collect(&:platform).collect(&:to_s).should == platforms
-        cross_specs.collect{|s| s.metadata['allowed_push_host']}.should == ['http://test', 'http://test']
+        cross_specs.collect { |s| s.metadata['allowed_push_host'] }.should == ['http://test', 'http://test']
 
         # original gemspec should keep unchanged
-        spec.required_ruby_version.should == Gem::Requirement.new([">= 0"])
+        spec.required_ruby_version.should == Gem::Requirement.new(['>= 0'])
         spec.platform.should == Gem::Platform::RUBY
         spec.extensions.should == ['ext/somegem/extconf.rb']
         spec.metadata['allowed_push_host'].should == 'http://test'
@@ -532,17 +532,17 @@ describe Rake::ExtensionTask do
         ENV.delete('RUBY_CC_VERSION')
       end
 
-      context "(cross compile for multiple versions)" do
+      context '(cross compile for multiple versions)' do
         before :each do
           allow_any_instance_of(Rake::CompilerConfig).to(
             receive(:find)
-              .with("1.8.6", "universal-unknown")
-              .and_return("/rubies/1.8.6/rbconfig.rb")
+              .with('1.8.6', 'universal-unknown')
+              .and_return('/rubies/1.8.6/rbconfig.rb')
           )
           allow_any_instance_of(Rake::CompilerConfig).to(
             receive(:find)
-              .with("1.9.1", "universal-unknown")
-              .and_return("/rubies/1.9.1/rbconfig.rb")
+              .with('1.9.1', 'universal-unknown')
+              .and_return('/rubies/1.9.1/rbconfig.rb')
           )
 
           ENV['RUBY_CC_VERSION'] = '1.8.6:1.9.1'
@@ -553,8 +553,8 @@ describe Rake::ExtensionTask do
         end
 
         it 'should create specific copy of binaries for each version' do
-          Rake::Task.should have_defined("copy:extension_one:universal-unknown:1.8.6")
-          Rake::Task.should have_defined("copy:extension_one:universal-unknown:1.9.1")
+          Rake::Task.should have_defined('copy:extension_one:universal-unknown:1.8.6')
+          Rake::Task.should have_defined('copy:extension_one:universal-unknown:1.9.1')
         end
       end
 
@@ -588,7 +588,7 @@ describe Rake::ExtensionTask do
         end
 
         context 'compile:universal-unknown' do
-          it "should be defined" do
+          it 'should be defined' do
             Rake::Task.task_defined?('compile:universal-unknown').should == true
           end
 
@@ -598,7 +598,7 @@ describe Rake::ExtensionTask do
         end
 
         context 'native:universal-unknown' do
-          it "should be defined" do
+          it 'should be defined' do
             Rake::Task.task_defined?('native:universal-unknown').should == true
           end
 
@@ -612,9 +612,9 @@ describe Rake::ExtensionTask do
         before :each do
           @ext = Rake::ExtensionTask.new('extension_one', @spec) do |ext|
             ext.cross_compile = true
-            ext.cross_platform = ['universal-known', 'universal-unknown']
+            ext.cross_platform = %w[universal-known universal-unknown]
             ext.cross_config_options << '--with-something'
-            ext.cross_config_options << {'universal-known' => '--with-known'}
+            ext.cross_config_options << { 'universal-known' => '--with-known' }
           end
         end
 
@@ -632,33 +632,33 @@ describe Rake::ExtensionTask do
   end
 
   private
+
   def ext_bin(extension_name)
     "#{extension_name}.#{RbConfig::CONFIG['DLEXT']}"
   end
 
   def mock_gem_spec(stubs = {})
     double(Gem::Specification,
-      { :name => 'my_gem', :platform => 'ruby', :files => [] }.merge(stubs)
-    )
+           { name: 'my_gem', platform: 'ruby', files: [] }.merge(stubs))
   end
 
   def mock_config_yml
     return @mock_config_yml if @mock_config_yml
 
     versions = {
-      "1.8.6"      => "1.8",
-      "1.8.7"      => "1.8",
-      "1.9.3"      => "1.9.1",
-      "2.0.0"      => "2.0.0",
-      "2.1.2"      => "2.1.0",
-      RUBY_VERSION => RbConfig::CONFIG["ruby_version"]
+      '1.8.6' => '1.8',
+      '1.8.7' => '1.8',
+      '1.9.3' => '1.9.1',
+      '2.0.0' => '2.0.0',
+      '2.1.2' => '2.1.0',
+      RUBY_VERSION => RbConfig::CONFIG['ruby_version']
     }
 
     platforms = [
-      "i386-mingw32",
-      "universal-known",
-      "universal-unknown",
-      "x64-mingw32",
+      'i386-mingw32',
+      'universal-known',
+      'universal-unknown',
+      'x64-mingw32',
       RUBY_PLATFORM
     ]
 
@@ -674,6 +674,6 @@ describe Rake::ExtensionTask do
   end
 
   def mock_fake_rb
-    double(File, :write => 45)
+    double(File, write: 45)
   end
 end

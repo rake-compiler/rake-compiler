@@ -5,20 +5,12 @@ require 'rbconfig'
 
 require 'pathname'
 
-require_relative "compiler_config"
+require_relative 'compiler_config'
 
 module Rake
   class BaseExtensionTask < TaskLib
-
-    attr_accessor :name
-    attr_accessor :gem_spec
-    attr_accessor :tmp_dir
-    attr_accessor :ext_dir
-    attr_accessor :lib_dir
-    attr_accessor :config_options
-    attr_accessor :source_pattern
-    attr_accessor :extra_options
-    attr_accessor :extra_sources
+    attr_accessor :name, :gem_spec, :tmp_dir, :ext_dir, :lib_dir, :config_options, :source_pattern, :extra_options,
+                  :extra_sources
     attr_writer :platform
 
     def platform
@@ -37,16 +29,15 @@ module Rake
       @tmp_dir = 'tmp'
       @ext_dir = "ext/#{@name}"
       @lib_dir = 'lib'
-      if @name and File.dirname(@name.to_s) != "."
-        @lib_dir += "/#{File.dirname(@name.to_s)}"
-      end
+      @lib_dir += "/#{File.dirname(@name.to_s)}" if @name and File.dirname(@name.to_s) != '.'
       @config_options = []
       @extra_options = ARGV.select { |i| i =~ /\A--?/ }
       @extra_sources = FileList[]
     end
 
     def define
-      fail "Extension name must be provided." if @name.nil?
+      raise 'Extension name must be provided.' if @name.nil?
+
       @name = @name.to_s
 
       define_compile_tasks
@@ -60,15 +51,15 @@ module Rake
 
     def binary(platform = nil)
       ext = case platform
-        when /darwin/
-          'bundle'
-        when /mingw|mswin|linux/
-          'so'
-        when /java/
-          'jar'
-        else
-          RbConfig::CONFIG['DLEXT']
-      end
+            when /darwin/
+              'bundle'
+            when /mingw|mswin|linux/
+              'so'
+            when /java/
+              'jar'
+            else
+              RbConfig::CONFIG['DLEXT']
+            end
       "#{@name}.#{ext}"
     end
 
@@ -79,6 +70,7 @@ module Rake
     def warn_once(message)
       @@already_warned ||= false
       return if @@already_warned
+
       @@already_warned = true
       warn message
     end

@@ -1,29 +1,25 @@
-require "rbconfig"
+require 'rbconfig'
 
 require 'rake/baseextensiontask'
-require "rubygems/package_task"
+require 'rubygems/package_task'
 
 # Define a series of tasks to aid in the compilation of C extensions for
 # gem developer/creators.
 
 module Rake
   class ExtensionTask < BaseExtensionTask
-    attr_accessor :config_script
-    attr_accessor :cross_compile
-    attr_writer :cross_platform
-    attr_writer :cross_config_options
-    attr_accessor :no_native
-    attr_accessor :config_includes
+    attr_accessor :config_script, :cross_compile, :no_native, :config_includes
+    attr_writer :cross_platform, :cross_config_options
 
     def init(name = nil, gem_spec = nil)
       super
       @config_script = 'extconf.rb'
-      @source_pattern = "*.{c,cc,cpp}"
-      @compiled_pattern = "*.{o,obj,so,bundle,dSYM}"
+      @source_pattern = '*.{c,cc,cpp}'
+      @compiled_pattern = '*.{o,obj,so,bundle,dSYM}'
       @cross_compile = false
       @cross_config_options = []
       @cross_compiling = nil
-      @no_native = (ENV["RAKE_EXTENSION_TASK_NO_NATIVE"] == "true")
+      @no_native = (ENV['RAKE_EXTENSION_TASK_NO_NATIVE'] == 'true')
       @config_includes = []
       # Default to an empty list of ruby versions for each platform
       @ruby_versions_per_platform = Hash.new { |h, k| h[k] = [] }
@@ -39,7 +35,7 @@ module Rake
     end
 
     def binary(platform = nil)
-      if platform == "java"
+      if platform == 'java'
         "#{name}.#{RbConfig::MAKEFILE_CONFIG['DLEXT']}"
       else
         super
@@ -59,19 +55,19 @@ module Rake
       # only define cross platform functionality when enabled
       return unless @cross_compile
 
-      if cross_platform.is_a?(Array) then
+      if cross_platform.is_a?(Array)
         cross_platform.each { |platf| define_cross_platform_tasks(platf) }
       else
         define_cross_platform_tasks(cross_platform)
       end
     end
 
-    def cross_config_options(for_platform=nil)
+    def cross_config_options(for_platform = nil)
       return @cross_config_options unless for_platform
 
       # apply options for this platform, only
       @cross_config_options.map do |option|
-        if option.kind_of?(Hash)
+        if option.is_a?(Hash)
           option[for_platform] || []
         else
           option
@@ -80,6 +76,7 @@ module Rake
     end
 
     private
+
     # copy other gem files to staging directory
     def define_staging_file_tasks(files, lib_path, stage_path, platf, ruby_ver)
       # lib_binary_path
@@ -88,10 +85,11 @@ module Rake
       files.each do |gem_file|
         # ignore directories and the binary extension
         next if File.directory?(gem_file) || gem_file == lib_binary_path
+
         stage_file = "#{stage_path}/#{gem_file}"
 
         # copy each file from base to stage directory
-        unless Rake::Task.task_defined?(stage_file) then
+        unless Rake::Task.task_defined?(stage_file)
           directory File.dirname(stage_file)
           file stage_file => [File.dirname(stage_file), gem_file] do
             cp gem_file, stage_file
@@ -141,7 +139,7 @@ module Rake
       directory File.dirname(siteconf_path)
       # Set paths for "make install" destinations
       file siteconf_path => File.dirname(siteconf_path) do
-        File.open(siteconf_path, "w") do |siteconf|
+        File.open(siteconf_path, 'w') do |siteconf|
           siteconf.puts "require 'rbconfig'"
           siteconf.puts "require 'mkmf'"
           siteconf.puts "dest_path = mkintpath(#{File.expand_path(lib_path).dump})"
@@ -156,9 +154,7 @@ module Rake
       # tmp/extension_name/extension_name.{so,bundle} => lib/
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_path, tmp_binary_path, "#{tmp_path}/Makefile"] do
         # install in lib for native platform only
-        unless for_platform
-          sh "#{make} install target_prefix=", chdir: tmp_path
-        end
+        sh "#{make} install target_prefix=", chdir: tmp_path unless for_platform
       end
       # copy binary from temporary location to staging directory
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_binary_dir_path, tmp_binary_path] do
@@ -171,17 +167,15 @@ module Rake
       # binary in temporary folder depends on makefile and source files
       # tmp/extension_name/extension_name.{so,bundle}
       file tmp_binary_path => [tmp_binary_dir_path, "#{tmp_path}/Makefile"] + source_files do
-        jruby_compile_msg = <<-EOF
-Compiling a native C extension on JRuby. This is discouraged and a
-Java extension should be preferred.
+        jruby_compile_msg = <<~EOF
+          Compiling a native C extension on JRuby. This is discouraged and a
+          Java extension should be preferred.
         EOF
         warn_once(jruby_compile_msg) if defined?(JRUBY_VERSION)
 
         chdir tmp_path do
           sh make
-          if binary_path != binary_base_name
-            cp binary_base_name, binary_path
-          end
+          cp binary_base_name, binary_path if binary_path != binary_base_name
         end
       end
 
@@ -202,17 +196,13 @@ Java extension should be preferred.
         cmd << abs_extconf.relative_path_from(abs_tmp_path)
 
         # fake.rb will be present if we are cross compiling
-        if t.prerequisites.include?("#{tmp_path}/fake.rb") then
-          options.push(*cross_config_options(platf))
-        end
+        options.push(*cross_config_options(platf)) if t.prerequisites.include?("#{tmp_path}/fake.rb")
 
         # add options to command
         cmd.push(*options)
 
         # add any extra command line options
-        unless extra_options.empty?
-          cmd.push(*extra_options)
-        end
+        cmd.push(*extra_options) unless extra_options.empty?
 
         chdir tmp_path do
           # FIXME: Rake is broken for multiple arguments system() calls.
@@ -222,13 +212,13 @@ Java extension should be preferred.
       end
 
       # compile tasks
-      unless Rake::Task.task_defined?('compile') then
-        desc "Compile all the extensions"
-        task "compile"
+      unless Rake::Task.task_defined?('compile')
+        desc 'Compile all the extensions'
+        task 'compile'
       end
 
       # compile:name
-      unless Rake::Task.task_defined?("compile:#{@name}") then
+      unless Rake::Task.task_defined?("compile:#{@name}")
         desc "Compile #{@name}"
         task "compile:#{@name}"
       end
@@ -239,13 +229,13 @@ Java extension should be preferred.
 
       # Only add this extension to the compile chain if current
       # platform matches the indicated one.
-      if platf == RUBY_PLATFORM then
-        # ensure file is always copied
-        file lib_binary_path => ["copy:#{name}:#{platf}:#{ruby_ver}"]
+      return unless platf == RUBY_PLATFORM
 
-        task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
-        task "compile" => ["compile:#{platf}"]
-      end
+      # ensure file is always copied
+      file lib_binary_path => ["copy:#{name}:#{platf}:#{ruby_ver}"]
+
+      task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
+      task 'compile' => ["compile:#{platf}"]
     end
 
     def define_native_tasks(for_platform = nil, ruby_ver = RUBY_VERSION, callback = nil)
@@ -277,7 +267,7 @@ Java extension should be preferred.
           # set ruby version constraints
           ruby_versions = @ruby_versions_per_platform[platf]
           sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
-            ruby_version.split(".").collect(&:to_i)
+            ruby_version.split('.').collect(&:to_i)
           end
           spec.required_ruby_version = [
             ">= #{ruby_api_version(sorted_ruby_versions.first)}",
@@ -293,7 +283,7 @@ Java extension should be preferred.
           # go through native prerequisites and grab the real extension files from there
           t.prerequisites.each do |ext|
             # strip stage path and keep lib/... only
-            ext_files << ext.sub(stage_path+"/", '')
+            ext_files << ext.sub(stage_path + '/', '')
           end
 
           # include the files in the gem specification
@@ -321,12 +311,16 @@ Java extension should be preferred.
             File.join(stage_path, gem_file)
           end
           file pkg.package_dir_path => stage_files do
-            mkdir_p pkg.package_dir rescue nil
+            begin
+              mkdir_p pkg.package_dir
+            rescue StandardError
+              nil
+            end
             spec.files.each do |ft|
               fn = File.join(stage_path, ft)
               f = File.join(pkg.package_dir_path, ft)
               fdir = File.dirname(f)
-              mkdir_p(fdir) if !File.exist?(fdir)
+              mkdir_p(fdir) unless File.exist?(fdir)
               if File.directory?(fn)
                 mkdir_p(f)
               else
@@ -342,9 +336,7 @@ Java extension should be preferred.
       task "native:#{@gem_spec.name}:#{platf}" => ["#{stage_path}/#{lib_binary_path}"]
 
       # ensure the extension get copied
-      unless Rake::Task.task_defined?(lib_binary_path) then
-        file lib_binary_path => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
-      end
+      file lib_binary_path => ["copy:#{@name}:#{platf}:#{ruby_ver}"] unless Rake::Task.task_defined?(lib_binary_path)
       file "#{stage_path}/#{lib_binary_path}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
 
       # Allow segmented packaging by platform (open door for 'cross compile')
@@ -352,29 +344,29 @@ Java extension should be preferred.
 
       # Only add this extension to the compile chain if current
       # platform matches the indicated one.
-      if platf == RUBY_PLATFORM then
-        task "native:#{@gem_spec.name}" => ["native:#{@gem_spec.name}:#{platf}"]
-        task "native" => ["native:#{platf}"]
-      end
+      return unless platf == RUBY_PLATFORM
+
+      task "native:#{@gem_spec.name}" => ["native:#{@gem_spec.name}:#{platf}"]
+      task 'native' => ["native:#{platf}"]
     end
 
     def define_cross_platform_tasks(for_platform)
-      if ruby_vers = ENV['RUBY_CC_VERSION']
-        ruby_vers = ENV['RUBY_CC_VERSION'].split(':')
-      else
-        ruby_vers = [RUBY_VERSION]
-      end
+      ruby_vers = if ruby_vers = ENV['RUBY_CC_VERSION']
+                    ENV['RUBY_CC_VERSION'].split(':')
+                  else
+                    [RUBY_VERSION]
+                  end
 
-      multi = (ruby_vers.size > 1) ? true : false
+      multi = ruby_vers.size > 1
 
       ruby_vers.each do |version|
         # save original lib_dir
         orig_lib_dir = @lib_dir
 
         # tweak lib directory only when targeting multiple versions
-        if multi then
+        if multi
           version =~ /(\d+\.\d+)/
-          @lib_dir = "#{@lib_dir}/#{$1}"
+          @lib_dir = "#{@lib_dir}/#{::Regexp.last_match(1)}"
         end
 
         define_cross_platform_tasks_with_version(for_platform, version)
@@ -385,7 +377,7 @@ Java extension should be preferred.
     end
 
     def define_cross_platform_tasks_with_version(for_platform, ruby_ver)
-      config_path = File.expand_path("~/.rake-compiler/config.yml")
+      config_path = File.expand_path('~/.rake-compiler/config.yml')
 
       # warn the user about the need of configuration to use cross compilation.
       unless File.exist?(config_path)
@@ -445,7 +437,7 @@ Java extension should be preferred.
         File.open(t.name, 'w') do |f|
           content = File.read(t.prerequisites.first)
           content.sub!(/^(require ')rbconfig(')$/, '\\1fake\\2')
-          if ruby_ver < "1.9" && "1.9" <= RUBY_VERSION
+          if ruby_ver < '1.9' && '1.9' <= RUBY_VERSION
             content.sub!(/^(      break )\*(defaults)$/, '\\1\\2.first')
             content.sub!(/^(    return )\*(defaults)$/, '\\1\\2.first')
             content.sub!(/^(  mfile\.)print( configuration\(srcprefix\))$/, '\\1puts\\2')
@@ -455,9 +447,7 @@ Java extension should be preferred.
       end
 
       # now define native tasks for cross compiled files
-      if @gem_spec && @gem_spec.platform == 'ruby' then
-        define_native_tasks(for_platform, ruby_ver, @cross_compiling)
-      end
+      define_native_tasks(for_platform, ruby_ver, @cross_compiling) if @gem_spec && @gem_spec.platform == 'ruby'
 
       # create cross task
       task 'cross' do
@@ -469,15 +459,13 @@ Java extension should be preferred.
 
         # clear lib/binary dependencies and trigger cross platform ones
         # check if lib/binary is defined (damn bundle versus so versus dll)
-        if Rake::Task.task_defined?(lib_binary_path) then
-          Rake::Task[lib_binary_path].prerequisites.clear
-        end
+        Rake::Task[lib_binary_path].prerequisites.clear if Rake::Task.task_defined?(lib_binary_path)
 
         # FIXME: targeting multiple platforms copies the file twice
         file lib_binary_path => ["copy:#{@name}:#{for_platform}:#{ruby_ver}"]
 
         # if everything for native task is in place
-        if @gem_spec && @gem_spec.platform == 'ruby' then
+        if @gem_spec && @gem_spec.platform == 'ruby'
           # double check: only cross platform native tasks should be here
           # FIXME: Sooo brittle
           Rake::Task['native'].prerequisites.reject! { |t| !natives_cross_platform.include?(t) }
@@ -490,7 +478,7 @@ Java extension should be preferred.
       task 'cross' do
         Rake::Task['compile'].clear
         task 'compile' do
-          raise "rake-compiler must be configured first to enable cross-compilation"
+          raise 'rake-compiler must be configured first to enable cross-compilation'
         end
       end
     end
@@ -500,27 +488,22 @@ Java extension should be preferred.
     end
 
     def make
-      unless @make
-        @make =
-          if RUBY_PLATFORM =~ /mswin/ then
-            'nmake'
-          else
-            ENV['MAKE'] || find_make
-          end
-      end
+      @make ||= if /mswin/.match?(RUBY_PLATFORM)
+                  'nmake'
+                else
+                  ENV['MAKE'] || find_make
+                end
 
-      unless @make
-        raise "Couldn't find a suitable `make` tool. Use `MAKE` env to set an alternative."
-      end
+      raise "Couldn't find a suitable `make` tool. Use `MAKE` env to set an alternative." unless @make
 
       @make
     end
 
     def find_make
-      candidates = ["gmake", "make"]
-      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
+      candidates = %w[gmake make]
+      paths = (ENV['PATH'] || '').split(File::PATH_SEPARATOR)
 
-      exeext = RbConfig::CONFIG["EXEEXT"]
+      exeext = RbConfig::CONFIG['EXEEXT']
       candidates.each do |candidate|
         paths.each do |path|
           make = File.join(path, "#{candidate}#{exeext}")
@@ -544,7 +527,7 @@ Java extension should be preferred.
     end
 
     def ruby_api_version(ruby_version)
-      ruby_version.split(".")[0, 2].join(".")
+      ruby_version.split('.')[0, 2].join('.')
     end
 
     def fake_rb(platform, version)
@@ -564,7 +547,7 @@ Java extension should be preferred.
           RUBY_VERSION = "#{version}"
           RUBY_DESCRIPTION = "ruby \#{RUBY_VERSION} (\#{RUBY_RELEASE_DATE}) [\#{RUBY_PLATFORM}]"
         end
-        if RUBY_PLATFORM =~ /mswin|bccwin|mingw/
+        if /mswin|bccwin|mingw/.match?(RUBY_PLATFORM)
           class File
             remove_const :ALT_SEPARATOR
             ALT_SEPARATOR = "\\\\"
@@ -576,7 +559,7 @@ Java extension should be preferred.
           untrace_var(:$ruby, posthook)
         end
         trace_var(:$ruby, posthook)
-FAKE_RB
+      FAKE_RB
     end
   end
 end

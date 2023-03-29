@@ -1,7 +1,7 @@
 module Rake
   class CompilerConfig
     def initialize(config_path)
-      require "yaml"
+      require 'yaml'
       @config = YAML.load_file(config_path)
     end
 
@@ -23,13 +23,11 @@ module Rake
         # installation).
         #
         # With rubygems >= 3.3.21, only the second variation will be present.
-        runtime_platform_name = config_name.split("-")[1..-2].join("-")
-        runtime_version = config_name.split("-").last
+        runtime_platform_name = config_name.split('-')[1..-2].join('-')
+        runtime_version = config_name.split('-').last
         runtime_platform = Gem::Platform.new(runtime_platform_name)
 
-        if (ruby_version == runtime_version) && (gem_platform =~ runtime_platform)
-          return config_location
-        end
+        return config_location if (ruby_version == runtime_version) && (gem_platform =~ runtime_platform)
       end
 
       nil

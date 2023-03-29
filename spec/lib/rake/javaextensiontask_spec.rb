@@ -69,7 +69,7 @@ describe Rake::JavaExtensionTask do
     end
 
     it 'should look for Java files pattern (.java)' do
-      @ext.source_pattern.should == "**/*.java"
+      @ext.source_pattern.should == '**/*.java'
     end
 
     it 'should have no configuration options preset to delegate' do
@@ -94,7 +94,7 @@ describe Rake::JavaExtensionTask do
 
     context '(one extension)' do
       before :each do
-        allow(Rake::FileList).to receive(:[]).and_return(["ext/extension_one/source.java"])
+        allow(Rake::FileList).to receive(:[]).and_return(['ext/extension_one/source.java'])
         @ext = Rake::JavaExtensionTask.new('extension_one')
         @ext_bin = ext_bin('extension_one')
         @platform = 'java'
@@ -139,7 +139,7 @@ describe Rake::JavaExtensionTask do
           Rake::Task.task_defined?("tmp/#{@platform}/extension_one/#{@ext_bin}").should == true
         end
 
-        it "should depend on checkpoint file" do
+        it 'should depend on checkpoint file' do
           Rake::Task["tmp/#{@platform}/extension_one/#{@ext_bin}"].prerequisites.should include("tmp/#{@platform}/extension_one/.build")
         end
       end
@@ -150,7 +150,7 @@ describe Rake::JavaExtensionTask do
         end
 
         it 'should depend on source files' do
-          Rake::Task["tmp/#{@platform}/extension_one/.build"].prerequisites.should include("ext/extension_one/source.java")
+          Rake::Task["tmp/#{@platform}/extension_one/.build"].prerequisites.should include('ext/extension_one/source.java')
         end
       end
 
@@ -184,7 +184,7 @@ describe Rake::JavaExtensionTask do
         let(:release) { nil }
 
         it 'should honor the lint option' do
-          (extension.lint_option).should be_falsey
+          extension.lint_option.should be_falsey
           (extension.send :java_lint_arg).should eq '-Xlint'
         end
       end
@@ -194,34 +194,35 @@ describe Rake::JavaExtensionTask do
         let(:release) { nil }
 
         it 'should honor the lint option' do
-          (extension.lint_option).should eq lint_option
+          extension.lint_option.should eq lint_option
           (extension.send :java_lint_arg).should eq '-Xlint:deprecated'
         end
       end
 
-      context "without release option" do
+      context 'without release option' do
         let(:lint_option) { nil }
         let(:release) { nil }
 
         it 'should generate -target and -source build options' do
-          extension.target_version = "1.8"
-          extension.source_version = "1.8"
-          (extension.send :java_target_args).should eq ["-target", "1.8", "-source", "1.8"]
+          extension.target_version = '1.8'
+          extension.source_version = '1.8'
+          (extension.send :java_target_args).should eq ['-target', '1.8', '-source', '1.8']
         end
       end
 
-      context "with release option" do
+      context 'with release option' do
         let(:lint_option) { nil }
         let(:release) { '8' }
 
         it 'should generate --release option even with target_version/source_version' do
-          extension.target_version = "1.8"
-          extension.source_version = "1.8"
-          (extension.send :java_target_args).should eq ["--release=8"]
+          extension.target_version = '1.8'
+          extension.source_version = '1.8'
+          (extension.send :java_target_args).should eq ['--release=8']
         end
       end
     end
   end
+
   private
 
   def ext_bin(extension_name)
@@ -230,8 +231,6 @@ describe Rake::JavaExtensionTask do
 
   def mock_gem_spec(stubs = {})
     double(Gem::Specification,
-      { :name => 'my_gem', :platform => 'ruby' }.merge(stubs)
-    )
+           { name: 'my_gem', platform: 'ruby' }.merge(stubs))
   end
-
 end

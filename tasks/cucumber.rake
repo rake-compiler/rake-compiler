@@ -1,7 +1,7 @@
 begin
   require 'cucumber/rake/task'
 rescue LoadError
-  warn "Cucumber gem is required, please install it. (gem install cucumber)"
+  warn 'Cucumber gem is required, please install it. (gem install cucumber)'
 end
 
 if defined?(Cucumber)
@@ -16,8 +16,8 @@ if defined?(Cucumber)
     end
 
     desc 'Run all features'
-    task :all => [:default, :java]
+    task all: %i[default java]
   end
   desc 'Alias for cucumber:default'
-  task :cucumber => 'cucumber:default'
+  task cucumber: 'cucumber:default'
 end

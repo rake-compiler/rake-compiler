@@ -1,7 +1,7 @@
 require 'rspec'
 
 # Console redirection helper
-require File.expand_path('../support/capture_output_helper', __FILE__)
+require File.expand_path('support/capture_output_helper', __dir__)
 
 RSpec.configure do |config|
   config.include CaptureOutputHelper

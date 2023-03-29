@@ -1,4 +1,4 @@
-require "rbconfig"
+require 'rbconfig'
 
 require 'rake/baseextensiontask'
 
@@ -7,9 +7,7 @@ require 'rake/baseextensiontask'
 
 module Rake
   class JavaExtensionTask < BaseExtensionTask
-
-    attr_accessor :classpath
-    attr_accessor :debug
+    attr_accessor :classpath, :debug, :encoding
 
     # Provide source compatibility with specified release
     attr_accessor :source_version
@@ -19,8 +17,6 @@ module Rake
 
     # Compile for oldeer platform version
     attr_accessor :release
-
-    attr_accessor :encoding
 
     # Specify lint option
     attr_accessor :lint_option
@@ -53,7 +49,8 @@ module Rake
     end
 
     private
-    def define_compile_tasks(for_platform = nil, ruby_ver = RUBY_VERSION)
+
+    def define_compile_tasks(for_platform = nil, _ruby_ver = RUBY_VERSION)
       # platform usage
       platf = for_platform || platform
 
@@ -84,40 +81,39 @@ module Rake
       end
 
       file "#{tmp_path}/#{binary_path}" => "#{tmp_path}/.build" do
-
-        class_files = FileList["#{tmp_path}/**/*.class"].
-          gsub("#{tmp_path}/", '')
+        class_files = FileList["#{tmp_path}/**/*.class"]
+                      .gsub("#{tmp_path}/", '')
 
         # avoid environment variable expansion using backslash
         class_files.gsub!('$', '\$') unless windows?
 
-        args = class_files.map { |path|
+        args = class_files.map do |path|
           ["-C #{tmp_path}", path]
-        }.flatten
+        end.flatten
 
         sh "jar cf #{tmp_path}/#{binary_path} #{args.join(' ')}"
       end
 
       file "#{tmp_path}/.build" => [tmp_path] + source_files do
-        not_jruby_compile_msg = <<-EOF
-WARNING: You're cross-compiling a binary extension for JRuby, but are using
-another interpreter. If your Java classpath or extension dir settings are not
-correctly detected, then either check the appropriate environment variables or
-execute the Rake compilation task using the JRuby interpreter.
-(e.g. `jruby -S rake compile:java`)
+        not_jruby_compile_msg = <<~EOF
+          WARNING: You're cross-compiling a binary extension for JRuby, but are using
+          another interpreter. If your Java classpath or extension dir settings are not
+          correctly detected, then either check the appropriate environment variables or
+          execute the Rake compilation task using the JRuby interpreter.
+          (e.g. `jruby -S rake compile:java`)
         EOF
         warn_once(not_jruby_compile_msg) unless defined?(JRUBY_VERSION)
 
         javac_command_line = [
-          "javac",
+          'javac',
           *java_target_args,
           java_lint_arg,
-          "-d", tmp_path,
+          '-d', tmp_path
         ]
         javac_command_line.concat(java_encoding_args)
         javac_command_line.concat(java_extdirs_args)
         javac_command_line.concat(java_classpath_args)
-        javac_command_line << "-g" if @debug
+        javac_command_line << '-g' if @debug
         javac_command_line.concat(source_files)
         sh(*javac_command_line)
 
@@ -126,13 +122,13 @@ execute the Rake compilation task using the JRuby interpreter.
       end
 
       # compile tasks
-      unless Rake::Task.task_defined?('compile') then
-        desc "Compile all the extensions"
-        task "compile"
+      unless Rake::Task.task_defined?('compile')
+        desc 'Compile all the extensions'
+        task 'compile'
       end
 
       # compile:name
-      unless Rake::Task.task_defined?("compile:#{@name}") then
+      unless Rake::Task.task_defined?("compile:#{@name}")
         desc "Compile #{@name}"
         task "compile:#{@name}"
       end
@@ -143,13 +139,13 @@ execute the Rake compilation task using the JRuby interpreter.
 
       # Only add this extension to the compile chain if current
       # platform matches the indicated one.
-      if platf == RUBY_PLATFORM then
-        # ensure file is always copied
-        file lib_binary_path => ["copy:#{name}:#{platf}"]
+      return unless platf == RUBY_PLATFORM
 
-        task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
-        task "compile" => ["compile:#{platf}"]
-      end
+      # ensure file is always copied
+      file lib_binary_path => ["copy:#{name}:#{platf}"]
+
+      task "compile:#{@name}" => ["compile:#{@name}:#{platf}"]
+      task 'compile' => ["compile:#{platf}"]
     end
 
     def define_java_platform_tasks
@@ -181,9 +177,7 @@ execute the Rake compilation task using the JRuby interpreter.
           spec.files += ext_files
 
           # expose gem specification for customization
-          if @java_compiling
-            @java_compiling.call(spec)
-          end
+          @java_compiling.call(spec) if @java_compiling
 
           # Generate a package for this gem
           Gem::PackageTask.new(spec) do |pkg|
@@ -199,9 +193,7 @@ execute the Rake compilation task using the JRuby interpreter.
         task "java:#{@gem_spec.name}" => [lib_binary_path]
 
         # ensure the extension get copied
-        unless Rake::Task.task_defined?(lib_binary_path) then
-          file lib_binary_path => ["copy:#{name}:#{platform}"]
-        end
+        file lib_binary_path => ["copy:#{name}:#{platform}"] unless Rake::Task.task_defined?(lib_binary_path)
 
         task 'java' => ["java:#{@gem_spec.name}"]
       end
@@ -215,7 +207,7 @@ execute the Rake compilation task using the JRuby interpreter.
       if @release
         ["--release=#{@release}"]
       else
-        ["-target", @target_version, "-source", @source_version]
+        ['-target', @target_version, '-source', @source_version]
       end
     end
 
@@ -223,12 +215,16 @@ execute the Rake compilation task using the JRuby interpreter.
     # Discover Java Extension Directories and build an extdirs arguments
     #
     def java_extdirs_args
-      extdirs = Java::java.lang.System.getProperty('java.ext.dirs') rescue nil
+      extdirs = begin
+        Java::java.lang.System.getProperty('java.ext.dirs')
+      rescue StandardError
+        nil
+      end
       extdirs ||= ENV['JAVA_EXT_DIR']
       if extdirs.nil?
         []
       else
-        ["-extdirs", extdirs]
+        ['-extdirs', extdirs]
       end
     end
 
@@ -239,7 +235,7 @@ execute the Rake compilation task using the JRuby interpreter.
       if @encoding.nil?
         []
       else
-        ["-encoding", @encoding]
+        ['-encoding', @encoding]
       end
     end
 
@@ -251,12 +247,12 @@ execute the Rake compilation task using the JRuby interpreter.
     #
     def java_classpath_args
       jruby_cpath = nil
-      if RUBY_PLATFORM =~ /java/
+      if /java/.match?(RUBY_PLATFORM)
         begin
           cpath  = Java::java.lang.System.getProperty('java.class.path').split(File::PATH_SEPARATOR)
           cpath += Java::java.lang.System.getProperty('sun.boot.class.path').split(File::PATH_SEPARATOR)
           jruby_cpath = cpath.compact.join(File::PATH_SEPARATOR)
-        rescue
+        rescue StandardError
         end
       end
 
@@ -276,21 +272,16 @@ execute the Rake compilation task using the JRuby interpreter.
       # found lib path
       unless jruby_cpath
         libdir = RbConfig::CONFIG['libdir']
-        if libdir.start_with?("uri:classloader:")
-          raise 'Cannot build with jruby-complete from Java 9 onwards'
-        end
-        candidate = File.join(libdir, "jruby.jar")
+        raise 'Cannot build with jruby-complete from Java 9 onwards' if libdir.start_with?('uri:classloader:')
+
+        candidate = File.join(libdir, 'jruby.jar')
         jruby_cpath = candidate if File.exist?(candidate)
       end
 
-      unless jruby_cpath
-        raise "Could not find jruby.jar. Please set JRUBY_HOME or use jruby in rvm"
-      end
+      raise 'Could not find jruby.jar. Please set JRUBY_HOME or use jruby in rvm' unless jruby_cpath
 
-      if @classpath and @classpath.size > 0
-        jruby_cpath = [jruby_cpath, *@classpath].join(File::PATH_SEPARATOR)
-      end
-      ["-cp", jruby_cpath]
+      jruby_cpath = [jruby_cpath, *@classpath].join(File::PATH_SEPARATOR) if @classpath and @classpath.size > 0
+      ['-cp', jruby_cpath]
     end
 
     #
