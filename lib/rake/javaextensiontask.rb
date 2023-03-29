@@ -212,7 +212,7 @@ execute the Rake compilation task using the JRuby interpreter.
     end
 
     def java_target_args
-      if @release
+      if @release && release_flag_supported?
         ["--release=#{@release}"]
       else
         ["-target", @target_version, "-source", @source_version]
@@ -302,6 +302,12 @@ execute the Rake compilation task using the JRuby interpreter.
       return '-Xlint' unless @lint_option
 
       "-Xlint:#{@lint_option}"
+    end
+
+    def release_flag_supported?
+      return true unless RUBY_PLATFORM =~ /java/
+      
+      Gem::Version.new(Java::java.lang.System.getProperty('java.version')) >= Gem::Version.new("9")
     end
   end
 end
