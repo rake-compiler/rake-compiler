@@ -1,3 +1,23 @@
+### 1.2.2 / 2023-05-25
+
+* Enhancements:
+  * GH-211: Added `extra_sources` that is for dynamic sources.
+    [Patch by James Tucker]
+  * GH-213: Stopped using `--release` on Java 8.
+    [Patch by James Pavel Rosický]
+  * GH-215: Added support for extra options with space.
+    [Reported by Jun Aruga]
+
+* Fixes:
+  * GH-211: Fixed a typo in documentation.
+    [Patch by Jan-Benedikt Jagusch]
+
+* Thanks:
+  * James Tucker
+  * Jan-Benedikt Jagusch
+  * Pavel Rosický
+  * Jun Aruga
+
 ### 1.2.1 / 2022-12-16
 
 * Enhancements:
