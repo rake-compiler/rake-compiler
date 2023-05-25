@@ -199,7 +199,7 @@ Java extension should be preferred.
         abs_extconf = (Pathname.new(Dir.pwd) + extconf).realpath
 
         # now add the extconf script
-        cmd << abs_extconf.relative_path_from(abs_tmp_path)
+        cmd << abs_extconf.relative_path_from(abs_tmp_path).to_s
 
         # fake.rb will be present if we are cross compiling
         if t.prerequisites.include?("#{tmp_path}/fake.rb") then
@@ -215,9 +215,7 @@ Java extension should be preferred.
         end
 
         chdir tmp_path do
-          # FIXME: Rake is broken for multiple arguments system() calls.
-          # Add current directory to the search path of Ruby
-          sh cmd.join(' ')
+          sh *cmd
         end
       end
 
