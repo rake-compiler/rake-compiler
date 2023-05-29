@@ -362,6 +362,24 @@ describe Rake::ExtensionTask do
 
         command.should eq(expected)
       end
+
+      it "handles 'nil' in the command array gracefully" do
+        @ext.config_options << nil # imagine this is ENV['NONEXISTENT_VALUE']
+
+        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, @siteconf_path, nil)
+
+        expected_includes = [".", "/injected/include1", "/injected/include2"].join(File::PATH_SEPARATOR)
+        expected = [
+          Gem.ruby,
+          "-I#{expected_includes}",
+          "-r.injected-siteconf.rb",
+          "../#{@extconf}",
+          "--with-a", # config_options
+          "--", "--with-b", # extra_options
+        ]
+
+        command.should eq(expected)
+      end
     end
 
     context '(one extension whose name with directory prefixes)' do

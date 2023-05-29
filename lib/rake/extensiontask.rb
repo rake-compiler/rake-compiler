@@ -105,7 +105,7 @@ module Rake
         cmd.push(*extra_options)
       end
 
-      cmd
+      cmd.compact
     end
 
     private
