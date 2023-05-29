@@ -260,7 +260,7 @@ describe Rake::ExtensionTask do
         end
 
         it 'should define as task for pure ruby gems' do
-          Rake::Task.task_defined?('native').should == false
+          Rake::Task.task_defined?('native').should be false
           Rake::ExtensionTask.new('extension_one', @spec)
           Rake::Task.task_defined?('native').should == true
         end
@@ -394,7 +394,7 @@ describe Rake::ExtensionTask do
           receive(:find).with(@ruby_ver, @platform).and_return(nil)
         )
 
-        out, err = capture_output do
+        _, err = capture_output do
           Rake::ExtensionTask.new('extension_one') do |ext|
             ext.cross_compile = true
           end
@@ -516,16 +516,16 @@ describe Rake::ExtensionTask do
           Gem::Requirement.new([">= 1.8", "< 2.12.dev"]),
           Gem::Requirement.new([">= 1.8", "< 2.11.dev"]),
         ]
-        cross_specs.collect(&:required_ruby_version).should == expected_required_ruby_versions
-        cross_specs.collect(&:extensions).should == [[], []]
-        cross_specs.collect(&:platform).collect(&:to_s).should == platforms
-        cross_specs.collect{|s| s.metadata['allowed_push_host']}.should == ['http://test', 'http://test']
+        cross_specs.collect(&:required_ruby_version).should eq expected_required_ruby_versions
+        cross_specs.collect(&:extensions).should eq [[], []]
+        cross_specs.collect(&:platform).collect(&:to_s).should eq platforms
+        cross_specs.collect{|s| s.metadata['allowed_push_host']}.should eq ['http://test', 'http://test']
 
         # original gemspec should keep unchanged
-        spec.required_ruby_version.should == Gem::Requirement.new([">= 0"])
-        spec.platform.should == Gem::Platform::RUBY
-        spec.extensions.should == ['ext/somegem/extconf.rb']
-        spec.metadata['allowed_push_host'].should == 'http://test'
+        spec.required_ruby_version.should eq Gem::Requirement.new([">= 0"])
+        spec.platform.should eq Gem::Platform::RUBY
+        spec.extensions.should eq ['ext/somegem/extconf.rb']
+        spec.metadata['allowed_push_host'].should eq 'http://test'
       end
 
       after :each do
@@ -589,7 +589,7 @@ describe Rake::ExtensionTask do
 
         context 'compile:universal-unknown' do
           it "should be defined" do
-            Rake::Task.task_defined?('compile:universal-unknown').should == true
+            Rake::Task.task_defined?('compile:universal-unknown').should be true
           end
 
           it "should depend on 'compile:extension_one:universal-unknown'" do
@@ -599,7 +599,7 @@ describe Rake::ExtensionTask do
 
         context 'native:universal-unknown' do
           it "should be defined" do
-            Rake::Task.task_defined?('native:universal-unknown').should == true
+            Rake::Task.task_defined?('native:universal-unknown').should be true
           end
 
           it "should depend on 'native:my_gem:universal-unknown'" do
