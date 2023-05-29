@@ -79,6 +79,35 @@ module Rake
       end.flatten
     end
 
+    def make_makefile_cmd(root_path, tmp_path, extconf, siteconf_path, cross_platform) # :nodoc:
+      options = @config_options.dup
+
+      # include current directory
+      include_dirs = ['.'].concat(@config_includes).uniq.join(File::PATH_SEPARATOR)
+      cmd = [Gem.ruby, "-I#{include_dirs}", "-r#{File.basename(siteconf_path)}"]
+
+      # build a relative path to extconf script
+      abs_tmp_path = (Pathname.new(root_path) + tmp_path).realpath
+      abs_extconf = (Pathname.new(root_path) + extconf).realpath
+
+      # now add the extconf script
+      cmd << abs_extconf.relative_path_from(abs_tmp_path).to_s
+
+      if cross_platform
+        options.push(*cross_config_options(cross_platform))
+      end
+
+      # add options to command
+      cmd.push(*options)
+
+      # add any extra command line options
+      unless extra_options.empty?
+        cmd.push(*extra_options)
+      end
+
+      cmd
+    end
+
     private
     # copy other gem files to staging directory
     def define_staging_file_tasks(files, lib_path, stage_path, platf, ruby_ver)
@@ -188,34 +217,16 @@ Java extension should be preferred.
       # makefile depends of tmp_dir and config_script
       # tmp/extension_name/Makefile
       file "#{tmp_path}/Makefile" => [tmp_path, extconf, siteconf_path] do |t|
-        options = @config_options.dup
-
-        # include current directory
-        include_dirs = ['.'].concat(@config_includes).uniq.join(File::PATH_SEPARATOR)
-        cmd = [Gem.ruby, "-I#{include_dirs}", "-r#{File.basename(siteconf_path)}"]
-
-        # build a relative path to extconf script
-        abs_tmp_path = (Pathname.new(Dir.pwd) + tmp_path).realpath
-        abs_extconf = (Pathname.new(Dir.pwd) + extconf).realpath
-
-        # now add the extconf script
-        cmd << abs_extconf.relative_path_from(abs_tmp_path).to_s
-
-        # fake.rb will be present if we are cross compiling
-        if t.prerequisites.include?("#{tmp_path}/fake.rb") then
-          options.push(*cross_config_options(platf))
+        if t.prerequisites.include?("#{tmp_path}/fake.rb")
+          cross_platform = platf
+        else
+          cross_platform = nil
         end
 
-        # add options to command
-        cmd.push(*options)
-
-        # add any extra command line options
-        unless extra_options.empty?
-          cmd.push(*extra_options)
-        end
+        command = make_makefile_cmd(Dir.pwd, tmp_path, extconf, siteconf_path, cross_platform)
 
         chdir tmp_path do
-          sh *cmd
+          sh(*command)
         end
       end
 
