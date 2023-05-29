@@ -9,7 +9,7 @@
     [Reported by Jun Aruga]
 
 * Fixes:
-  * GH-211: Fixed a typo in documentation.
+  * GH-212: Fixed a typo in documentation.
     [Patch by Jan-Benedikt Jagusch]
 
 * Thanks:
