@@ -344,6 +344,24 @@ describe Rake::ExtensionTask do
 
         command.should eq(expected)
       end
+
+      it "handles spaces in arguments correctly" do
+        @ext.extra_options << "--with-spaces='a b'"
+
+        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, @siteconf_path, nil)
+
+        expected_includes = [".", "/injected/include1", "/injected/include2"].join(File::PATH_SEPARATOR)
+        expected = [
+          Gem.ruby,
+          "-I#{expected_includes}",
+          "-r.injected-siteconf.rb",
+          "../#{@extconf}",
+          "--with-a", # config_options
+          "--", "--with-b", "--with-spaces='a b'", # extra_options
+        ]
+
+        command.should eq(expected)
+      end
     end
 
     context '(one extension whose name with directory prefixes)' do
