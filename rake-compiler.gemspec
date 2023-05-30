@@ -26,8 +26,6 @@ Gem::Specification.new do |s|
   s.files = Dir.glob("features/**/*.{feature,rb}")
   s.files += ["bin/rake-compiler"]
   s.files += Dir.glob("lib/**/*.rb")
-  s.files += ["spec/spec.opts"]
-  s.files += Dir.glob("spec/**/*.rb")
   s.files += Dir.glob("tasks/**/*.rake")
   s.files += ["Rakefile", "Gemfile"]
   s.files += Dir.glob("*.{md,rdoc,txt,yml}")
