@@ -80,30 +80,21 @@ module Rake
     end
 
     def make_makefile_cmd(root_path, tmp_path, extconf, siteconf_path, cross_platform) # :nodoc:
-      options = @config_options.dup
-
       # include current directory
       include_dirs = ['.'].concat(@config_includes).uniq.join(File::PATH_SEPARATOR)
-      cmd = [Gem.ruby, "-I#{include_dirs}", "-r#{File.basename(siteconf_path)}"]
 
       # build a relative path to extconf script
       abs_tmp_path = (Pathname.new(root_path) + tmp_path).realpath
       abs_extconf = (Pathname.new(root_path) + extconf).realpath
+      rel_extconf = abs_extconf.relative_path_from(abs_tmp_path).to_s
 
-      # now add the extconf script
-      cmd << abs_extconf.relative_path_from(abs_tmp_path).to_s
+      # base command
+      cmd = [Gem.ruby, "-I#{include_dirs}", "-r#{File.basename(siteconf_path)}", rel_extconf]
 
-      if cross_platform
-        options.push(*cross_config_options(cross_platform))
-      end
-
-      # add options to command
-      cmd.push(*options)
-
-      # add any extra command line options
-      unless extra_options.empty?
-        cmd.push(*extra_options)
-      end
+      # add all the options
+      cmd += @config_options
+      cmd += cross_config_options(cross_platform) if cross_platform
+      cmd += extra_options
 
       cmd.compact
     end
