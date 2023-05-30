@@ -1,3 +1,17 @@
+### 1.2.3 / 2023-05-30
+
+* Enhancements:
+  * GH-217: Added support for `nil` in build options again.
+    [Patch by Mike Dalessio]
+
+* Fixes:
+  * GH-219: Fixed a typo in documentation.
+    [Patch by y-yagi]
+
+* Thanks:
+  * Mike Dalessio
+  * y-yagi
+
 ### 1.2.2 / 2023-05-25
 
 * Enhancements:
