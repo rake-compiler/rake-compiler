@@ -103,7 +103,7 @@ as easy:
 
 Those **two** simple lines of code automatically added the Rake tasks needed to
 build your 'hello_world' extension. For example, checking the Rake tasks on
-MRI Ruby 1.8.x/1.9 returns something similar to:
+MRI Ruby returns something similar to:
 
     $ rake -T
     (in /home/user/my_extension)
@@ -251,7 +251,7 @@ several settings for `Rake::ExtensionTask`:
 ## Cross compilation - the future is now.
 
 Rake-compiler also provides a standardized way to generate, from either Linux
-or OSX, extensions and gem binaries for your Windows users!
+or OSX, extensions and gem binaries for your Windows and Linux users!
 
 How can this be you say? Simple, rake-compiler's cross compilation features
 take advantage of GCC's host/target capabilities to build 'target' binaries on
@@ -263,8 +263,8 @@ different 'host' OS's.
 
 Use rake-compiler-dock, a gem that makes use of a virtual machine provisioned with
 all the necessary build tools.  You can add a task to your Rakefile, that
-cross-compiles and packages your gem into Windows fat binaries (with 1.8 to 2.2
-and x86/x64 support). See https://github.com/rake-compiler/rake-compiler-dock for more
+cross-compiles and packages your gem into Windows and/or Linux fat binaries (with 2.2 to 2.7
+and x86/x86_64 support). See https://github.com/rake-compiler/rake-compiler-dock for more
 information.
 
 #### The Manual Way
@@ -316,14 +316,15 @@ on the Windows host system you're cross-compiling for. An example:
 
     # File: ~/.rake-compiler/config.yml
 
-    rbconfig-x86-mingw32-1.8.6: /path/to/ruby-1.8.6/rbconfig.rb
-    rbconfig-x86-mingw32-1.8.7: /path/to/ruby-1.8.7/rbconfig.rb
-    rbconfig-x86-mingw32-1.9.2: /path/to/ruby-1.9.2/rbconfig.rb
+    rbconfig-x86-mingw32-2.6.0: /path/to/ruby-2.6.0/rbconfig.rb
+    rbconfig-x86-mingw32-2.7.0: /path/to/ruby-2.7.0/rbconfig.rb
+    rbconfig-x64-mingw32-2.6.0: /path/to/ruby-2.6.0/rbconfig.rb
+    rbconfig-x64-mingw32-2.7.0: /path/to/ruby-2.7.0/rbconfig.rb
 
 If, instead, you want to build a different Ruby version than the default one, please
 supply a `VERSION`:
 
-    rake-compiler cross-ruby VERSION=1.8.6-p114
+    rake-compiler cross-ruby VERSION=2.7.0
 
 If you, like me, have multiple versions of MinGW packages installed, you can
 specify the HOST that will be used to cross compile Ruby:
@@ -343,7 +344,7 @@ Now, you only need specify a few additional options in your extension definition
       ext.cross_compile = true
 
       # set a single platform or an array of platforms to target
-      ext.cross_platform = ['x86-mingw32', 'x64-mingw32']
+      ext.cross_platform = ['x86-mingw32', 'x64-mingw32', 'x86-linux', 'x86_64-linux']
 
       # cross-compile options will be passed to extconf.rb for each
       # platform build, with platform-specific options in a hash.
@@ -364,8 +365,7 @@ Now, you only need specify a few additional options in your extension definition
     end
 
 By default, cross compilation targets 'i386-mingw32' which is the default
-GCC platform for Ruby. MRI Ruby's current official distribution uses
-`i386-mswin32-60`. The RubyInstaller distribution uses
+GCC platform for Ruby. The RubyInstaller distribution uses
 `x86-mingw32` and `x64-mingw32` for 32-bit and 64-bit
 Windows targets, respectively. Note that `i386` and `x86`
 are synonymous here; `x86` is preferred going forward.
@@ -381,7 +381,7 @@ Cross compiling is still very simple:
 
     rake cross compile
 
-And now, building gems for your Windows users is just 6 more letters:
+And now, building fat binary gems is just 6 more letters:
 
     rake cross native gem
 
@@ -391,31 +391,27 @@ And you're done, yeah.
 
 You can specify which version of Ruby to build the extension against:
 
-    rake cross compile RUBY_CC_VERSION=1.8.6
+    rake cross compile RUBY_CC_VERSION=2.6.0
 
-For example, if you installed `1.9.2`, you can do:
+Even better, you can target multiple versions (ie. 2.6.0 and 2.7.0) via:
 
-    rake cross compile RUBY_CC_VERSION=1.9.2
-
-Even better, you can target multiple versions (ie. 1.8.6 and 1.9.2) in
-the same gem via:
-
-    rake cross compile RUBY_CC_VERSION=1.8.6:1.9.2
+    rake cross compile RUBY_CC_VERSION=2.6.0:2.7.0
 
 And better yet, you can bundle both binary extensions into one so-called "fat"
 gem via:
 
-    rake cross native gem RUBY_CC_VERSION=1.8.6:1.9.2
+    rake cross native gem RUBY_CC_VERSION=2.6.0:2.7.0
 
-That will place binaries for both the 1.8 and 1.9 versions of your Ruby
+That will place binaries for both the 2.6 and 2.7 versions of your Ruby
 extensions inside your project's `lib_dir` directory:
 
-    lib/1.8/my_extension.so
-    lib/1.9/my_extension.so
+    lib/2.6/my_extension.so
+    lib/2.7/my_extension.so
 
-NOTE: building "fat" gems is currently only supported by rake-compiler when
-cross compiling from a Linux or OSX host. Patches are welcome if building
-"fat" gems from Windows hosts is desired, or natively for your platform :-)
+NOTE: Building "fat" gems is currently only supported by rake-compiler on a Linux
+or OSX host or by using rake-compiler-dock on any docker supported platform.
+Patches are welcome if building "fat" gems from Windows hosts is desired, or
+natively for your platform :-)
 
 Now it's up to you to make your gem load the proper binary at runtime:
 
@@ -426,7 +422,7 @@ Now it's up to you to make your gem load the proper binary at runtime:
       require "my_extension"
     end
 
-The above technique will lookup first for 1.8 or 1.9 version of the extension
+The above technique will lookup first for 2.6 or 2.7 version of the extension
 and when not found, will look for the plain extension.
 
 This approach catch the cases of provided fat binaries or gems compiled by the
