@@ -69,17 +69,19 @@ contribute back to your project.
 Now the fun part. It's time to introduce the code to your projects Rakefile
 to tell it to use rake-compiler to build your extension:
 
-    # File: extconf.rb
+```ruby
+# File: extconf.rb
 
-    # these lines must exist already
-    require 'mkmf'
-    create_makefile('hello_world')
+# these lines must exist already
+require 'mkmf'
+create_makefile('hello_world')
 
-    # File: Rakefile
+# File: Rakefile
 
-    require 'rake/extensiontask'
+require 'rake/extensiontask'
 
-    Rake::ExtensionTask.new('hello_world')
+Rake::ExtensionTask.new('hello_world')
+```
 
 That's it? Yes, that's it! No other lines of code are needed for
 rake-compiler to work its magic.
@@ -93,11 +95,13 @@ below for details.
 If you want to do the same for a JRuby extension written in Java, it's just
 as easy:
 
-    # File: Rakefile
+```ruby
+# File: Rakefile
 
-    require 'rake/javaextensiontask'
+require 'rake/javaextensiontask'
 
-    Rake::JavaExtensionTask.new('hello_world')
+Rake::JavaExtensionTask.new('hello_world')
+```
 
 ### The simple process
 
@@ -140,19 +144,21 @@ building native gems on Windows systems.
 Creating native gems is really easy with rake-compiler's
 `Rake::ExtensionTask`:
 
-    # somewhere in your Rakefile, define your gem spec
-    spec = Gem::Specification.new do |s|
-      s.name = "my_gem"
-      s.platform = Gem::Platform::RUBY
-      s.extensions = FileList["ext/**/extconf.rb"]
-    end
+```ruby
+# somewhere in your Rakefile, define your gem spec
+spec = Gem::Specification.new do |s|
+  s.name = "my_gem"
+  s.platform = Gem::Platform::RUBY
+  s.extensions = FileList["ext/**/extconf.rb"]
+end
 
-    # add your default gem packing task
-    Gem::PackageTask.new(spec) do |pkg|
-    end
+# add your default gem packing task
+Gem::PackageTask.new(spec) do |pkg|
+end
 
-    # feed the ExtensionTask with your spec
-    Rake::ExtensionTask.new('hello_world', spec)
+# feed the ExtensionTask with your spec
+Rake::ExtensionTask.new('hello_world', spec)
+```
 
 As expected, you can still build your pure-ruby gem in the usual way
 (standard output) by running:
@@ -209,18 +215,19 @@ Yes you can! While the conventional project structure is recommended, you may
 want, or need, to tweak those conventions. Rake-compiler allows you to customize
 several settings for `Rake::ExtensionTask`:
 
-    Rake::ExtensionTask.new do |ext|
-      ext.name = 'hello_world'                # indicate the name of the extension.
-      ext.ext_dir = 'ext/weird_world'         # search for 'hello_world' inside it.
-      ext.lib_dir = 'lib/my_lib'              # put binaries into this folder.
-      ext.config_script = 'custom_extconf.rb' # use instead of the default 'extconf.rb'.
-      ext.tmp_dir = 'tmp'                     # temporary folder used during compilation.
-      ext.source_pattern = "*.{c,cpp}"        # monitor file changes to allow simple rebuild.
-      ext.config_options << '--with-foo'      # supply additional options to configure script.
-      ext.gem_spec = spec                     # optionally indicate which gem specification
-                                              # will be used.
-    end
-
+```ruby
+Rake::ExtensionTask.new do |ext|
+  ext.name = 'hello_world'                # indicate the name of the extension.
+  ext.ext_dir = 'ext/weird_world'         # search for 'hello_world' inside it.
+  ext.lib_dir = 'lib/my_lib'              # put binaries into this folder.
+  ext.config_script = 'custom_extconf.rb' # use instead of the default 'extconf.rb'.
+  ext.tmp_dir = 'tmp'                     # temporary folder used during compilation.
+  ext.source_pattern = "*.{c,cpp}"        # monitor file changes to allow simple rebuild.
+  ext.config_options << '--with-foo'      # supply additional options to configure script.
+  ext.gem_spec = spec                     # optionally indicate which gem specification
+                                          # will be used.
+end
+```
 
 ### Show me all of the supported configuration options
 
@@ -338,30 +345,32 @@ reporting any issues.
 
 Now, you only need specify a few additional options in your extension definition:
 
-    Rake::ExtensionTask.new('my_extension', gem_spec) do |ext|
-      # enable cross compilation (requires cross compile toolchain)
-      ext.cross_compile = true
+```ruby
+Rake::ExtensionTask.new('my_extension', gem_spec) do |ext|
+  # enable cross compilation (requires cross compile toolchain)
+  ext.cross_compile = true
 
-      # set a single platform or an array of platforms to target
-      ext.cross_platform = ['x86-mingw32', 'x64-mingw32']
+  # set a single platform or an array of platforms to target
+  ext.cross_platform = ['x86-mingw32', 'x64-mingw32']
 
-      # cross-compile options will be passed to extconf.rb for each
-      # platform build, with platform-specific options in a hash.
-      ext.cross_config_options << '--with-common-option'
-      ext.cross_config_options << {
-        'x86-mswin32-60' => '--with-some-option',
-        'x64-mingw32'   => '--enable-64bits',
-      }
-      ext.cross_config_options << '--with-final-option'
+  # cross-compile options will be passed to extconf.rb for each
+  # platform build, with platform-specific options in a hash.
+  ext.cross_config_options << '--with-common-option'
+  ext.cross_config_options << {
+    'x86-mswin32-60' => '--with-some-option',
+    'x64-mingw32'   => '--enable-64bits',
+  }
+  ext.cross_config_options << '--with-final-option'
 
-      # perform alterations on the gemspec when cross compiling
-      ext.cross_compiling do |gem_spec|
-        # such as packaging a file that isn't specified in the gemspec
-        gem_spec.files << 'lib/generated_file.rb'
-        # or adding a new installation message
-        gem_spec.post_install_message = "You installed the binary version of this gem!"
-      end
-    end
+  # perform alterations on the gemspec when cross compiling
+  ext.cross_compiling do |gem_spec|
+    # such as packaging a file that isn't specified in the gemspec
+    gem_spec.files << 'lib/generated_file.rb'
+    # or adding a new installation message
+    gem_spec.post_install_message = "You installed the binary version of this gem!"
+  end
+end
+```
 
 By default, cross compilation targets 'i386-mingw32' which is the default
 GCC platform for Ruby. MRI Ruby's current official distribution uses
@@ -419,12 +428,14 @@ cross compiling from a Linux or OSX host. Patches are welcome if building
 
 Now it's up to you to make your gem load the proper binary at runtime:
 
-    begin
-      RUBY_VERSION =~ /(\d+\.\d+)/
-      require "#{$1}/my_extension"
-    rescue LoadError
-      require "my_extension"
-    end
+```ruby
+begin
+  RUBY_VERSION =~ /(\d+\.\d+)/
+  require "#{$1}/my_extension"
+rescue LoadError
+  require "my_extension"
+end
+```
 
 The above technique will lookup first for 1.8 or 1.9 version of the extension
 and when not found, will look for the plain extension.
