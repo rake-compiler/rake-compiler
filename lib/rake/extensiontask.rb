@@ -175,14 +175,6 @@ module Rake
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_path, tmp_binary_path, "#{tmp_path}/Makefile"] do
-        # install in lib for native platform only
-        unless for_platform
-          sh "#{make} install target_prefix=", chdir: tmp_path
-        end
-      end
-      # copy binary from temporary location to staging directory
-      task "copy:#{@name}:#{platf}:#{ruby_ver}" => [stage_binary_dir_path, tmp_binary_path] do
-        cp tmp_binary_path, stage_binary_path
       end
 
       # copy other gem files to staging directory
