@@ -289,7 +289,6 @@ describe Rake::ExtensionTask do
       around :each do |test|
         @tmp_path = "injectedtmp"
         @extconf = "injectedextconf.rb"
-        @siteconf_path = "#{@tmp_path}/.injected-siteconf.rb"
 
         Dir.mktmpdir do |root_path|
           @root_path = root_path
@@ -313,13 +312,12 @@ describe Rake::ExtensionTask do
       end
 
       it "runs the extconf with proper arguments when not cross-compiling" do
-        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, @siteconf_path, nil)
+        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, nil)
 
         expected_includes = [".", "/injected/include1", "/injected/include2"].join(File::PATH_SEPARATOR)
         expected = [
           Gem.ruby,
           "-I#{expected_includes}",
-          "-r.injected-siteconf.rb",
           "../#{@extconf}",
           "--with-a", # config_options
           "--", "--with-b", # extra_options
@@ -329,13 +327,12 @@ describe Rake::ExtensionTask do
       end
 
       it "runs the extconf with proper arguments when cross-compiling" do
-        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, @siteconf_path, "universal-known")
+        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, "universal-known")
 
         expected_includes = [".", "/injected/include1", "/injected/include2"].join(File::PATH_SEPARATOR)
         expected = [
           Gem.ruby,
           "-I#{expected_includes}",
-          "-r.injected-siteconf.rb",
           "../#{@extconf}",
           "--with-a", # config_options
           "--with-c", "--with-d", # cross_config_options
@@ -348,13 +345,12 @@ describe Rake::ExtensionTask do
       it "handles spaces in arguments correctly" do
         @ext.extra_options << "--with-spaces='a b'"
 
-        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, @siteconf_path, nil)
+        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, nil)
 
         expected_includes = [".", "/injected/include1", "/injected/include2"].join(File::PATH_SEPARATOR)
         expected = [
           Gem.ruby,
           "-I#{expected_includes}",
-          "-r.injected-siteconf.rb",
           "../#{@extconf}",
           "--with-a", # config_options
           "--", "--with-b", "--with-spaces='a b'", # extra_options
@@ -366,13 +362,12 @@ describe Rake::ExtensionTask do
       it "handles 'nil' in the command array gracefully" do
         @ext.config_options << nil # imagine this is ENV['NONEXISTENT_VALUE']
 
-        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, @siteconf_path, nil)
+        command = @ext.make_makefile_cmd(@root_path, @tmp_path, @extconf, nil)
 
         expected_includes = [".", "/injected/include1", "/injected/include2"].join(File::PATH_SEPARATOR)
         expected = [
           Gem.ruby,
           "-I#{expected_includes}",
-          "-r.injected-siteconf.rb",
           "../#{@extconf}",
           "--with-a", # config_options
           "--", "--with-b", # extra_options

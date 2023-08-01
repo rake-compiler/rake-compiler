@@ -1,4 +1,5 @@
 require "rbconfig"
+require "shellwords"
 
 require 'rake/baseextensiontask'
 require "rubygems/package_task"
@@ -79,7 +80,7 @@ module Rake
       end.flatten
     end
 
-    def make_makefile_cmd(root_path, tmp_path, extconf, siteconf_path, cross_platform) # :nodoc:
+    def make_makefile_cmd(root_path, tmp_path, extconf, cross_platform) # :nodoc:
       # include current directory
       include_dirs = ['.'].concat(@config_includes).uniq.join(File::PATH_SEPARATOR)
 
@@ -89,7 +90,7 @@ module Rake
       rel_extconf = abs_extconf.relative_path_from(abs_tmp_path).to_s
 
       # base command
-      cmd = [Gem.ruby, "-I#{include_dirs}", "-r#{File.basename(siteconf_path)}", rel_extconf]
+      cmd = [Gem.ruby, "-I#{include_dirs}", rel_extconf]
 
       # add all the options
       cmd += @config_options
@@ -140,7 +141,6 @@ module Rake
       tmp_path = "#{@tmp_dir}/#{platf}/#{@name}/#{ruby_ver}"
       stage_path = "#{@tmp_dir}/#{platf}/stage"
 
-      siteconf_path = "#{tmp_path}/.rake-compiler-siteconf.rb"
       tmp_binary_path = "#{tmp_path}/#{binary_path}"
       tmp_binary_dir_path = File.dirname(tmp_binary_path)
       stage_binary_path = "#{stage_path}/#{lib_binary_path}"
@@ -158,26 +158,20 @@ module Rake
       directory lib_path
       directory stage_binary_dir_path
 
-      directory File.dirname(siteconf_path)
-      # Set paths for "make install" destinations
-      file siteconf_path => File.dirname(siteconf_path) do
-        File.open(siteconf_path, "w") do |siteconf|
-          siteconf.puts "require 'rbconfig'"
-          siteconf.puts "require 'mkmf'"
-          siteconf.puts "dest_path = mkintpath(#{File.expand_path(lib_path).dump})"
-          %w[sitearchdir sitelibdir].each do |dir|
-            siteconf.puts "RbConfig::MAKEFILE_CONFIG['#{dir}'] = dest_path"
-            siteconf.puts "RbConfig::CONFIG['#{dir}'] = dest_path"
-          end
-        end
-      end
-
       # copy binary from temporary location to final lib
       # tmp/extension_name/extension_name.{so,bundle} => lib/
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_path, tmp_binary_path, "#{tmp_path}/Makefile"] do
         # install in lib for native platform only
         unless for_platform
-          sh "#{make} install target_prefix=", chdir: tmp_path
+          relative_lib_path = Pathname(lib_path).relative_path_from(tmp_path)
+
+          make_command_line = Shellwords.shellsplit(make)
+          make_command_line << "install"
+          make_command_line << "sitearchdir=#{relative_lib_path}"
+          make_command_line << "sitelibdir=#{relative_lib_path}"
+          make_command_line << "target_prefix="
+
+          sh(*make_command_line, chdir: tmp_path)
         end
       end
       # copy binary from temporary location to staging directory
@@ -207,14 +201,14 @@ Java extension should be preferred.
 
       # makefile depends of tmp_dir and config_script
       # tmp/extension_name/Makefile
-      file "#{tmp_path}/Makefile" => [tmp_path, extconf, siteconf_path] do |t|
+      file "#{tmp_path}/Makefile" => [tmp_path, extconf] do |t|
         if t.prerequisites.include?("#{tmp_path}/fake.rb")
           cross_platform = platf
         else
           cross_platform = nil
         end
 
-        command = make_makefile_cmd(Dir.pwd, tmp_path, extconf, siteconf_path, cross_platform)
+        command = make_makefile_cmd(Dir.pwd, tmp_path, extconf, cross_platform)
 
         chdir tmp_path do
           sh(*command)
