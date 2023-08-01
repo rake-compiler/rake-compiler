@@ -1,3 +1,17 @@
+### 1.2.4 / 2023-08-01
+
+* Enhancements:
+  * GH-221: Enabled syntax highlighting in documents.
+    [Patch by Ryo Nakamura]
+  * GH-202 GH-222: Use environment variables to set install paths.
+    [Reported by Brandon Fish]
+    [Patch by Michael Go]
+
+* Thanks:
+  * Ryo Nakamura
+  * Brandon Fish
+  * Michael Go
+
 ### 1.2.3 / 2023-05-30
 
 * Enhancements:
