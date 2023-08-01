@@ -1,7 +1,8 @@
 require "rbconfig"
+require "shellwords"
+
 require 'rake/baseextensiontask'
 require "rubygems/package_task"
-require "Shellwords"
 
 # Define a series of tasks to aid in the compilation of C extensions for
 # gem developer/creators.
