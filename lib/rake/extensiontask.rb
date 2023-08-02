@@ -163,7 +163,7 @@ module Rake
       task "copy:#{@name}:#{platf}:#{ruby_ver}" => [lib_path, tmp_binary_path, "#{tmp_path}/Makefile"] do
         # install in lib for native platform only
         unless for_platform
-          relative_lib_path = Pathname(lib_path).relative_path_from(tmp_path)
+          relative_lib_path = Pathname(lib_path).relative_path_from(Pathname(tmp_path))
 
           make_command_line = Shellwords.shellsplit(make)
           make_command_line << "install"
