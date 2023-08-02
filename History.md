@@ -1,3 +1,18 @@
+### 1.2.5 / 2023-08-03
+
+* Fixes:
+  * GH-225: Fixed a bug that `rake compile` may not work on Windows.
+    [Reported by Lukasz Suleja]
+  * GH-224 GH-226: Fixed a bug that 1.2.4 doesn't work on Ruby < 2.6.
+    [Reported by Ivo Anjo]
+    [Patch by Mike Dalessio and Akira Matsuda separately]
+
+* Thanks:
+  * Lukasz Suleja
+  * Ivo Anjo
+  * Mike Dalessio
+  * Akira Matsuda
+
 ### 1.2.4 / 2023-08-01
 
 * Enhancements:
