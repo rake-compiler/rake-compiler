@@ -513,12 +513,15 @@ Java extension should be preferred.
     def find_make
       candidates = ["gmake", "make"]
       paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
+      paths = paths.collect do |path|
+        Pathname(path).cleanpath
+      end
 
       exeext = RbConfig::CONFIG["EXEEXT"]
       candidates.each do |candidate|
         paths.each do |path|
-          make = File.join(path, "#{candidate}#{exeext}")
-          return make if File.executable?(make)
+          make = path + "#{candidate}#{exeext}"
+          return make.to_s if make.executable?
         end
       end
 
