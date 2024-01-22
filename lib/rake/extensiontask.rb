@@ -429,7 +429,7 @@ Java extension should be preferred.
           f.puts("require 'rbconfig'")
           f.puts("original_enable_shared = RbConfig::CONFIG['ENABLE_SHARED']")
           f.puts(fake_rb(for_platform, ruby_ver))
-          f.puts(File.read(t.prerequisites.first))
+          f.puts("require #{t.prerequisites.first.dump}")
           f.puts("RbConfig::CONFIG['ENABLE_SHARED'] = original_enable_shared")
         end
       end
