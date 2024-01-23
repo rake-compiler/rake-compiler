@@ -1,3 +1,13 @@
+### 1.2.6 / 2024-01-23
+
+* Improvements:
+  * GH-232 GH-233: Changed to use `require` instead of copying content
+    of `rbconfig.rb` for `__FILE__` in `rbconfig.rb`.
+    [Patch by ParadoxV5]
+
+* Thanks:
+  * ParadoxV5
+
 ### 1.2.5 / 2023-08-03
 
 * Fixes:
