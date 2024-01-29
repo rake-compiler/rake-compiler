@@ -1,6 +1,6 @@
 begin
   require "rspec/core/rake_task"
-rescue LoadError => e
+rescue LoadError
   warn "RSpec gem is required, please install it (gem install rspec)."
 end
 
