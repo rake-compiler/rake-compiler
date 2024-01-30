@@ -620,6 +620,93 @@ describe Rake::ExtensionTask do
         spec.metadata['allowed_push_host'].should eq 'http://test'
       end
 
+      it "should set required_rubygems_version when building a gem for `-linux-gnu` or `-linux-musl`" do
+        platforms = ["arm64-darwin", "arm-linux", "arm-linux-gnu", "arm-linux-musl"]
+        ruby_cc_versions = ["3.3.0"]
+        ENV["RUBY_CC_VERSION"] = ruby_cc_versions.join(":")
+
+        ruby_cc_versions.each do |ruby_cc_version|
+          platforms.each do |platform|
+            rbconf = "/rubies/#{ruby_cc_version}/rbconfig.rb"
+            allow_any_instance_of(Rake::CompilerConfig).to(
+              receive(:find)
+                .with(ruby_cc_version, platform)
+                .and_return(rbconf)
+            )
+          end
+        end
+
+        allow(Gem).to receive_message_chain(:configuration, :verbose=).and_return(true)
+
+        spec = Gem::Specification.new do |s|
+          s.name = 'my_gem'
+          s.platform = Gem::Platform::RUBY
+          s.extensions = ['ext/somegem/extconf.rb']
+        end
+
+        cross_specs = {} # platform => spec
+        Rake::ExtensionTask.new("extension_one", spec) do |ext|
+          ext.cross_platform = platforms
+          ext.cross_compile = true
+          ext.cross_compiling do |cross_spec|
+            cross_specs[cross_spec.platform.to_s] = cross_spec
+          end
+        end
+        platforms.each do |platform|
+          Rake::Task["native:my_gem:#{platform}"].execute
+        end
+
+        cross_specs["arm64-darwin"].required_rubygems_version.should eq(Gem::Requirement.default)
+        cross_specs["arm-linux"].required_rubygems_version.should eq(Gem::Requirement.default)
+
+        if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("3.3.22")
+          expected_rubygems_version = Gem::Requirement.new([">= 3.3.22"])
+          cross_specs["arm-linux-gnu"].required_rubygems_version.should eq(expected_rubygems_version)
+          cross_specs["arm-linux-musl"].required_rubygems_version.should eq(expected_rubygems_version)
+        end
+      end
+
+      it "should append to required_rubygems_version if it's set" do
+        platform = "arm-linux-musl"
+        ruby_cc_versions = ["3.3.0"]
+        ENV["RUBY_CC_VERSION"] = ruby_cc_versions.join(":")
+
+        ruby_cc_versions.each do |ruby_cc_version|
+          rbconf = "/rubies/#{ruby_cc_version}/rbconfig.rb"
+          allow_any_instance_of(Rake::CompilerConfig).to(
+            receive(:find)
+              .with(ruby_cc_version, platform)
+              .and_return(rbconf)
+          )
+        end
+
+        allow(Gem).to receive_message_chain(:configuration, :verbose=).and_return(true)
+
+        spec = Gem::Specification.new do |s|
+          s.name = 'my_gem'
+          s.platform = Gem::Platform::RUBY
+          s.extensions = ['ext/somegem/extconf.rb']
+          s.required_rubygems_version = "!= 3.4.1" # keep this around
+        end
+
+        actual_cross_spec = nil
+        Rake::ExtensionTask.new("extension_one", spec) do |ext|
+          ext.cross_platform = [platform]
+          ext.cross_compile = true
+          ext.cross_compiling do |cross_spec|
+            actual_cross_spec = cross_spec
+          end
+        end
+        Rake::Task["native:my_gem:#{platform}"].execute
+
+        if Gem::Version.new(Gem::VERSION) < Gem::Version.new("3.3.22")
+          actual_cross_spec.required_rubygems_version.should eq(Gem::Requirement.new(["!= 3.4.1"]))
+        else
+          expected_rubygems_version = Gem::Requirement.new(["!= 3.4.1", ">= 3.3.22"])
+          actual_cross_spec.required_rubygems_version.should eq(expected_rubygems_version)
+        end
+      end
+
       after :each do
         ENV.delete('RUBY_CC_VERSION')
       end

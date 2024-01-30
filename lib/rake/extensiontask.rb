@@ -278,6 +278,16 @@ Java extension should be preferred.
             "< #{ruby_api_version(sorted_ruby_versions.last).succ}.dev"
           ]
 
+          # set rubygems version constraints
+          if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("3.3.22") &&
+             spec.platform.os == "linux" && !spec.platform.version.nil?
+            spec.required_rubygems_version = if spec.required_rubygems_version == Gem::Requirement.default
+              [">= 3.3.22"]
+            else
+              Gem::Requirement.new(gem_spec.required_rubygems_version, ">= 3.3.22")
+            end
+          end
+
           # clear the extensions defined in the specs
           spec.extensions.clear
 
