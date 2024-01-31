@@ -3,7 +3,7 @@
 Gem::Specification.new do |s|
   # basic information
   s.name        = "rake-compiler"
-  s.version     = "1.2.7"
+  s.version     = "1.2.8"
   s.platform    = Gem::Platform::RUBY
 
   # description and details
