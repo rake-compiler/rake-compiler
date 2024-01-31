@@ -1,3 +1,13 @@
+### 1.2.7 / 2024-01-31
+
+* Improvements:
+  * GH-236: Added support for setting `required_rubygems_version` for
+    fat-gems that specify the Linux libc.
+    [Patch by Mike Dalessio]
+
+* Thanks:
+  * Mike Dalessio
+
 ### 1.2.6 / 2024-01-23
 
 * Improvements:
