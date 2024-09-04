@@ -288,9 +288,9 @@ On OSX, we no longer recommend the usage of MacPorts `mingw32` package because
 it stagnated in GCC version 3.4.5.
 
 Instead we recommend you download mingw-w64 automated build packages available at
-SourceForge:
+OSDN:
 
-http://sourceforge.net/downloads/mingw-w64/
+https://osdn.net/projects/mingw/
 
 Browse into *Toolchains targetting Win32* and then *Automated Builds*.
 
