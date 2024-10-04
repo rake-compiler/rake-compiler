@@ -1,3 +1,12 @@
+### 1.2.8 / 2024-10-04
+
+* Improvements:
+  * GH-240: Stopped to generate tasks for nonexistent files.
+    * Patch by y-yagi
+
+* Thanks:
+  * y-yagi
+
 ### 1.2.7 / 2024-01-31
 
 * Improvements:
