@@ -86,8 +86,8 @@ module Rake
       lib_binary_path = "#{lib_path}/#{File.basename(binary(platf))}"
 
       files.each do |gem_file|
-        # ignore directories and the binary extension
-        next if File.directory?(gem_file) || gem_file == lib_binary_path
+        # ignore directories, the binary extension and non-existent files
+        next if File.directory?(gem_file) || gem_file == lib_binary_path || !File.exist?(gem_file)
         stage_file = "#{stage_path}/#{gem_file}"
 
         # copy each file from base to stage directory
