@@ -154,7 +154,7 @@ task 'update-config' do
   files = Dir.glob("#{USER_HOME}/ruby/*/*/**/rbconfig.rb").sort
 
   files.each do |rbconfig|
-    version, platform = rbconfig.match(/.*-(\d.\d.\d).*\/([-\w]+)\/rbconfig/)[1,2]
+    version, platform = rbconfig.match(/.*-(\d+\.\d+\.\d+).*\/([-\w]+)\/rbconfig/)[1,2]
     platforms = [platform]
 
     # fake alternate (binary compatible) i386-mswin32-60 platform
