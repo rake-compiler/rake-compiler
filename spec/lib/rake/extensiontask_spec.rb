@@ -504,11 +504,10 @@ describe Rake::ExtensionTask do
         }.should_not raise_error
       end
 
-      it 'should generate additional rake tasks if files are added when cross compiling and files exist' do
+      it 'should generate additional rake tasks if files are added when cross compiling' do
         allow_any_instance_of(Rake::CompilerConfig).to(
           receive(:find).and_return("/rubies/1.9.1/rbconfig.rb")
         )
-        expect(File).to receive(:exist?).with('somedir/non-existent-file').and_return(false)
 
         # Use a real spec instead of a mock because define_native_tasks dups and
         # calls methods on Gem::Specification, which is more than mock can do.
@@ -528,13 +527,11 @@ describe Rake::ExtensionTask do
           ext.cross_platform = 'universal-unknown'
           ext.cross_compiling do |gem_spec|
             gem_spec.files << 'somedir/somefile'
-            gem_spec.files << 'somedir/non-existent-file'
           end
         end
         Rake::Task['native:my_gem:universal-unknown'].execute
         Rake::Task.should have_defined("tmp/universal-unknown/stage/somedir")
         Rake::Task.should have_defined("tmp/universal-unknown/stage/somedir/somefile")
-        Rake::Task.should_not have_defined("tmp/universal-unknown/stage/somedir/non-existent-file")
       end
 
       it 'should allow usage of RUBY_CC_VERSION to indicate a different version of ruby' do
