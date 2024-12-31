@@ -26,3 +26,29 @@ jobs:
             --title "${title}"
         env:
           GH_TOKEN: ${{ github.token }}
+
+  rubygems:
+    name: RubyGems
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+    environment: release
+    strategy:
+      matrix:
+        ruby:
+          - ruby
+          - jruby
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Build
+        run: |
+          bundle exec rake compile
+      - uses: rubygems/configure-rubygems-credentials@v1.0.0
+      - name: Push gems
+        run: |
+          bundle exec rake release:rubygem_push
