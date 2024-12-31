@@ -1,3 +1,20 @@
+### 1.2.9 / 2024-12-31
+
+* Improvements:
+  * GH-242: Java: Changed to the default target Java to 8.
+    * Patch by Charles Oliver Nutter
+
+  * GH-244: Added support for double-digit version segments in Ruby
+    version such as "2.6.10".
+    * Patch by Mike Dalessio
+
+  * GH-240: Reverted "stopped to generate tasks for nonexistent files"
+    in 1.2.8. Users must specify valid `spec.files`.
+
+* Thanks:
+  * Charles Oliver Nutter
+  * Mike Dalessio
+
 ### 1.2.8 / 2024-10-04
 
 * Improvements:
