@@ -108,8 +108,15 @@ execute the Rake compilation task using the JRuby interpreter.
         EOF
         warn_once(not_jruby_compile_msg) unless defined?(JRUBY_VERSION)
 
+        java_home = ENV["JAVA_HOME"]
+        if java_home
+          javac_path = File.join(java_home, "bin", "javac")
+          javac_path = nil unless File.exist?(javac_path)
+        end
+        javac_path ||= "javac" 
+
         javac_command_line = [
-          "javac",
+          javac_path,
           *java_target_args,
           java_lint_arg,
           "-d", tmp_path,
@@ -306,7 +313,7 @@ execute the Rake compilation task using the JRuby interpreter.
 
     def release_flag_supported?
       return true unless RUBY_PLATFORM =~ /java/
-      
+
       Gem::Version.new(Java::java.lang.System.getProperty('java.version')) >= Gem::Version.new("9")
     end
   end
