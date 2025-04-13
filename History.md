@@ -1,3 +1,12 @@
+### 1.3.0 / 2025-04-13
+
+* Improvements:
+  * GH-247: Java: Added support for the `JAVA_HOME` environment variable.
+    * Patch by MSP-Greg
+
+* Thanks:
+  * MSP-Greg
+
 ### 1.2.9 / 2024-12-31
 
 * Improvements:
