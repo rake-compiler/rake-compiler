@@ -47,4 +47,10 @@ Gem::Specification.new do |s|
   # author and contributors
   s.authors     = ['Kouhei Sutou', 'Luis Lavena']
   s.email       = ['kou@cozmixng.org', 'luislavena@gmail.com']
+
+  s.metadata = {
+    "bug_tracker_uri" => "https://github.com/rake-compiler/rake-compiler/issues",
+    "changelog_uri" => "https://github.com/rake-compiler/rake-compiler/blob/-/History.md",
+    "source_code_uri" => "https://github.com/rake-compiler/rake-compiler",
+  }
 end
