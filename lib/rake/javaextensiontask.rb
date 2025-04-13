@@ -113,7 +113,7 @@ execute the Rake compilation task using the JRuby interpreter.
           javac_path = File.join(java_home, "bin", "javac")
           javac_path = nil unless File.exist?(javac_path)
         end
-        javac_path ||= "javac" 
+        javac_path ||= "javac"
 
         javac_command_line = [
           javac_path,
