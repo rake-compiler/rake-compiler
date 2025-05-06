@@ -110,7 +110,8 @@ execute the Rake compilation task using the JRuby interpreter.
 
         java_home = ENV["JAVA_HOME"]
         if java_home
-          javac_path = File.join(java_home, "bin", "javac")
+          exeext = RbConfig::CONFIG["EXEEXT"]
+          javac_path = File.join(java_home, "bin", "javac#{exeext}")
           javac_path = nil unless File.exist?(javac_path)
         end
         javac_path ||= "javac"
