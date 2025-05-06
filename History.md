@@ -1,3 +1,8 @@
+### 1.3.1 / 2025-05-06
+
+* Improvements:
+  * Java: Improved `javac` detection.
+
 ### 1.3.0 / 2025-04-13
 
 * Improvements:
