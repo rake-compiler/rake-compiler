@@ -56,6 +56,13 @@ module Rake
         warn "WARNING: rake-compiler found compiled files in '#{@ext_dir}' directory. Please remove them."
       end
 
+      if @content_addressable && !Gem::PackageTask.method_defined?(:content_addressable=)
+        warn <<~MSG
+          WARNING: content_addressable is enabled but RubyGems #{Gem::VERSION} does not support content addressable gems.
+                   Only the multi-ABI gem will be built. Upgrade RubyGems with `gem update --system`.
+        MSG
+      end
+
       # only gems with 'ruby' platforms are allowed to define native tasks
       define_native_tasks if !@no_native && (@gem_spec && @gem_spec.platform == 'ruby')
 

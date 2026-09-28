@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require 'rake/extensiontask'
 require 'rbconfig'
 require 'yaml'
-require 'tmpdir'
 
 describe Rake::ExtensionTask do
   context '#new' do
@@ -755,7 +754,7 @@ describe Rake::ExtensionTask do
         )
       end
 
-      it 'should use traditional packaging when RubyGems does not support content-addressable PackageTask builds' do
+      it 'should only build the multi ABI gem when RubyGems does not support content addressable gems' do
         platform = "x86-mingw32"
         ruby_cc_version = "1.8.6"
         ENV["RUBY_CC_VERSION"] = ruby_cc_version
@@ -776,11 +775,15 @@ describe Rake::ExtensionTask do
           s.platform = Gem::Platform::RUBY
         end
 
-        Rake::ExtensionTask.new("extension_one", spec) do |ext|
-          ext.cross_platform = platform
-          ext.cross_compile = true
-          ext.content_addressable = true
-        end
+        expect {
+          Rake::ExtensionTask.new("extension_one", spec) do |ext|
+            ext.cross_platform = platform
+            ext.cross_compile = true
+            ext.content_addressable = true
+          end
+        }.to output(/content_addressable is enabled but RubyGems #{Regexp.escape(Gem::VERSION)} does not support/).to_stderr
+
+        Rake::Task.task_defined?("native:my_gem:#{platform}:1.8").should be false
 
         Rake::Task["native:my_gem:#{platform}"].execute
 
