@@ -244,87 +244,6 @@ Java extension should be preferred.
       end
     end
 
-    def define_content_addressable_package_task(
-      task_name, platf, ruby_ver, ruby_abi, stage_path, lib_path, callback
-    )
-      return if Rake::Task.task_defined?(task_name)
-
-      task task_name do |t|
-        # FIXME: workaround Gem::Specification limitation around cache_file:
-        # http://github.com/rubygems/rubygems/issues/78
-        spec = gem_spec.dup
-        spec.instance_variable_set(:"@cache_file", nil) if spec.respond_to?(:cache_file)
-
-        # adjust to specified platform
-        spec.platform = Gem::Platform.new(platf)
-
-        # introduce pessimistic version requirement syntax for skinny packaged gems
-        spec.required_ruby_version = "~> #{ruby_abi}.0"
-
-        # set rubygems version constraints
-        if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("3.3.22") &&
-           spec.platform.os == "linux" && !spec.platform.version.nil?
-          spec.required_rubygems_version = if spec.required_rubygems_version == Gem::Requirement.default
-            [">= 3.3.22"]
-          else
-            Gem::Requirement.new(gem_spec.required_rubygems_version, ">= 3.3.22")
-          end
-        end
-
-        # clear the extensions defined in the specs
-        spec.extensions.clear
-
-        # add the binaries that this task depends on
-        ext_files = []
-        t.prerequisites.each do |ext|
-          # strip stage path and keep lib/... only
-          ext_files << ext.sub(stage_path+"/", '')
-        end
-
-        # include the files in the gem specification
-        spec.files += ext_files
-
-        # expose gem specification for customization
-        callback.call(spec) if callback
-
-        # Generate a package for this gem
-        pkg = Gem::PackageTask.new(spec) do |p|
-          p.need_zip = false
-          p.need_tar = false
-          # Do not copy any files per PackageTask, because
-          # we need the files from the staging directory
-          p.package_files.clear
-          p.content_addressable = true
-          p.package_dir = File.join(p.package_dir, ruby_abi)
-        end
-
-        # copy other gem files to staging directory if added by the callback
-        define_staging_file_tasks(spec.files, lib_path, stage_path, platf, ruby_ver)
-
-        # Copy from staging directory to gem package directory.
-        # This is derived from the code of Gem::PackageTask
-        # but uses stage_path as source directory.
-        stage_files = spec.files.map do |gem_file|
-          File.join(stage_path, gem_file)
-        end
-        file pkg.package_dir_path => stage_files do
-          mkdir_p pkg.package_dir rescue nil
-          spec.files.each do |ft|
-            fn = File.join(stage_path, ft)
-            f = File.join(pkg.package_dir_path, ft)
-            fdir = File.dirname(f)
-            mkdir_p(fdir) if !File.exist?(fdir)
-            if File.directory?(fn)
-              mkdir_p(f)
-            else
-              rm_f f
-              safe_ln(fn, f)
-            end
-          end
-        end
-      end
-    end
-
     def define_native_tasks(for_platform = nil, ruby_ver = RUBY_VERSION, callback = nil)
       platf = for_platform || platform
 
@@ -341,13 +260,21 @@ Java extension should be preferred.
       @ruby_versions_per_platform[platf] << ruby_ver
 
       native_task_name = "native:#{@gem_spec.name}:#{platf}"
-      content_addressable_package = content_addressable && Gem::PackageTask.method_defined?(:content_addressable=)
-      ruby_abi = ruby_api_version(ruby_ver) if content_addressable_package
-      abi_task_name = "#{native_task_name}:#{ruby_abi}" if ruby_abi
+
+      # packaging tasks to define: task name => Ruby ABI (nil for the multi-ABI gem)
+      package_tasks = { native_task_name => nil }
+
+      # when content addressable, also build a single Ruby ABI gem per Ruby version
+      if content_addressable && Gem::PackageTask.method_defined?(:content_addressable=)
+        abi = ruby_api_version(ruby_ver)
+        package_tasks["#{native_task_name}:#{abi}"] = abi
+      end
 
       # create 'native:gem_name' and chain it to 'native' task
-      unless Rake::Task.task_defined?(native_task_name)
-        task native_task_name do |t|
+      package_tasks.each do |task_name, ruby_abi|
+        next if Rake::Task.task_defined?(task_name)
+
+        task task_name do |t|
           # FIXME: workaround Gem::Specification limitation around cache_file:
           # http://github.com/rubygems/rubygems/issues/78
           spec = gem_spec.dup
@@ -357,15 +284,19 @@ Java extension should be preferred.
           spec.platform = Gem::Platform.new(platf)
 
           # set ruby version constraints
-          ruby_versions = @ruby_versions_per_platform[platf]
-          sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
-            ruby_version.split(".").collect(&:to_i)
+          if ruby_abi
+            # pessimistic version requirement for a single Ruby ABI gem
+            spec.required_ruby_version = "~> #{ruby_abi}.0"
+          else
+            ruby_versions = @ruby_versions_per_platform[platf]
+            sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
+              ruby_version.split(".").collect(&:to_i)
+            end
+            spec.required_ruby_version = [
+              ">= #{ruby_api_version(sorted_ruby_versions.first)}",
+              "< #{ruby_api_version(sorted_ruby_versions.last).succ}.dev"
+            ]
           end
-
-          spec.required_ruby_version = [
-            ">= #{ruby_api_version(sorted_ruby_versions.first)}",
-            "< #{ruby_api_version(sorted_ruby_versions.last).succ}.dev"
-          ]
 
           # set rubygems version constraints
           if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("3.3.22") &&
@@ -383,15 +314,8 @@ Java extension should be preferred.
           # add the binaries that this task depends on
           ext_files = []
 
-          extension_prerequisites =
-            if content_addressable_package
-              t.prerequisite_tasks.flat_map(&:prerequisites)
-            else
-              t.prerequisites
-            end
-
           # go through native prerequisites and grab the real extension files from there
-          extension_prerequisites.each do |ext|
+          t.prerequisites.each do |ext|
             # strip stage path and keep lib/... only
             ext_files << ext.sub(stage_path+"/", '')
           end
@@ -409,6 +333,9 @@ Java extension should be preferred.
             # Do not copy any files per PackageTask, because
             # we need the files from the staging directory
             p.package_files.clear
+            # Gem::PackageTask scopes its staging directory by Ruby ABI when
+            # content_addressable is set, so every gem still lands in `pkg/`.
+            p.content_addressable = true if ruby_abi
           end
 
           # copy other gem files to staging directory if added by the callback
@@ -438,21 +365,9 @@ Java extension should be preferred.
         end
       end
 
-      # add packaging tasks and binaries to the dependency chain
-      if abi_task_name
-        define_content_addressable_package_task(
-          abi_task_name,
-          platf,
-          ruby_ver,
-          ruby_abi,
-          stage_path,
-          lib_path,
-          callback
-        )
-        task native_task_name => [abi_task_name]
-        task abi_task_name => ["#{stage_path}/#{lib_binary_path}"]
-      else
-        task native_task_name => ["#{stage_path}/#{lib_binary_path}"]
+      # add binaries to the dependency chain
+      package_tasks.each_key do |task_name|
+        task task_name => ["#{stage_path}/#{lib_binary_path}"]
       end
 
       # ensure the extension get copied
@@ -462,12 +377,12 @@ Java extension should be preferred.
       file "#{stage_path}/#{lib_binary_path}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
 
       # Allow segmented packaging by platform (open door for 'cross compile')
-      task "native:#{platf}" => ["native:#{@gem_spec.name}:#{platf}"]
+      task "native:#{platf}" => package_tasks.keys
 
       # Only add this extension to the compile chain if current
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
-        task "native:#{@gem_spec.name}" => ["native:#{@gem_spec.name}:#{platf}"]
+        task "native:#{@gem_spec.name}" => package_tasks.keys
         task "native" => ["native:#{platf}"]
       end
     end

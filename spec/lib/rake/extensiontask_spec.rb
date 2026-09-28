@@ -626,7 +626,7 @@ describe Rake::ExtensionTask do
         spec.metadata['allowed_push_host'].should eq 'http://test'
       end
 
-      it 'should set a pessimistic Ruby requirement and configure content-addressable packaging in the ABI directory' do
+      it 'should set a pessimistic Ruby requirement and configure content-addressable packaging' do
         platform = "x86-mingw32"
         ruby_cc_version = "1.8.6"
         ENV["RUBY_CC_VERSION"] = ruby_cc_version
@@ -664,8 +664,7 @@ describe Rake::ExtensionTask do
           .with(true)
 
         expect_any_instance_of(Gem::PackageTask)
-          .to receive(:package_dir=)
-          .with(File.join("pkg", "1.8"))
+          .not_to receive(:package_dir=)
 
         Rake::Task["native:my_gem:#{platform}:1.8"].execute
 
@@ -711,14 +710,26 @@ describe Rake::ExtensionTask do
         end
 
         native_task = Rake::Task["native:my_gem:#{platform}"]
-
-        native_task.prerequisites.should eq [
+        abi_task_names = [
           "native:my_gem:#{platform}:3.3",
           "native:my_gem:#{platform}:3.4",
           "native:my_gem:#{platform}:4.0",
         ]
+        binaries = [
+          "tmp/#{platform}/stage/lib/3.3/extension_one.so",
+          "tmp/#{platform}/stage/lib/3.4/extension_one.so",
+          "tmp/#{platform}/stage/lib/4.0/extension_one.so",
+        ]
 
-        native_task.prerequisite_tasks.each do |abi_task|
+        # the multi-ABI gem depends on the binaries directly, not on the single-ABI gem tasks
+        native_task.prerequisites.should eq binaries
+
+        # both the multi-ABI gem and the single-ABI gems hang off the platform task
+        Rake::Task["native:#{platform}"].prerequisites.should eq [native_task.name, *abi_task_names]
+
+        abi_task_names.zip(binaries).each do |abi_task_name, binary|
+          abi_task = Rake::Task[abi_task_name]
+          abi_task.prerequisites.should eq [binary]
           abi_task.actions.should_not be_empty
           abi_task.execute
         end
