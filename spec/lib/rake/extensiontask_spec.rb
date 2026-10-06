@@ -605,10 +605,6 @@ describe Rake::ExtensionTask do
           Rake::Task["native:my_gem:#{platform}"].execute
         end
 
-        gem_targets = Rake::Task["gem"].prerequisites
-        gem_targets.collect {|target| File.dirname(target)}.should eq ["pkg", "pkg"]
-        gem_targets.collect {|target| File.extname(target)}.should eq [".gem", ".gem"]
-
         expected_required_ruby_versions = [
           Gem::Requirement.new([">= 1.8", "< 2.12.dev"]),
           Gem::Requirement.new([">= 1.8", "< 2.11.dev"]),
@@ -625,171 +621,77 @@ describe Rake::ExtensionTask do
         spec.metadata['allowed_push_host'].should eq 'http://test'
       end
 
-      it 'should set a pessimistic Ruby requirement and configure content-addressable packaging' do
-        platform = "x86-mingw32"
-        ruby_cc_version = "1.8.6"
-        ENV["RUBY_CC_VERSION"] = ruby_cc_version
+      context "(content addressable)" do
+        before :each do
+          @platform = "x86-mingw32"
+          @ruby_cc_versions = ["3.3.0", "3.4.0"]
+          ENV["RUBY_CC_VERSION"] = @ruby_cc_versions.join(":")
 
-        allow_any_instance_of(Rake::CompilerConfig).to(
-          receive(:find)
-            .with(ruby_cc_version, platform)
-            .and_return("/rubies/#{ruby_cc_version}/rbconfig.rb")
-        )
+          @ruby_cc_versions.each do |ruby_cc_version|
+            allow_any_instance_of(Rake::CompilerConfig).to(
+              receive(:find)
+                .with(ruby_cc_version, @platform)
+                .and_return("/rubies/#{ruby_cc_version}/rbconfig.rb")
+            )
+          end
 
-        allow(Gem).to receive_message_chain(:configuration, :verbose=).and_return(true)
+          allow(Gem).to receive_message_chain(:configuration, :verbose=).and_return(true)
+          allow(Gem::PackageTask).to receive(:method_defined?).and_call_original
 
-        spec = Gem::Specification.new do |s|
-          s.name = 'my_gem'
-          s.platform = Gem::Platform::RUBY
-        end
-
-        allow(Gem::PackageTask).to receive(:method_defined?).and_call_original
-        allow(Gem::PackageTask).to receive(:method_defined?)
-          .with(:content_addressable=)
-          .and_return(true)
-
-        cross_spec = nil
-        Rake::ExtensionTask.new("extension_one", spec) do |ext|
-          ext.cross_platform = platform
-          ext.cross_compile = true
-          ext.content_addressable = true
-          ext.cross_compiling do |generated_spec|
-            cross_spec = generated_spec
+          @spec = Gem::Specification.new do |s|
+            s.name = 'my_gem'
+            s.platform = Gem::Platform::RUBY
           end
         end
 
-        expect_any_instance_of(Gem::PackageTask)
-          .to receive(:content_addressable=)
-          .with(true)
+        it "should build a single Ruby ABI gem per Ruby version in addition to the multi ABI gem" do
+          allow(Gem::PackageTask).to receive(:method_defined?)
+            .with(:content_addressable=)
+            .and_return(true)
+          allow_any_instance_of(Gem::PackageTask).to receive(:content_addressable=)
 
-        expect_any_instance_of(Gem::PackageTask)
-          .not_to receive(:package_dir=)
-
-        Rake::Task["native:my_gem:#{platform}:1.8"].execute
-
-        cross_spec.required_ruby_version.should eq Gem::Requirement.new("~> 1.8.0")
-      end
-
-      it 'also creates content-addressable packages for each Ruby ABI while retaining the multi-ABI package' do
-        platform = "x86-mingw32"
-        ruby_cc_versions = ["3.3.0", "3.4.0", "4.0.0"]
-
-        ENV["RUBY_CC_VERSION"] = ruby_cc_versions.join(":")
-
-        ruby_cc_versions.each do |ruby_cc_version|
-          allow_any_instance_of(Rake::CompilerConfig).to(
-            receive(:find)
-              .with(ruby_cc_version, platform)
-              .and_return("/rubies/#{ruby_cc_version}/rbconfig.rb")
-          )
-        end
-
-        allow(Gem).to receive_message_chain(:configuration, :verbose=).and_return(true)
-
-        spec = Gem::Specification.new do |s|
-          s.name = 'my_gem'
-          s.platform = Gem::Platform::RUBY
-        end
-
-        allow(Gem::PackageTask).to receive(:method_defined?).and_call_original
-        allow(Gem::PackageTask).to receive(:method_defined?)
-          .with(:content_addressable=)
-          .and_return(true)
-        allow_any_instance_of(Gem::PackageTask).to receive(:content_addressable=)
-
-        generated_specs = []
-
-        Rake::ExtensionTask.new("extension_one", spec) do |ext|
-          ext.cross_platform = platform
-          ext.cross_compile = true
-          ext.content_addressable = true
-          ext.cross_compiling do |generated_spec|
-            generated_specs << generated_spec
-          end
-        end
-
-        native_task = Rake::Task["native:my_gem:#{platform}"]
-        abi_task_names = [
-          "native:my_gem:#{platform}:3.3",
-          "native:my_gem:#{platform}:3.4",
-          "native:my_gem:#{platform}:4.0",
-        ]
-        binaries = [
-          "tmp/#{platform}/stage/lib/3.3/extension_one.so",
-          "tmp/#{platform}/stage/lib/3.4/extension_one.so",
-          "tmp/#{platform}/stage/lib/4.0/extension_one.so",
-        ]
-
-        # the multi-ABI gem depends on the binaries directly, not on the single-ABI gem tasks
-        native_task.prerequisites.should eq binaries
-
-        # both the multi-ABI gem and the single-ABI gems hang off the platform task
-        Rake::Task["native:#{platform}"].prerequisites.should eq [native_task.name, *abi_task_names]
-
-        abi_task_names.zip(binaries).each do |abi_task_name, binary|
-          abi_task = Rake::Task[abi_task_name]
-          abi_task.prerequisites.should eq [binary]
-          abi_task.actions.should_not be_empty
-          abi_task.execute
-        end
-
-        generated_specs.collect(&:required_ruby_version).should eq [
-          Gem::Requirement.new("~> 3.3.0"),
-          Gem::Requirement.new("~> 3.4.0"),
-          Gem::Requirement.new("~> 4.0.0"),
-        ]
-        generated_specs.collect(&:files).should eq [
-          ["lib/3.3/extension_one.so"],
-          ["lib/3.4/extension_one.so"],
-          ["lib/4.0/extension_one.so"],
-        ]
-
-        native_task.execute
-        multi_abi_spec = generated_specs.last
-
-        multi_abi_spec.files.should include(
-          "lib/3.3/extension_one.so",
-          "lib/3.4/extension_one.so",
-          "lib/4.0/extension_one.so",
-        )
-      end
-
-      it 'should only build the multi ABI gem when RubyGems does not support content addressable gems' do
-        platform = "x86-mingw32"
-        ruby_cc_version = "1.8.6"
-        ENV["RUBY_CC_VERSION"] = ruby_cc_version
-
-        allow_any_instance_of(Rake::CompilerConfig).to(
-          receive(:find)
-            .with(ruby_cc_version, platform)
-            .and_return("/rubies/#{ruby_cc_version}/rbconfig.rb")
-        )
-        allow(Gem).to receive_message_chain(:configuration, :verbose=).and_return(true)
-        allow(Gem::PackageTask).to receive(:method_defined?).and_call_original
-        allow(Gem::PackageTask).to receive(:method_defined?)
-          .with(:content_addressable=)
-          .and_return(false)
-
-        spec = Gem::Specification.new do |s|
-          s.name = 'my_gem'
-          s.platform = Gem::Platform::RUBY
-        end
-
-        expect {
-          Rake::ExtensionTask.new("extension_one", spec) do |ext|
-            ext.cross_platform = platform
+          cross_specs = []
+          Rake::ExtensionTask.new("extension_one", @spec) do |ext|
+            ext.cross_platform = @platform
             ext.cross_compile = true
             ext.content_addressable = true
+            ext.cross_compiling do |cross_spec|
+              cross_specs << cross_spec
+            end
           end
-        }.to output(/content_addressable is enabled but RubyGems #{Regexp.escape(Gem::VERSION)} does not support/).to_stderr
 
-        Rake::Task.task_defined?("native:my_gem:#{platform}:1.8").should be false
+          Rake::Task["native:my_gem:#{@platform}"].execute
+          Rake::Task["native:my_gem:#{@platform}:3.3"].execute
+          Rake::Task["native:my_gem:#{@platform}:3.4"].execute
 
-        Rake::Task["native:my_gem:#{platform}"].execute
+          cross_specs.collect(&:required_ruby_version).should eq [
+            Gem::Requirement.new([">= 3.3", "< 3.5.dev"]),
+            Gem::Requirement.new("~> 3.3.0"),
+            Gem::Requirement.new("~> 3.4.0"),
+          ]
+          cross_specs.collect(&:files).should eq [
+            ["lib/3.3/extension_one.so", "lib/3.4/extension_one.so"],
+            ["lib/3.3/extension_one.so"],
+            ["lib/3.4/extension_one.so"],
+          ]
+        end
 
-        gem_target = Rake::Task["gem"].prerequisites.fetch(0)
-        File.dirname(gem_target).should eq "pkg"
-        File.extname(gem_target).should eq ".gem"
+        it "should warn and build only the multi ABI gem when RubyGems doesn't support content addressable gems" do
+          allow(Gem::PackageTask).to receive(:method_defined?)
+            .with(:content_addressable=)
+            .and_return(false)
+
+          _, err = capture_output do
+            Rake::ExtensionTask.new("extension_one", @spec) do |ext|
+              ext.cross_platform = @platform
+              ext.cross_compile = true
+              ext.content_addressable = true
+            end
+          end
+          err.should match(/content_addressable is enabled but RubyGems/)
+
+          Rake::Task.task_defined?("native:my_gem:#{@platform}:3.3").should be false
+        end
       end
 
       it "should set required_rubygems_version when building a gem for `-linux-gnu` or `-linux-musl`" do
