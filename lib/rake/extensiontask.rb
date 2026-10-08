@@ -15,6 +15,7 @@ module Rake
     attr_writer :cross_config_options
     attr_accessor :no_native
     attr_accessor :config_includes
+    attr_accessor :content_addressable
 
     def init(name = nil, gem_spec = nil)
       super
@@ -26,6 +27,7 @@ module Rake
       @cross_compiling = nil
       @no_native = (ENV["RAKE_EXTENSION_TASK_NO_NATIVE"] == "true")
       @config_includes = []
+      @content_addressable = false
       # Default to an empty list of ruby versions for each platform
       @ruby_versions_per_platform = Hash.new { |h, k| h[k] = [] }
       @make = nil
@@ -52,6 +54,13 @@ module Rake
 
       unless compiled_files.empty?
         warn "WARNING: rake-compiler found compiled files in '#{@ext_dir}' directory. Please remove them."
+      end
+
+      if @content_addressable && !Gem::PackageTask.method_defined?(:content_addressable=)
+        warn <<~MSG
+          WARNING: content_addressable is enabled but RubyGems #{Gem::VERSION} does not support content addressable gems.
+                   Only the multi-ABI gem will be built. Upgrade RubyGems with `gem update --system`.
+        MSG
       end
 
       # only gems with 'ruby' platforms are allowed to define native tasks
@@ -257,9 +266,22 @@ Java extension should be preferred.
       # Update compiled platform/version combinations
       @ruby_versions_per_platform[platf] << ruby_ver
 
+      native_task_name = "native:#{@gem_spec.name}:#{platf}"
+
+      # packaging tasks to define: task name => Ruby ABI (nil for the multi-ABI gem)
+      package_tasks = { native_task_name => nil }
+
+      # when content addressable, also build a single Ruby ABI gem per Ruby version
+      if content_addressable && Gem::PackageTask.method_defined?(:content_addressable=)
+        abi = ruby_api_version(ruby_ver)
+        package_tasks["#{native_task_name}:#{abi}"] = abi
+      end
+
       # create 'native:gem_name' and chain it to 'native' task
-      unless Rake::Task.task_defined?("native:#{@gem_spec.name}:#{platf}")
-        task "native:#{@gem_spec.name}:#{platf}" do |t|
+      package_tasks.each do |task_name, ruby_abi|
+        next if Rake::Task.task_defined?(task_name)
+
+        task task_name do |t|
           # FIXME: workaround Gem::Specification limitation around cache_file:
           # http://github.com/rubygems/rubygems/issues/78
           spec = gem_spec.dup
@@ -269,14 +291,19 @@ Java extension should be preferred.
           spec.platform = Gem::Platform.new(platf)
 
           # set ruby version constraints
-          ruby_versions = @ruby_versions_per_platform[platf]
-          sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
-            ruby_version.split(".").collect(&:to_i)
+          if ruby_abi
+            # pessimistic version requirement for a single Ruby ABI gem
+            spec.required_ruby_version = "~> #{ruby_abi}.0"
+          else
+            ruby_versions = @ruby_versions_per_platform[platf]
+            sorted_ruby_versions = ruby_versions.sort_by do |ruby_version|
+              ruby_version.split(".").collect(&:to_i)
+            end
+            spec.required_ruby_version = [
+              ">= #{ruby_api_version(sorted_ruby_versions.first)}",
+              "< #{ruby_api_version(sorted_ruby_versions.last).succ}.dev"
+            ]
           end
-          spec.required_ruby_version = [
-            ">= #{ruby_api_version(sorted_ruby_versions.first)}",
-            "< #{ruby_api_version(sorted_ruby_versions.last).succ}.dev"
-          ]
 
           # set rubygems version constraints
           if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("3.3.22") &&
@@ -313,6 +340,9 @@ Java extension should be preferred.
             # Do not copy any files per PackageTask, because
             # we need the files from the staging directory
             p.package_files.clear
+            # Gem::PackageTask scopes its staging directory by Ruby ABI when
+            # content_addressable is set, so every gem still lands in `pkg/`.
+            p.content_addressable = true if ruby_abi
           end
 
           # copy other gem files to staging directory if added by the callback
@@ -343,7 +373,9 @@ Java extension should be preferred.
       end
 
       # add binaries to the dependency chain
-      task "native:#{@gem_spec.name}:#{platf}" => ["#{stage_path}/#{lib_binary_path}"]
+      package_tasks.each_key do |task_name|
+        task task_name => ["#{stage_path}/#{lib_binary_path}"]
+      end
 
       # ensure the extension get copied
       unless Rake::Task.task_defined?(lib_binary_path) then
@@ -352,12 +384,12 @@ Java extension should be preferred.
       file "#{stage_path}/#{lib_binary_path}" => ["copy:#{@name}:#{platf}:#{ruby_ver}"]
 
       # Allow segmented packaging by platform (open door for 'cross compile')
-      task "native:#{platf}" => ["native:#{@gem_spec.name}:#{platf}"]
+      task "native:#{platf}" => package_tasks.keys
 
       # Only add this extension to the compile chain if current
       # platform matches the indicated one.
       if platf == RUBY_PLATFORM then
-        task "native:#{@gem_spec.name}" => ["native:#{@gem_spec.name}:#{platf}"]
+        task "native:#{@gem_spec.name}" => package_tasks.keys
         task "native" => ["native:#{platf}"]
       end
     end

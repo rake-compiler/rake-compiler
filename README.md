@@ -247,6 +247,7 @@ end
 | cross_config_options | ExtensionTask (CRuby) | [Optional] See [Cross compilation - the future is now.](#cross-compilation---the-future-is-now) Default: `[]`. |
 | no_native            | ExtensionTask (CRuby) | [Optional] Set to true to prevent non-CRuby platforms from defining native tasks. Default: `false`. |
 | config_includes      | ExtensionTask (CRuby) | [Optional] Specify an Array of paths to include as `-I...:...` includes during compilation. Default: `['.']`. |
+| content_addressable  | ExtensionTask (CRuby) | [Optional] Set to true to also build a content addressable gem per Ruby ABI. See [Building content addressable gems](#building-content-addressable-gems). Default: `false`. |
 | classpath            | JavaExtensionTask     | [Optional] Specify additional classpath paths as an Array. Default: _Uses the current CLASSPATH._  |
 | debug                | JavaExtensionTask     | [Optional] Whether to set the debug flag during compilation. Default: `false`. |
 | source_version       | JavaExtensionTask     | [Optional] The JRE version that your source code requires to compile. Default: `1.6`. |
@@ -443,6 +444,34 @@ and when not found, will look for the plain extension.
 This approach catch the cases of provided fat binaries or gems compiled by the
 end user installing the gem. It has also been implemented successfully in
 several projects.
+
+#### Building content addressable gems
+
+RubyGems 4.1.0 or later can build gems that target a single Ruby ABI and are
+named by the hash of their contents instead of by platform. If you enable
+`content_addressable`, rake-compiler builds one of these gems for each Ruby
+version in `RUBY_CC_VERSION`, in addition to the multi ABI gem:
+
+```ruby
+Rake::ExtensionTask.new('my_extension', gem_spec) do |ext|
+  ext.cross_compile = true
+  ext.cross_platform = ['x86_64-linux', 'arm64-darwin']
+  ext.content_addressable = true
+end
+```
+
+    rake cross native gem RUBY_CC_VERSION=3.3.11:3.4.9
+
+This produces, in `pkg/`, the usual multi ABI gem plus one gem per Ruby ABI whose
+`required_ruby_version` is pinned to that ABI:
+
+    pkg/my_gem-1.0.0-x86_64-linux.gem   # multi ABI gem, Ruby >= 3.3, < 3.5.dev
+    pkg/my_gem-1.0.0-<hash>.gem         # Ruby ~> 3.3.0
+    pkg/my_gem-1.0.0-<hash>.gem         # Ruby ~> 3.4.0
+
+`rake native` and `rake native:<platform>` build the multi ABI gem and all of
+the single ABI gems. To build only the gem for one Ruby ABI, run
+`rake native:<gem name>:<platform>:<ruby abi>`.
 
 ## What are you talking about? (Give me examples)
 
