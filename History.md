@@ -1,3 +1,16 @@
+### 1.3.2 / 2026-10-08
+
+* Improvements:
+  * GH-257: Add support for content addressable gem.
+    * Patch by Harriet Oughton
+    * Patch by Jenny Shen
+    * Patch by Gira Chawda
+
+* Thanks:
+  * Harriet Oughton
+  * Jenny Shen
+  * Gira Chawda
+
 ### 1.3.1 / 2025-05-06
 
 * Improvements:
