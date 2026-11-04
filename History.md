@@ -1,3 +1,12 @@
+### 1.3.3 / 2026-11-04
+
+* Improvements:
+  * GH-260 GH-261: Add support for Ruby 2.1 and 2.2 again.
+    * Patch by Felix Bünemann
+
+* Thanks:
+  * Felix Bünemann
+
 ### 1.3.2 / 2026-10-08
 
 * Improvements:
