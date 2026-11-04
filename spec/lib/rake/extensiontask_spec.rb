@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 require 'rake/extensiontask'
 require 'rbconfig'
+require 'tmpdir'
 require 'yaml'
 
 describe Rake::ExtensionTask do

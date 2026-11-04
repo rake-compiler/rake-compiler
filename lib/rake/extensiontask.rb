@@ -57,10 +57,8 @@ module Rake
       end
 
       if @content_addressable && !Gem::PackageTask.method_defined?(:content_addressable=)
-        warn <<~MSG
-          WARNING: content_addressable is enabled but RubyGems #{Gem::VERSION} does not support content addressable gems.
-                   Only the multi-ABI gem will be built. Upgrade RubyGems with `gem update --system`.
-        MSG
+        warn "WARNING: content_addressable is enabled but RubyGems #{Gem::VERSION} does not support content addressable gems.\n" \
+             "         Only the multi-ABI gem will be built. Upgrade RubyGems with `gem update --system`."
       end
 
       # only gems with 'ruby' platforms are allowed to define native tasks
